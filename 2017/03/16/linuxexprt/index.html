@@ -1,0 +1,781 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="Maybe is Maybe"><title>linux 常用命令 | alvin's blog</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/8.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">linux 常用命令</h1><a id="logo" href="/.">alvin's blog</a><p class="description">Good memory is worse than bad writing</p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">linux 常用命令</h1><div class="post-meta">Mar 16, 2017<span> | </span><span class="category"><a href="/categories/linux/">linux</a></span></div><div class="post-content"><p><img src="http://ombpxfki1.bkt.clouddn.com/14898214187343ye65vbk.png?imageslim" alt="paste image"><br>在开发运维当中，一些基本的 linux 命令还是要掌握一些的<br><a id="more"></a></p>
+<h3 id="命令基本格式"><a href="#命令基本格式" class="headerlink" title="命令基本格式"></a>命令基本格式</h3><p>[root@localhost ~]#<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">其中：root   当前登录用户</span><br><span class="line"> 	localhost 主机名</span><br><span class="line">     ~ 当前所在目录（家目录）</span><br><span class="line">     # 超级用户的提示符</span><br><span class="line">  	 普通用户的提示符是 `$`</span><br><span class="line">命令 [选项] [参数]  注意：a.个别不遵循 b.多个选项可以写在一起  c.简化选项与完整选项 -a等于--all</span><br></pre></td></tr></table></figure></p>
+<h3 id="查询目录中的内容ls"><a href="#查询目录中的内容ls" class="headerlink" title="查询目录中的内容ls"></a>查询目录中的内容ls</h3><pre><code>ls [选项] [文件或目录]
+选项：
+-a 显示所有文件，包括隐藏文件
+-l 显示详细信息
+-d 查看目录的属性
+-h 人性化显示文件大小
+-i 显示inode     每个文件都有id号  查找时根据id查找
+
+-rw-r--r--.  22 root root 4096 7月  27 22:12 var
+
+第一字符代表文件类型：-代表文件 d 代表目录 | 代表软连接文件  总共有七种文件类型主要掌握三种
+第一位除外，每三个一组    rw- :u所有者  r--:g所属组  r--:o其它人
+字母含义：r读  w写 x执行
+最后一个点：ACL权限
+22：引用计数
+root:用户
+root:组
+4096：代表文件大小为4096字节  可以规范化显示大小 ls -lh  h可以显示kb
+</code></pre><h3 id="文件处理命令"><a href="#文件处理命令" class="headerlink" title="文件处理命令"></a>文件处理命令</h3><h4 id="目录处理命令"><a href="#目录处理命令" class="headerlink" title="目录处理命令"></a>目录处理命令</h4><h5 id="建立目录"><a href="#建立目录" class="headerlink" title="建立目录"></a>建立目录</h5><pre><code>mkdir -p [目录名]
+-p 递归创建   递归创建意思是 一级一级往下创建目录 直到最底层
+</code></pre><h5 id="切换目录命令"><a href="#切换目录命令" class="headerlink" title="切换目录命令"></a>切换目录命令</h5><pre><code>cd [目录]
+简化操作：
+cd ~    进入当前用户的家目录
+cd      进入当前用户的家目录 
+cd -    进入上次目录
+cd ..    进入上一级目录
+cd .    进入当前目录
+</code></pre><h5 id="pwd-显示当前用户所在位置"><a href="#pwd-显示当前用户所在位置" class="headerlink" title="pwd     显示当前用户所在位置"></a>pwd     显示当前用户所在位置</h5><h5 id="tab键-命令或文件或目录补全"><a href="#tab键-命令或文件或目录补全" class="headerlink" title="tab键 命令或文件或目录补全"></a>tab键 命令或文件或目录补全</h5><h5 id="删除空目录"><a href="#删除空目录" class="headerlink" title="删除空目录"></a>删除空目录</h5><pre><code>rmdir [目录名]
+</code></pre><h5 id="删除文件或目录"><a href="#删除文件或目录" class="headerlink" title="删除文件或目录"></a>删除文件或目录</h5><pre><code>rm -rf [文件或目录]
+选项：
+-r 删除目录
+-f 强制   
+</code></pre><h4 id="文件处理命令-1"><a href="#文件处理命令-1" class="headerlink" title="文件处理命令"></a>文件处理命令</h4><h4 id="链接命令"><a href="#链接命令" class="headerlink" title="链接命令"></a>链接命令</h4><pre><code>a.硬链接
+创建命令：  ln 文件  文件硬连接名[.hard]
+拥有相同的i节点和存储block块，可以看作同一个文件
+可通过i节点识别  ls -i 文件1 文件2(硬链接)
+不能跨分区
+不能针对目录使用
+b.软连接
+创建命令：ln -s 文件 文件软连接名[.soft]
+类似windows快捷方式
+拥有自己的i节点和block块，但数据块中存储源文件的文件名和i节点
+lrwxrwxrwx  l软连接
+修改任意一个都改变
+</code></pre><h3 id="文件搜索命令"><a href="#文件搜索命令" class="headerlink" title="文件搜索命令"></a>文件搜索命令</h3><h4 id="locate搜索命令"><a href="#locate搜索命令" class="headerlink" title="locate搜索命令"></a>locate搜索命令</h4><pre><code>locate 文件名
+在后台数据库中搜索文件名，搜索速度较快，只能通过文件名搜索
+
+/var/lib/mlocate
+locate命令搜索的后台数据库 一般一天一更新  可通过updatedb命令手动更新
+
+locate搜索按照 /etc/updatedb.conf 配置规则进行搜索
+</code></pre><h4 id="命令搜索命令whereis-和-which"><a href="#命令搜索命令whereis-和-which" class="headerlink" title="命令搜索命令whereis 和 which"></a>命令搜索命令whereis 和 which</h4><pre><code>shell中的内置命令不能使用
+(1) whereis 命令名
+#搜索命令所在路径及帮助文档所在位置
+选项：
+-b：只查找可执行文件
+-m:只查找帮助文件
+(2)which 命令名
+#搜索命令所在路径及显示命令的别名
+</code></pre><h4 id="find命令"><a href="#find命令" class="headerlink" title="find命令"></a>find命令</h4><pre><code>find [搜索范围] [搜索条件]
+#搜索指定范围的文件
+
+如：find / -name install.log
+#避免大范围搜索，会非常消耗系统资源
+
+#find 在系统中搜索指定文件名的文件，默认完整匹配；若模糊匹配，要使用通配符
+*匹配任意内容
+?匹配任意一个字符
+[]匹配中括号内的字符
+
+find /root -iname install.log 
+#-iname不区分大小写
+
+find /root -user root
+#按照所有者搜索文件
+
+find /root -nouser
+#搜索没有所有者的文件 即垃圾文件
+
+find /var/log/ -mtime +10
+#查找10天前修改的文件
+-10 10天内
+10 10天当天
++10 10天前
+actime 文件访问的时间
+ctime    文件创建的时间
+mtime    修改文件内容
+
+find . -size 25k
+#查找文件大小是25kb的文件
+-25k    小于25kb的文件
+25k     等于25kb的文件
++25k    大于25kb的文件
+
+find . inum 262422 
+#查找i节点是262422的文件
+
+find /ect -size +20k -a -size  -50k
+#查找etc目录下 大于20kb并且小于50kb的文件
+-a and 逻辑与
+-o or   逻辑或
+
+
+find /ect -size +20k -a -size  -50k -exec ls -lh {}\;
+#查找etc目录下 大于20kb并且小于50kb的文件，并显示详细信息
+#exec/-ok 命令 ｛｝\;固定格式；对搜索结果执行操作；
+</code></pre><h4 id="搜索字符串命令"><a href="#搜索字符串命令" class="headerlink" title="搜索字符串命令"></a>搜索字符串命令</h4><pre><code>grep [选项] 字符串 文件名
+#在文件中匹配符合条件的字符串
+选项：-i 忽略大小写
+      -v 排除指定字符串
+</code></pre><h3 id="帮助命令"><a href="#帮助命令" class="headerlink" title="帮助命令"></a>帮助命令</h3><h4 id="man帮助命令"><a href="#man帮助命令" class="headerlink" title="man帮助命令"></a>man帮助命令</h4><pre><code> man 命令
+#获取指定命令的帮助
+执行man命令之后可输入 /content  查询content
+
+man的级别
+1:查看命令的帮助
+2：查看可被内核调用的函数的帮助
+3：查看函数和函数库的帮助
+4：查看特殊文件的帮助(主要是/dev目录下的文件)
+5：查看配置文件的帮组
+6：查看游戏的帮助
+7：查看其它杂项的帮助
+8：查看系统管理员可用命令的帮助
+9：查看和内核相关文件的帮助
+
+man -f 命令名
+#查看某个命令有哪个级别的帮助
+该命令相当于：
+whatis 命令
+举例：
+man 5 passwd
+man 4 null
+man -8 ifconfig
+
+man -k 命令
+相当于
+apropos 命令
+#查看和命令相关的所有帮助
+例如：
+apropos passwd
+</code></pre><h4 id="其它帮助"><a href="#其它帮助" class="headerlink" title="其它帮助"></a>其它帮助</h4><pre><code>命令 --help 
+#获取命令选项的帮助
+例如：ls --help
+
+shell内部帮助命令
+help shell内部命令
+#获取shell内部命令的帮助
+例如： 
+whereis cd
+#确定是否是shell内部命令  --找不到执行路径的就是内部命令
+help cd
+#获取内部命令帮助
+</code></pre><h3 id="压缩命令"><a href="#压缩命令" class="headerlink" title="压缩命令"></a>压缩命令</h3><pre><code>linux常用压缩格式 .zip .gz  .bz2  .tar.gz  .tar.bz2
+</code></pre><h4 id="zip格式压缩"><a href="#zip格式压缩" class="headerlink" title=".zip格式压缩"></a>.zip格式压缩</h4><pre><code>zip  压缩文件名 源文件
+#压缩文件
+zip -r 压缩文件名 源目录
+#压缩目录
+
+unzip 压缩文件
+#解压缩.zip文件
+</code></pre><h4 id="gz格式压缩"><a href="#gz格式压缩" class="headerlink" title=".gz格式压缩"></a>.gz格式压缩</h4><pre><code>gzip 源文件
+#压缩为.gz格式的压缩文件，源文件会消失
+
+gzip -c 源文件 &gt; 压缩文件
+#压缩为.gz格式，源文件保留
+例如：gzip -c cangls &gt; cangls.gz
+
+gzip -r 目录
+#压缩目录下所有的子文件,单个，但是不能压缩目录
+
+gzip -d 压缩文件
+#解压缩文件
+或
+gunzip 压缩文件
+#解压缩文件
+</code></pre><h4 id="bz2格式压缩"><a href="#bz2格式压缩" class="headerlink" title=".bz2格式压缩"></a>.bz2格式压缩</h4><pre><code>bzip2 源文件
+#压缩为.bz2格式，不保留源文件
+
+bzip2 -k 源文件
+#压缩之后保留源文件
+注意：bzip2命令不能压缩目录
+
+bzip2 -d 压缩文件
+#解压缩，-k保留压缩文件
+或
+bunzip2 压缩文件，-k 保留压缩文件
+</code></pre><h4 id="打包命令tar"><a href="#打包命令tar" class="headerlink" title="打包命令tar"></a>打包命令tar</h4><pre><code>tar -cvf 打包文件名 源文件
+选项：
+-c:打包
+-v:显示过程
+-f:指定打包后的文件名
+例如：
+tar -cvf longzls.tar longzls
+
+tar -xvf 打包文件名
+选项：
+    -x:解打包
+例如：tar -xvf longzls.tar
+</code></pre><h4 id="tar-gz压缩格式"><a href="#tar-gz压缩格式" class="headerlink" title=".tar.gz压缩格式"></a>.tar.gz压缩格式</h4><pre><code>其实就是先打包为.tar格式，再压缩为.gz格式
+
+tar -zcvf 压缩包名.tar.gz 源文件 
+选项：
+    -z:压缩为.tar.gz格式
+
+tar -zxvf 压缩包名.tar.gz     
+选项：
+    -x:解压缩.tar.gz格式
+</code></pre><h4 id="tar-bz2压缩格式"><a href="#tar-bz2压缩格式" class="headerlink" title=".tar.bz2压缩格式"></a>.tar.bz2压缩格式</h4><pre><code>其实就是先打包为.tar格式，再压缩为.bz2格式
+
+tar -jcvf 压缩包名.tar.bz2 源文件 
+选项：
+    -z:压缩为.tar.bz2格式
+
+tar -jxvf 压缩包名.tar.bz2
+选项：
+    -x:解压缩.tar.bz2格式
+</code></pre><h4 id="技巧"><a href="#技巧" class="headerlink" title="技巧"></a>技巧</h4><pre><code>(1)指定解压缩位置
+tar -zxvf 压缩包名.tar.gz -c /tmp/
+选项：
+    -c:指定解压缩的具体位置
+
+(2)压缩多个文件,并指定压缩文件所在位置
+tar -zcvf /tmp/test.tar.gz  jp a.cfg
+#将jp文件夹及a.cfg文件压缩到/tmp/test.tar.gz
+
+(3)只查看不解压
+tar -ztvf  test.tar.gz
+#查看压缩文件test.tar.gz的内容 
+选项-t代表查看压缩文件的内容
+</code></pre><h3 id="关机与重启命令"><a href="#关机与重启命令" class="headerlink" title="关机与重启命令"></a>关机与重启命令</h3><h4 id="shutdown命令"><a href="#shutdown命令" class="headerlink" title="shutdown命令"></a>shutdown命令</h4><pre><code>shutdown [选项] 时间
+选项
+-c:取消前一个关机命令
+-h:关机
+-r:重启 
+时间可以是now就是立刻重启
+例如：shutdown -r 05:30 &amp;
+    #在凌晨五点半重启电脑，&amp;的意思是放后台执行，前台仍可以进行其它操作
+    shutdown -c
+    #取消上面的重启命令
+</code></pre><h4 id="其它关机命令"><a href="#其它关机命令" class="headerlink" title="其它关机命令"></a>其它关机命令</h4><pre><code>halt
+poweroff
+init 0
+这几个没有shutdown命令安全，shutdown是保存数据库再做操作，而这几个就不一定保存数据
+</code></pre><h4 id="其它重启命令"><a href="#其它重启命令" class="headerlink" title="其它重启命令"></a>其它重启命令</h4><pre><code>reboot
+init 6
+reboot 重启也是比较安全的，但init 6就不安全
+</code></pre><h4 id="系统运行级别"><a href="#系统运行级别" class="headerlink" title="系统运行级别"></a>系统运行级别</h4><pre><code>0：关机
+1：单用户(类似windows中安全模式)
+2：不完全多用户，不含NFS服务(文件共享服务)
+3：完全多用户
+4：未分配
+5：图形界面
+6：重启
+
+查看系统运行级别
+runlevel
+显示：N 3        
+#N代表上一个运行级别为空，当前运行级别为3
+
+修改系统登录时默认运行级别：
+centos6以前：
+vi /ect/inittab中修改 id:3:initdefault:
+</code></pre><h4 id="退出登录命令"><a href="#退出登录命令" class="headerlink" title="退出登录命令"></a>退出登录命令</h4><pre><code>logout
+</code></pre><h3 id="其它常用命令"><a href="#其它常用命令" class="headerlink" title="其它常用命令"></a>其它常用命令</h3><h4 id="挂载命令"><a href="#挂载命令" class="headerlink" title="挂载命令"></a>挂载命令</h4><pre><code>(1)查询与自动挂载
+mount
+#查询系统中已经挂载的设备
+
+mount -a
+#依据配置文件/etc/fstab的内容，自动挂载
+
+(2)、挂载命令格式
+mount [-t 文件系统] [-o 特殊选项] 设备文件名  挂载点
+选项：
+-t 文件系统：加入文件系统类型来指定挂载待类型，可以ext3、ext4、iso9660(挂载光盘使用d文件系统)等
+-o 特殊选项：可以指定挂载待额外选项 自行百度
+
+mount -o remount,noexec /home/
+#remount重新挂载，noexec是挂载的系统没有执行权限，没写文件系统是因为
+/home/是默认挂载好的，已经知道文件系统类型
+
+(3)、挂载光盘
+mnt 一般是挂载u盘待目录 
+media 一般是挂载光盘待目录
+misc 一般是挂载磁带机的目录
+既然是一般，当然也可根据习惯挂载其它目录
+下面我们在mnt下创建cdrom挂载光盘 创建usb挂载U盘
+
+mkdir /mnt/cdrom
+#创建光盘挂载点
+mount [-t iso9660]  /dev/sr0/  /mnt/cdrom
+#挂载光盘 注意/dev/sr0 其中sr0是光盘的设备文件名 /dev/cdrom是/dev/sr0的软连接
+可以去/mnt/cdrom下挂载的内容
+
+(4)、卸载命令
+umount 设备文件名或挂载点
+
+umount /mnt/cdrom/
+或
+umount /dev/sr0/
+#卸载光盘
+
+注意：为了防止出错，用完后一定要卸载
+
+(5)、挂载U盘
+因为u盘设备文件名不固定，先查看设备文件名
+fdisk -l 
+#查看U盘设备文件名
+
+mkdir /mnt/usb
+#创建U盘挂载点
+mount -t vfat /dev/sdb1 /mnt/usb
+# vfat 代表文件系统为fat32(单个文件最大4G) /dev/sdb1为U盘设备文件名(以查到的为准)
+注意：Linux 默认不支持NTFS系统
+</code></pre><h4 id="用户登录查看命令"><a href="#用户登录查看命令" class="headerlink" title="用户登录查看命令"></a>用户登录查看命令</h4><pre><code>(1)w  [用户名]
+#查看指定用户登录情况
+w
+#查看所有登录用户
+结果：
+08:48:09 up 16:51,  2 users,  load average: 0.00, 0.01, 0.05
+USER     TTY        LOGIN@   IDLE   JCPU   PCPU WHAT
+root     tty1       六17   15:07m  0.07s  0.07s -bash
+root     pts/0     07:22    1.00s  0.24s  0.03s w
+
+#其中：
+    08:48:09 up 16:51 系统到08:48:09运行了16小时51分钟
+    2 users   总共两个用户登录
+    load average  系统在1分钟 5分钟 和15分钟占据的负载压力
+    USER:登录用户名
+    TTY:登录终端 tty1代表本机登陆 pts/0代表远程终端
+    FROM:从哪个ip地址登录；
+    LOGIN@:登录时间；
+    IDLE：用户闲置时间；
+    JCPU：指的是和该终端链接的所有进程占用的时间。这个时间里并不包括过去的
+        后台作业时间,但却包括当前正在运行的后台作业所占用的时间；
+    PCUP:是指当前进程所占用的时间
+    WHAT:当前正在运行的命令
+
+(2)who [用户名]
+功能与w命令相似
+
+who
+#命令输出：
+-用户名
+-登录终端
+-登录时间(登录来源ip地址)
+
+(3)last
+查询当前登录和过去登录的用户信息
+last命令默认读取/var/log/wtmp文件数据
+
+last
+#命令输出：
+-用户名
+-登录终端
+-登录ip
+-登录时间
+-退出时间(在线时间)
+
+(4)lastlog
+查看系统所有用户最后登录时间
+lastlog命令默认读取/var/log/lastlog文件数据
+
+lastlog
+#命令输出：
+-用户名
+-登录终端
+-登录ip
+-最后一次登录时间
+</code></pre><h3 id="shell基础"><a href="#shell基础" class="headerlink" title="shell基础"></a>shell基础</h3><h4 id="shell概述"><a href="#shell概述" class="headerlink" title="shell概述"></a>shell概述</h4><pre><code>(1)、shell概述
+*shell 是一个命令行解释器，它为用户提供了一个向linux内核发送请求以便
+    运行程序待界面系统程序，用户可以通过shell启动、挂起、停止甚至编写
+    一些程序
+*shell还是一个功能相当强大的编程语言，在shell中可以直接调用linux系统命令
+(2)、shell分类
+*Bourne Shell:1979开始使用，Bourne Shell的主文件名为sh  基本已淘汰
+*C Shell:主要在BSD版的Unix系统中使用，其语法和c语言相似
+*Shell 两种主要语法有Bourn和C，两种语法不兼容。
+    Bourn家族主要包括sh、ksh、Bash(linux标准shell)、psh、zsh;C家族主要有：csh、tcsh
+
+echo $SHELL
+#查看系统使用的shell版本 
+echo 代表输出 $ 调用变量  SHELL为shell的变量名  
+
+(3)、查看系统支持shell
+    cat /etc/shells
+    #查看兼容的所有shell版本
+
+    切换shell输入相应shell版本名称即可
+    sh
+    #将shell版本切换为sh
+    exit退出子shell
+</code></pre><h4 id="脚本执行方式"><a href="#脚本执行方式" class="headerlink" title="脚本执行方式"></a>脚本执行方式</h4><pre><code>(1)echo 输出命令
+echo [选项] [输出内容]
+选项：
+-e:支持反斜线控制的字符转换
+
+echo &quot;Today is sunday.Where we go?&quot;
+#在屏幕输出 Today is sunday.Where we go?
+注意：有空格就要用引号
+
+echo -e &quot;Today is\b sunday.Where we go?&quot;
+#在屏幕输出 Today i sunday.Where we go?
+少了一个s
+支持的字符转换：
+\a 输出警告音
+\b 退格键，也就是向左删除键
+\n 换行键
+\r 回车键
+\t 制表符 tab键
+\v 垂直制表符
+\0nnn 按照八进制ASCII码表输出字符。其中0为数字零，nnn是三位八进制数
+\xhh 按照16进制ASCII码表输出字符。其中hh是两位十六进制数
+
+echo -e &quot;\e[1;31m 嫁人就要嫁凤姐\e[0m&quot;
+#以红色字体显示：嫁人就要嫁凤姐 \e[1; 是开启颜色 31m=红色 \e[0m是关闭颜色显示
+#输出颜色
+    30m=黑色 31=红色 32m=绿色 33m=黄色
+    34m=蓝色 35m=洋红 36m=青色 37m=白色  
+
+(2)第一个脚本
+vim hello.sh
+#创建文件hello.sh
+在hello.sh中输入下面内容：
+    #!/bin/bash
+    #The first program
+    echo  -e &quot;\e[1;31m天上掉下个林妹妹\e[0m&quot;
+注意：#!/bin/bash 这句比较特殊不是注释  声明该脚本为bash脚本 必须添加 不然复杂脚本可能报错
+(3)执行一个脚本
+    a.赋予执行权限，直接运行
+        chmod 755 hello.sh
+        ./hello.sh
+    b. 通过bash调用执行脚本
+        bash hello.sh
+</code></pre><h4 id="bash的基本功能"><a href="#bash的基本功能" class="headerlink" title="bash的基本功能"></a>bash的基本功能</h4><pre><code>(1)命令别名与快捷键
+alias
+#查看系统中所有命令的别名
+
+alias 别名=&apos;原命令&apos;
+#设定命令别名(重启失效)
+
+vi ~/.bashrc
+#修改家目录下的bashrc文件 使别名永久生效 默认重新登陆生效  
+也可使用 source .bashrc命令使立即生效
+
+unalias 别名
+#删除别名(重启失效) 若要永久生效 删除bashrc中定义的别名
+并使用source .bashrc命令使其不用重新登陆就可以立即生效
+
+命令生效顺序：
+*第一顺位 使用绝对路径或相对路径执行命令
+*第二顺位 执行别名
+*第三顺位 执行bash的内部命令
+*第四顺位 从$PATH中查找到的第一个命令
+
+快捷键：
+ctrl+c    强制终止当前命令
+ctrl+l  清屏
+ctrl+a  光标移动到命令的首行
+ctrl+e  光标移动到命令的行尾
+ctrl+u  从光标所在的位置删除到行首
+ctrl+z  把命令放入后台
+ctrl+r  在历史命令中搜索
+
+(2)历史命令
+ history [选项] [历史命令保存文件]
+ 选项:
+ -c ：清空历史命令
+ -w ：把缓存中的历史命令写入到历史命令保存文件~/.bash_history
+
+ 历史命令的调用
+ *使用上下箭头调用以前的命令
+ *使用!n重复执行第n条历史命令
+ *使用!!重复执行上一条命令
+ *使用&quot;!字串&quot; 重复执行最后一条以该字串开头的命令 
+
+命令与文件补全
+*在bash中，按&quot;Tab&quot;键自动进行补全
+
+(3)输出重定向
+    &lt;1&gt;标准输入输出
+    设备            设备文件名            文件描述符            类型        
+    键盘               /dev/stdin                0                标准输入
+    显示器            /dev/sdtout                1                标准输出
+    显示器            /dev/sdterr                2                标准错误输出 
+
+    &lt;2&gt;输出重定向
+    类型                        符号                    作用
+    标准输出重定向                命令&gt;文件                以覆盖的方式，把命令的正确输出输出到指定的文件或设备当中
+    标准输出重定向                命令&gt;&gt;文件                以追加的方式，把命令的正确输出输出到指定的文件或设备当中
+    标准错误输出重定向            错误命令 2&gt;文件            以覆盖的方式，把命令的正确输出输出到指定的文件或设备当中
+    标准错误输出重定向            错误命令 2&gt;&gt;文件         以追加的方式，把命令的正确输出输出到指定的文件或设备当中
+    正确输出和错误输出同时保存    命令&gt;文件 2&gt;&amp;1             以覆盖的方式，把正确输出和错误输出都保存到同一个文件当中
+    正确输出和错误输出同时保存    命令&gt;&gt;文件 2&gt;&amp;1         以追加的方式，把正确输出和错误输出都保存到同一个文件当中
+    正确输出和错误输出同时保存    命令 &amp;&gt;文件             以覆盖的方式，把正确输出和错误输出都保存到同一个文件当中
+    正确输出和错误输出同时保存    命令 &amp;&gt;&gt;文件             以追加的方式，把正确输出和错误输出都保存到同一个文件当中
+    正确输出和错误输出同时保存    命令&gt;&gt;文件1 2&gt;&gt;文件2    把正确的输出追加到文件1中，把错误的输出追加到文件2中
+    #上面的2代表文件描述符 意思是当出错时 把错误信息输出到文件  并且2后面不能有空格
+
+    ls &amp;&gt;/dev/null
+    #将执行结果直接丢弃 既不显示在屏幕上，也不保存到文件中  null相当于windows系统中垃圾回收站
+
+(4)输入重定向
+    wc [选项][文件名]
+    选项:
+    -c: 统计字节数
+    -w: 统计单词数
+    -l: 统计行数
+
+    输入wc
+    输入sdfds
+    按ctrl+d 统计行数 单词数 字符数 
+
+    *命令&lt;文件 
+    #把文件作为命令的输入
+    *命令&lt;&lt;标识符
+
+(5)管道符
+&lt;1&gt;多命令顺序执行
+ 多名令执行符                    格式                        作用
+    ;                        命令1;命令2                多个命令顺序执行，命令之间没有任何逻辑关系
+    &amp;&amp;                        命令1&amp;&amp;命令2            逻辑与；当命令1正确执行，命令2才会执行；当命令1不正确，命令2不会执行
+    ||                        命令1||命令2            逻辑或；当命令1执行不正确，命令2才会执行；当命令1正确，命令2不会执行
+
+&lt;2&gt;管道符
+    命令格式：
+    命令1 | 命令2
+    #命令1的正确输出作为命令2的操作对象
+
+    netstat -an | grep ESTABLISHED
+    #从netstat -an执行结果中搜索ESTABLISHED
+
+(6)通配符
+&lt;1&gt; 通配符
+            通配符                                        作用
+              ？                                        匹配一个任意字符
+              *                                            匹配0个或任意多个字符，也就是可以匹配任意内容
+              []                                        匹配括号中任意一个字符。例如[abc]代表匹配a或b或c
+              [-]                                        匹配括号中任意一个字符，-代表范围。例：[a-z]代表匹配一个小写字母
+              [^]                                        逻辑非，表示匹配不是中括号内的一个字符。例如：[^0-9]代表匹配一个不是数字的字符
+&lt;2&gt;Bash中其它特殊符号
+</code></pre><h3 id="VIM文本编辑器"><a href="#VIM文本编辑器" class="headerlink" title="VIM文本编辑器"></a>VIM文本编辑器</h3><h4 id="VIM文本编辑器概述"><a href="#VIM文本编辑器概述" class="headerlink" title="VIM文本编辑器概述"></a>VIM文本编辑器概述</h4><pre><code>*vi---&gt;VIM VIM是VI升级版
+
+*VIM相对VI做了哪些提升
+    -VIM支持多级撤销(u)
+    -VIM可以跨平台运行 vi只能运行在以unix为内核的系统中 VIM可以运行在其它平台(如linux)
+    -VIM支持语法高亮
+    -VIM支持图形界面
+</code></pre><h4 id="VIM操作模式和命令模式"><a href="#VIM操作模式和命令模式" class="headerlink" title="VIM操作模式和命令模式"></a>VIM操作模式和命令模式</h4><pre><code>*command mode         -命令模式
+*insert mode          -插入模式
+*last line mode        -底行模式(尾行、末行)
+
+vim abc
+#打开abc，若没有创建abc并打开
+
+首先进入命令模式---&gt;i键进入插入模式---&gt;esc键进入底行模式 :wq 保存退出     :q或:q! 不保存退出
+命令模式下 dd表示删除一行
+
+vim +[i] abc
+#打开abc 并定位到最后一行(第i行)
+
+vim +/alvin abc
+#打开abc，并定位到alvin第一次出现的地方 n可以在多个alvin之间切换
+
+vim aa bb cc
+#若不存在创建多个文件，若存在打开多个文件  底行模式下输入n切换到下一个文件
+输入prev或N切换到上一个文件
+</code></pre><h4 id="底行模式和命令模式常用命令"><a href="#底行模式和命令模式常用命令" class="headerlink" title="底行模式和命令模式常用命令"></a>底行模式和命令模式常用命令</h4><pre><code>(1)底行模式常用命令
+(2)命令模式常用命令
+    -h 光标左移
+    -j 光标下移
+    -k 光标上移
+    -l 光标右移
+    -ctrl+f 向下翻页(front)
+    -ctrl+b 向上翻页(back)
+    -ctrl+d 向下翻半页(down)
+    -ctrl+u 向上翻半页(up)
+    -dd     删除光标所在一行
+    -o         在光标所在位置下方插入一行并切换到插入模式
+    -yy        复制光标所在的一行
+    -p        在光标所在行的下方粘贴
+</code></pre><h3 id="磁盘管理"><a href="#磁盘管理" class="headerlink" title="磁盘管理"></a>磁盘管理</h3><h4 id="磁盘管理基本命令"><a href="#磁盘管理基本命令" class="headerlink" title="磁盘管理基本命令"></a>磁盘管理基本命令</h4><pre><code>df 查看磁盘分区使用情况
+    -l 仅显示本地磁盘(默认)
+    -a 显示所有文件系统的磁盘使用情况，包含比如/proc/
+    -h 以1024进制计算最合适的单位显示磁盘容量
+    -H 以1000进制计算最合适的单位显示磁盘容量
+    -T 显示磁盘分区类型
+    -t 显示指定文件系统的磁盘分区
+    -x 不显示指定文件系统的磁盘分区
+
+du 统计磁盘上的文件大小
+    -b 以byte为单位统计文件
+    -k 以kb为单位统计文件
+    -m 以mb为单位统计
+    -h 以1024进制计算最合适的单位显示磁盘容量
+    -H 以1000进制计算最合适的单位显示磁盘容量
+    -s 指定统计目标 跟参数
+</code></pre><h4 id="硬盘分区和格式化概述"><a href="#硬盘分区和格式化概述" class="headerlink" title="硬盘分区和格式化概述"></a>硬盘分区和格式化概述</h4><pre><code>在服务器挂载新的硬盘
+</code></pre><h4 id="在VM虚拟机中添加硬盘"><a href="#在VM虚拟机中添加硬盘" class="headerlink" title="在VM虚拟机中添加硬盘"></a>在VM虚拟机中添加硬盘</h4><pre><code>场景:硬盘空间不够用 需添加新硬盘
+</code></pre><h4 id="MBR分区-已经过时"><a href="#MBR分区-已经过时" class="headerlink" title="MBR分区(已经过时)"></a>MBR分区(已经过时)</h4><pre><code>-主分区不超过4个
+-单个分区容量最大2TB
+
+fdisk -l 
+#查看硬盘大小及分区情况        
+
+fdisk 未分区硬盘文件名
+#进入分区模式
+输入n 新增一个分区---&gt;选择主分区或者扩展分区---&gt;输入分区编号(1-4)---&gt;指定扇区开始位置----&gt;指定扇区结束位置或指定分区大小
+</code></pre><h4 id="GPT分区"><a href="#GPT分区" class="headerlink" title="GPT分区"></a>GPT分区</h4><pre><code>-主分区个数&quot;几乎&quot;没有限制(最多支持128个主分区)
+-单个分区容量&quot;几乎&quot;没有限制(最多支持18EB)
+1EB=1024PB,1PB=1024TB
+
+parted
+#启动分区工具
+
+select /dev/sdc
+#切换到待分区的硬盘
+
+mklable  gpt(或者msdos  msdos就是mbr)
+#指定要用的分区表
+
+print
+#查看当前硬盘分区详情
+print all
+#查看所有硬盘分区详情
+
+交互方式添加分区：
+mkpart
+#添加分区
+添加分区名称---&gt;指定分区文件系统类型默认为ext2---&gt;指定开始MB 一般从1MB开始 预留1M左右4k对齐--&gt;指定结束MB---&gt;print查看目前分区状况
+
+命令模式添加分区(不同于上面的方式)
+mkpart test 2000 3000
+#添加名称为test的分区  指定MB区间为2000-3000MB
+
+rm n
+#删除编号为n的分区
+
+unit GB
+#默认分区大小单位MB,使用unit命令指定分区单位为GB
+
+若添加的分区重叠：会给出警告，系统给出建议性提示分区大小
+</code></pre><h4 id="分区的格式化"><a href="#分区的格式化" class="headerlink" title="分区的格式化"></a>分区的格式化</h4><pre><code>mkfs.ext3 /dev/sdb1
+#格式化 sdb1硬盘 指定系统文件类型为ext3
+
+mkfs -t dext4 /dev/sdb2
+#为另一种格式化方式 将sdb2格式化为ext4
+</code></pre><h4 id="挂载分区"><a href="#挂载分区" class="headerlink" title="挂载分区"></a>挂载分区</h4><pre><code>分区--&gt;格式化--&gt;挂载  
+经过这个过程才能使用硬盘
+
+mkdir -p /mnt/alvin
+#创建挂载目录
+
+mount /dev/sdb1  /mnt/alvin
+#挂载sdb1硬盘 指定挂载点为alvin
+
+umount /mnt/alvin
+#卸载挂载  参数为挂载点
+
+mount挂载重启挂载失效
+解决方法如下：
+vim + /etc/fstab
+#在fstab末添加 ： /dev/sdb1     /mnt/alvin  ext3  defaults  0   0
+该方法挂载永久有效
+</code></pre><h4 id="swap-交换分区"><a href="#swap-交换分区" class="headerlink" title="swap 交换分区"></a>swap 交换分区</h4><pre><code>创建交换分区步骤：
+第一，建立一个普通的linux分区            
+第二，修改分区类型的16进制编码
+第三，格式化交换分区
+第四，启用交换分区
+
+fdisk /dev/sdb
+#查看硬盘大小及分区情况
+输入t--&gt;输入分区编号---&gt;指定交换分区hex code编号--&gt;输入w保存
+mkswap /dev/sdb6
+#格式化交换分区
+swapon /dev/sdb6
+#启用交换分区
+free
+#查看swap加载状况
+swapoff /dev/sdb6
+#停止交换分区
+</code></pre><h3 id="用户管理"><a href="#用户管理" class="headerlink" title="用户管理"></a>用户管理</h3><h4 id="用户和用户组的概念"><a href="#用户和用户组的概念" class="headerlink" title="用户和用户组的概念"></a>用户和用户组的概念</h4><pre><code>用户：使用操作系统的人
+用户组：具体相同权限的一组用户
+
+* /etc/group 存储当前系统中所有用户组信息
+    -Group:            x            :  123  :abc,def,xyz
+    -组名称：    组密码占位符 ： 组编号  ：组中用户名列表
+
+说明：root组编号为0；1-499为系统预留编号；用户手动创建的组编号从500开始包括500
+
+* /etc/gshadow 存储当前系统中用户组的密码信息
+    -Group:            *            :  123  :abc,def,xyz
+    -组名称：    组密码 ： 组管理者  ：组中用户名列表
+
+    说明：组密码 为* 或 ！说明密码为空
+
+
+* /etc/passwd 存储当前系统中所有用户的信息
+    -user :            x        :    123  :   456    :  xxxxxxxxxx    :    /home/user    :  /bin/bash
+    -用户名：密码占位符        ：用户编号：用户组编号：用户注释信息  ：用户主目录        ：shell类型
+
+说明：root用户编号为0
+
+* /etc/shadow 存储当前系统中所有用户密码的信息
+    -user :            x        :::::  
+    -用户名：密码(单向加密)        ：：：：：：
+</code></pre><h4 id="用户和用户组的基本命令"><a href="#用户和用户组的基本命令" class="headerlink" title="用户和用户组的基本命令"></a>用户和用户组的基本命令</h4><pre><code>groupadd group1
+#添加用户组group1
+groupmod -n group2 group1
+#将组名由group1修改为group2
+groupmod -g 668 group2
+#将用户组group2的编号修改为668
+groupadd -g 888 group3
+#创建用户组group3，并指定组编号为888
+groupdel group2
+#删除用户组group2，要先删除组内用户
+
+useradd -g group1 alvin
+#创建用户alvin，并分配用户组为group1
+useradd -g group1 alex
+#创建用户alex，并分配用户组为group1
+useradd -d /home/xxx mark
+#创建用户mark，并创建个人文件夹为home下的xxx alvin和alex没有指定，则默认在home下创建同名个人文件夹
+
+注意：若创建的用户没有手动分配用户组，则自动创建同名用户组 新建用户属于该组
+
+usermod -c thisisalvin alvin
+#修改用户alvin注释信息为thisisalvin
+usermod -l alvin alex
+#将用户名alex修改为alvin
+usermod -d /home/alvin alvin
+#修改用户alvin的个人文件夹路径为/home/alvin
+usermod -g group1 alvin
+#修改alvin所属用户组为group1
+userdel alex
+#删除用户alex 不会删除个人文件夹
+userdel -r alex
+#删除用户alex 同时删除个人文件夹
+touch /etc/nologin
+#创建空文件，禁止除root外的用户登录服务器
+</code></pre><h4 id="用户和用户组进阶命令"><a href="#用户和用户组进阶命令" class="headerlink" title="用户和用户组进阶命令"></a>用户和用户组进阶命令</h4><pre><code>passwd -l alex
+#锁定账户alex
+passwd -u alex
+#解锁账户alex
+passwd -d alex
+#清除alex的登录密码
+
+主要组和附属组：
+    用户可以同时属于多个组
+    -一个主要组
+    -多个附属组
+
+gpasswd -a alex group2
+#将alex添加到附属组group2
+newgrp group2
+#alex登录系统执行该命令，将当前组切换到附属组group2
+gpasswd -d alex group2
+#将alex用户从附属组group2中删除
+useradd -g group1 -G group2,group3......  temp
+#在创建用户temp的同时指定主要组为group1，附属组为group2,group3......
+gpasswd group1
+#指定用户组密码
+</code></pre><h4 id="其它命令"><a href="#其它命令" class="headerlink" title="其它命令"></a>其它命令</h4><pre><code>su username
+#切换用户
+
+whoami
+#显示登陆用户名
+
+id 用户名 
+#显示指定用户信息，包括用户编号、用户名、主要组编号，附属组列表
+
+groups 用户名 
+#显示用户所在的所有组
+
+chfn 用户名 
+#设置用户资料，依次输入用户资料
+
+finger 用户名 
+#显示用户详细资料
+</code></pre></div><div class="tags"></div><div class="post-nav"><a class="pre" href="/2018/05/11/hello-world/">Hexo Start Blog</a><a class="next" href="/2017/03/09/spring_cloud_eureka/">spring cloud eureka</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank"><input type="text" name="q" maxlength="20" placeholder="Search"/><input type="hidden" name="sitesearch" value="https://dongme.site"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/music/">music</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/schedule/">schedule</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring-cloud/">spring cloud</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/名词解释/">名词解释</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/工具/">工具</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/杂记/">杂记</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/B2C/" style="font-size: 15px;">B2C</a> <a href="/tags/B2B/" style="font-size: 15px;">B2B</a> <a href="/tags/P2P/" style="font-size: 15px;">P2P</a> <a href="/tags/C2C/" style="font-size: 15px;">C2C</a> <a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/编程思想/" style="font-size: 15px;">编程思想</a> <a href="/tags/jdk/" style="font-size: 15px;">jdk</a> <a href="/tags/markdown/" style="font-size: 15px;">markdown</a> <a href="/tags/小记/" style="font-size: 15px;">小记</a> <a href="/tags/快捷键/" style="font-size: 15px;">快捷键</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/09/26/jdk新特性之jdk7/">jdk新特性之jdk7</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/26/jdk新特性之jdk6/">jdk新特性之jdk6</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/26/java编程思想-21/">java编程思想[21]-并发</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/25/java编程思想-17/">java编程思想[17]-容器</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/23/java编程思想-16/">java编程思想[16]-数组</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/23/java编程思想-15/">java编程思想[15]-范型</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/16/java编程思想-14/">java编程思想[14]-RTTI</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/16/java编程思想-10-13/">java编程思想[10-13]-内部类、持有对象、异常</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/22/快捷键/">快捷键</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/06/java编程思想-1/">java编程思想[1-9]</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="http://www.example1.com/" title="site-name1" target="_blank">site-name1</a><ul></ul><a href="http://www.example2.com/" title="site-name2" target="_blank">site-name2</a><ul></ul><a href="http://www.example3.com/" title="site-name3" target="_blank">site-name3</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2018 <a href="/." rel="nofollow">alvin's blog.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>

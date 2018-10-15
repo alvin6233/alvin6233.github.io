@@ -1,0 +1,133 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="Maybe is Maybe"><title>java编程思想[1-9] | alvin's blog</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/8.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">java编程思想[1-9]</h1><a id="logo" href="/.">alvin's blog</a><p class="description">Good memory is worse than bad writing</p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">java编程思想[1-9]</h1><div class="post-meta">Jun 6, 2018<span> | </span><span class="category"><a href="/categories/java/">java</a></span></div><div class="post-content"><p>最近看java编程思想，对看过的前1-9章一些似懂非懂的知识点做个记录吧。<br><a id="more"></a></p>
+<h4 id="1-”是一个”与”像是一个”的关系"><a href="#1-”是一个”与”像是一个”的关系" class="headerlink" title="1.”是一个”与”像是一个”的关系"></a>1.”是一个”与”像是一个”的关系</h4><ul>
+<li>导出类只覆盖基类的方法，导出类和基类是完全相同的类型，基类和导出类的关系是一个关系。</li>
+<li>导出类添加新的接口元素，基类无法访问导出类的新接口元素，基类和导出类之间的关系是”像是一个的关系”</li>
+</ul>
+<h4 id="2-伴随多态的可互换对象"><a href="#2-伴随多态的可互换对象" class="headerlink" title="2.伴随多态的可互换对象"></a>2.伴随多态的可互换对象</h4><ul>
+<li>伴随多态的可互换对象基于面向对象程序设计语言采用了后期绑定的概念。当向对象发送消息时，被调用的代码在运行时才能确定。</li>
+</ul>
+<h4 id="3-为什么支持多种类型容器"><a href="#3-为什么支持多种类型容器" class="headerlink" title="3.为什么支持多种类型容器"></a>3.为什么支持多种类型容器</h4><p> 容器持有其它对象的引用，设计多种容器类型原因如下：</p>
+<ul>
+<li>不同容器提供不同的接口和行为</li>
+<li>不同容器对某些操作的效率不同</li>
+</ul>
+<h4 id="4-对象和其它变量存储空间、生命周期"><a href="#4-对象和其它变量存储空间、生命周期" class="headerlink" title="4.对象和其它变量存储空间、生命周期"></a>4.对象和其它变量存储空间、生命周期</h4><ul>
+<li>普通变量存在在堆栈，在编译阶段就会确定变量的存储空间地址和生命周期；对象存在堆（heap），在运行阶段动态分配存储空间，对象的生命周期取决是否被引用，且通过java垃圾回收机制回收。</li>
+</ul>
+<h4 id="5-异常处理不是面向对象的特征。"><a href="#5-异常处理不是面向对象的特征。" class="headerlink" title="5.异常处理不是面向对象的特征。"></a>5.异常处理不是面向对象的特征。</h4><h4 id="6-java基本类型"><a href="#6-java基本类型" class="headerlink" title="6.java基本类型"></a>6.java基本类型</h4><ul>
+<li>boolean、char、byte、short、int、long、float、double、void</li>
+<li>基本类型所占存储空间不随机器硬件架构的变化而变化</li>
+<li>boolean类型没有明确指定存储空间大小，仅定义为能够取字面值true&amp;false</li>
+</ul>
+<h4 id="7-BigInteger-amp-BigDecimal"><a href="#7-BigInteger-amp-BigDecimal" class="headerlink" title="7. BigInteger&amp;BigDecimal"></a>7. BigInteger&amp;BigDecimal</h4><ul>
+<li>高精度计算类，虽然属于包装类却没有对应的基本类型。高精度计算类操作复杂，运算速度相当较慢。</li>
+</ul>
+<h4 id="8-java数组对比C和C"><a href="#8-java数组对比C和C" class="headerlink" title="8.java数组对比C和C++"></a>8.java数组对比C和C++</h4><ul>
+<li>java有范围检查，要求数组必须进行初始化且不超出范围，牺牲了少量内存开销换来安全性和效率的提升。</li>
+</ul>
+<h4 id="9-java类中基本类型成员会自动初始化，但局部变量并不会-非某个类的字段"><a href="#9-java类中基本类型成员会自动初始化，但局部变量并不会-非某个类的字段" class="headerlink" title="9. java类中基本类型成员会自动初始化，但局部变量并不会(非某个类的字段)"></a>9. java类中基本类型成员会自动初始化，但局部变量并不会(非某个类的字段)</h4><ul>
+<li>boolean==&gt;false</li>
+<li>char==&gt;null</li>
+<li>byte==&gt;(byte)0</li>
+<li>short==&gt;(short)0</li>
+<li>int==&gt;0</li>
+<li>long==&gt;oL</li>
+<li>float==&gt;0.0L</li>
+<li>double==&gt;0.0D</li>
+</ul>
+<h4 id="10-方法签名（方法名和参数列表）唯一标识某个方法"><a href="#10-方法签名（方法名和参数列表）唯一标识某个方法" class="headerlink" title="10.方法签名（方法名和参数列表）唯一标识某个方法"></a>10.方法签名（方法名和参数列表）唯一标识某个方法</h4><h4 id="11-static方法牧羊人角色-创建或使用同类型的被命名对象"><a href="#11-static方法牧羊人角色-创建或使用同类型的被命名对象" class="headerlink" title="11.static方法牧羊人角色-创建或使用同类型的被命名对象"></a>11.static方法牧羊人角色-创建或使用同类型的被命名对象</h4><h4 id="12-java-lang默认导入到每个java文件中"><a href="#12-java-lang默认导入到每个java文件中" class="headerlink" title="12.java.lang默认导入到每个java文件中"></a>12.java.lang默认导入到每个java文件中</h4><h4 id="13-文档注释"><a href="#13-文档注释" class="headerlink" title="13.文档注释"></a>13.文档注释</h4><ul>
+<li><code>/*comment*/</code>  整段注释</li>
+<li><code>//</code> 行注释</li>
+</ul>
+<h4 id="14-javadoc命令只能出现在-中，可嵌入html"><a href="#14-javadoc命令只能出现在-中，可嵌入html" class="headerlink" title="14.javadoc命令只能出现在/**中，可嵌入html"></a>14.javadoc命令只能出现在/**中，可嵌入html</h4><ul>
+<li>@see: 引用其他类</li>
+<li>@link: 与@see类似，但是属于行内引用，{@link package.class#member label}</li>
+<li>@{@docRoot}</li>
+<li>@{inheritDoc}</li>
+<li>@version</li>
+<li>@author</li>
+<li>@since</li>
+<li>@param</li>
+<li>@return</li>
+<li>@throws</li>
+<li>@deprecated</li>
+</ul>
+<h4 id="15-几乎所有操作类型只能操作基本类型，例外的操作符是“-”，“-”，“-”可以操作所有对象"><a href="#15-几乎所有操作类型只能操作基本类型，例外的操作符是“-”，“-”，“-”可以操作所有对象" class="headerlink" title="15.几乎所有操作类型只能操作基本类型，例外的操作符是“=”，“!=”，“==”可以操作所有对象"></a>15.几乎所有操作类型只能操作基本类型，例外的操作符是“=”，“!=”，“==”可以操作所有对象</h4><h4 id="16-随机数的生成"><a href="#16-随机数的生成" class="headerlink" title="16.随机数的生成"></a>16.随机数的生成</h4><p><strong>Random rand = new Random():</strong><br>若创建时不输入构造参数，每一轮执行第n次rand.nextInt(100)的结果都不同；<br>若创建时输入构造参数，每一轮执行第n次rand.nextInt(100)的结构都相同。</p>
+<h4 id="17-对象的等价性"><a href="#17-对象的等价性" class="headerlink" title="17.对象的等价性"></a>17.对象的等价性</h4><ul>
+<li>基本类型判断等价性使用==和!=；比较其他对象的等价性使用每个对象都有的equals方法。</li>
+</ul>
+<h4 id="18-指数计数法"><a href="#18-指数计数法" class="headerlink" title="18.指数计数法"></a>18.指数计数法</h4><p><code>float flt = 1.36e-19f</code><br>等价于如下计算:<br><code>flt = 1.36*10^(-19)</code></p>
+<h4 id="19-java位运算"><a href="#19-java位运算" class="headerlink" title="19.java位运算"></a>19.java位运算</h4><ul>
+<li>在计算机中所有数据都是以二进制的形式储存的。位运算其实就是直接对在内存中的二进制数据进行操作，因此处理数据的速度非常快。</li>
+<li>基本的位操作符有与、或、异或、取反、左移、右移这6种，它们的运算规则如下所示：<br>| 符号 | 描述 | 运算规则 |<br>| :-: | :-: | :-: |<br>| &amp; | 与 | 两个位都为1时结果才为1 |<br>| | | 或 | 两个位都为0时才为0 |<br>| ^ | 异或 | 两个位相同时为0，相异时为1 |<br>| ~ | 取反 | 1变0，0变1 |<br>| &lt;&lt; | 左移 | 各二进位全部左移若干位，高位丢弃，低位补 0；num &lt;&lt; 1”相当于num乘以2|<br>| &gt;&gt; | 有符号右移 | 各二进位全部右移若干位，对无符号数，高位补 0，有符号数，各编译器处理方法不一样，有的补符号位(算术右移，java采用)，有的补 0 (逻辑右移)；num &gt;&gt; 1”相当于num除以2|<br>| &gt;&gt;&gt; | 无符号右移 | 无论正负都在高位补0|</li>
+<li>计算机中采用补码的形式进行二进制运算；正数的原码、反码和补码都一样；负数的反码，对应正数二进制表示所有位取反；负数的补码等于反码</li>
+</ul>
+<h4 id="20-java类型转换，扩展转换是自动的，窄化转换是强制的，而且数值窄化转换会强制截尾（Math-round-x-可实现四舍五入）"><a href="#20-java类型转换，扩展转换是自动的，窄化转换是强制的，而且数值窄化转换会强制截尾（Math-round-x-可实现四舍五入）" class="headerlink" title="20.java类型转换，扩展转换是自动的，窄化转换是强制的，而且数值窄化转换会强制截尾（Math.round(x)可实现四舍五入）"></a>20.java类型转换，扩展转换是自动的，窄化转换是强制的，而且数值窄化转换会强制截尾（Math.round(x)可实现四舍五入）</h4><h4 id="21-while-x-y-除非x和y都是boolean类型，否则编译报错"><a href="#21-while-x-y-除非x和y都是boolean类型，否则编译报错" class="headerlink" title="21. while(x=y)除非x和y都是boolean类型，否则编译报错"></a>21. while(x=y)除非x和y都是boolean类型，否则编译报错</h4><h4 id="22-void方法中有隐含的return，另外return会退出当前方法"><a href="#22-void方法中有隐含的return，另外return会退出当前方法" class="headerlink" title="22. void方法中有隐含的return，另外return会退出当前方法"></a>22. void方法中有隐含的return，另外return会退出当前方法</h4><h4 id="23-break-lable和continue-lable的区别"><a href="#23-break-lable和continue-lable的区别" class="headerlink" title="23. break lable和continue lable的区别"></a>23. break lable和continue lable的区别</h4><ul>
+<li>嵌套循环，内循环内执行continue label会跳到外循环外label1并重新进入循环，break label则不会重新进入循环</li>
+</ul>
+<h4 id="24-多个构造器也是方法重载的使用"><a href="#24-多个构造器也是方法重载的使用" class="headerlink" title="24.多个构造器也是方法重载的使用"></a>24.多个构造器也是方法重载的使用</h4><h4 id="25-this代表调用方法的那个对象，会隐式的作为方法的第一个参数传过去，并通过this进行引用"><a href="#25-this代表调用方法的那个对象，会隐式的作为方法的第一个参数传过去，并通过this进行引用" class="headerlink" title="25. this代表调用方法的那个对象，会隐式的作为方法的第一个参数传过去，并通过this进行引用"></a>25. this代表调用方法的那个对象，会隐式的作为方法的第一个参数传过去，并通过this进行引用</h4><h4 id="26-构造器中调用构造器，可用this-参数列表-且必须放第一行且只能通过该形式调用一次"><a href="#26-构造器中调用构造器，可用this-参数列表-且必须放第一行且只能通过该形式调用一次" class="headerlink" title="26. 构造器中调用构造器，可用this(参数列表)且必须放第一行且只能通过该形式调用一次"></a>26. 构造器中调用构造器，可用this(参数列表)且必须放第一行且只能通过该形式调用一次</h4><h4 id="27-static的含义"><a href="#27-static的含义" class="headerlink" title="27. static的含义"></a>27. static的含义</h4><ul>
+<li>static的方法没有隐含this参数</li>
+<li>static的方法不能调用非static的方法，反之可以</li>
+</ul>
+<h4 id="28-finalize-用法"><a href="#28-finalize-用法" class="headerlink" title="28. finalize()用法"></a>28. finalize()用法</h4><ul>
+<li>在类中定义一个finalize()，在垃圾回收器准备回收对象时会首先调用该函数</li>
+<li>java中调用了非java的代码开辟了存储空间，需要finalize()中释放空间</li>
+<li>通常不能指望finalize()，必须创建其它的清理方法</li>
+</ul>
+<h4 id="29-类的数据成员如果是基本类型会被自动初始化为默认值"><a href="#29-类的数据成员如果是基本类型会被自动初始化为默认值" class="headerlink" title="29. 类的数据成员如果是基本类型会被自动初始化为默认值"></a>29. 类的数据成员如果是基本类型会被自动初始化为默认值</h4><h4 id="30-类成员初始化顺序依次"><a href="#30-类成员初始化顺序依次" class="headerlink" title="30. 类成员初始化顺序依次"></a>30. 类成员初始化顺序依次</h4><ul>
+<li>基类构造器 &gt;（静态变量、静态初始化块）&gt;（变量、初始化块）&gt; 导出类构造器</li>
+</ul>
+<h4 id="31-对象创建过程及成员初始化"><a href="#31-对象创建过程及成员初始化" class="headerlink" title="31. 对象创建过程及成员初始化"></a>31. 对象创建过程及成员初始化</h4><p><strong>假设有个名为Dog的类</strong></p>
+<ol>
+<li>即使没有显式地使用static关键字，构造器实际上也是静态方法。因此，当首次创建类型为Dog的对象时，<br>或者Dog类的静态方法/静态域首次被访问时，java解释器必须查找类路径，以定位Dog.class文件</li>
+<li>然后载入Dog.class(会创建Class对象)，有关静态初始化的所有动作都会执行。因此，静态初始化只在Class<br>对象首次加载的时候执行一次。</li>
+<li>当用new Dog()创建对象的时候，首先将在堆上为Dog对象分配足够的存储空间。</li>
+<li>这块存储空间会被清零，这就自动地将Dog对象中所有基本类型设置成默认值。(数字、字符、布尔为0，引用为null)</li>
+<li>执行所有出现于字段定义处的初始化动作。</li>
+<li>执行构造器</li>
+</ol>
+<h4 id="32-数组初始化"><a href="#32-数组初始化" class="headerlink" title="32. 数组初始化"></a>32. 数组初始化</h4><ul>
+<li><code>int[] a1 = {1&quot;2&quot;3&quot;4&quot;5}</code></li>
+<li><code>int a2 [] = new int[]{20&quot;21&quot;22}</code></li>
+<li><code>int a3 = new int[5]</code>，随后进行初始化</li>
+</ul>
+<h4 id="33-可变参数列表"><a href="#33-可变参数列表" class="headerlink" title="33. 可变参数列表"></a>33. 可变参数列表</h4><ul>
+<li>void test(Object… objs)，objs会根据输入的参数创建数组。</li>
+</ul>
+<h4 id="34-enum枚举类型可以结合switch语句使用"><a href="#34-enum枚举类型可以结合switch语句使用" class="headerlink" title="34.enum枚举类型可以结合switch语句使用"></a>34.enum枚举类型可以结合switch语句使用</h4><h4 id="35-一个java源代码文件有且只能有一个public类"><a href="#35-一个java源代码文件有且只能有一个public类" class="headerlink" title="35.一个java源代码文件有且只能有一个public类"></a>35.一个java源代码文件有且只能有一个public类</h4><h4 id="36-package语言必须出现在除注释外的第一行"><a href="#36-package语言必须出现在除注释外的第一行" class="headerlink" title="36.package语言必须出现在除注释外的第一行"></a>36.package语言必须出现在除注释外的第一行</h4><h4 id="37-java类中不指定package，会使用默认包"><a href="#37-java类中不指定package，会使用默认包" class="headerlink" title="37.java类中不指定package，会使用默认包"></a>37.java类中不指定package，会使用默认包</h4><h4 id="38-运行java-类名会自动运行该类下的main方法"><a href="#38-运行java-类名会自动运行该类下的main方法" class="headerlink" title="38.运行java 类名会自动运行该类下的main方法"></a>38.运行java 类名会自动运行该类下的main方法</h4><h4 id="39-继承类的构造过程是从内向外，先调用基类构造器后调用导出类构造器"><a href="#39-继承类的构造过程是从内向外，先调用基类构造器后调用导出类构造器" class="headerlink" title="39.继承类的构造过程是从内向外，先调用基类构造器后调用导出类构造器"></a>39.继承类的构造过程是从内向外，先调用基类构造器后调用导出类构造器</h4><h4 id="40-子类调用父类带参构造器使用super"><a href="#40-子类调用父类带参构造器使用super" class="headerlink" title="40.子类调用父类带参构造器使用super"></a>40.子类调用父类带参构造器使用super</h4><h4 id="41-复用类之组合、继承、代理"><a href="#41-复用类之组合、继承、代理" class="headerlink" title="41.复用类之组合、继承、代理"></a>41.复用类之组合、继承、代理</h4><ul>
+<li>代理的实质是通过创建一个代理类去，并将代理对象作为初始化成员属性通过自身方法调用目标对象的方法，是对目标方法的再次包装</li>
+</ul>
+<h4 id="42-导出类可以向上自动转型为基类类型"><a href="#42-导出类可以向上自动转型为基类类型" class="headerlink" title="42.导出类可以向上自动转型为基类类型"></a>42.导出类可以向上自动转型为基类类型</h4><h4 id="43-继承or组合"><a href="#43-继承or组合" class="headerlink" title="43.继承or组合"></a>43.继承or组合</h4><ul>
+<li>继承当慎用，使用组合还是继承判断标准是:是否需要向上转型，若需要则使用继承</li>
+</ul>
+<h4 id="44-final相关"><a href="#44-final相关" class="headerlink" title="44.final相关"></a>44.final相关</h4><ul>
+<li>final标注的类型必须初始化</li>
+<li>分配固定的存储空间，基本类型值不变，引用类型引用地址不变</li>
+<li>基本类型且不是随机数属于编译期常量</li>
+<li>基本类型且属于随机数、对象等引用类型在运行时才能确定，运行时常量</li>
+<li>对数组等引用类型使用final意义不大</li>
+<li>final标注类型初始化可发生在使用之前，如在构造函数中进行初始化</li>
+<li>final标注的方法，可以防止被重写，而是提高效率(编译时动态绑定)</li>
+<li>final标注的类不能被继承，类的方法隐式的指定为final，显示的添加final无意义</li>
+<li>java中除了static方法和final方法(private方法属于final方法)，其它所有方法都是后期绑定</li>
+</ul>
+<h4 id="45-域和静态方法"><a href="#45-域和静态方法" class="headerlink" title="45.域和静态方法"></a>45.域和静态方法</h4><ul>
+<li>普通方法才具有多态性，直接访问的域则是在编译期进行解析，如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">public class FieldAccess &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Super sup = new Sub();</span><br><span class="line">        System.out.println(&quot;sup.field=&quot; + sup.field + &quot;;sup.getField()=&quot; + sup.getField());</span><br><span class="line">        Sub sub = new Sub();</span><br><span class="line">        System.out.println(&quot;sub.field=&quot; + sub.field + &quot;;sub.getField()=&quot; + sub.getField() + &quot;;sub.getSuperField()=&quot; + sub.getSuperField());</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Super &#123;</span><br><span class="line">    public int field = 0;</span><br><span class="line"></span><br><span class="line">    public int getField() &#123;</span><br><span class="line">        return field;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Sub extends Super &#123;</span><br><span class="line">    public int field = 1;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public int getField() &#123;</span><br><span class="line">        return field;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getSuperField() &#123;</span><br><span class="line">        return super.field;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>基类中的域和导出类中的域尽量不要起相同的名字</li>
+<li>静态方法是不具有多态性的，静态方法是和类而非对象进行关联的</li>
+</ul>
+<h4 id="46-构造器是隐式的static"><a href="#46-构造器是隐式的static" class="headerlink" title="46.构造器是隐式的static"></a>46.构造器是隐式的static</h4><h4 id="47-抽象类和抽象方法"><a href="#47-抽象类和抽象方法" class="headerlink" title="47.抽象类和抽象方法"></a>47.抽象类和抽象方法</h4><ul>
+<li>包含抽象方法的类为抽象类</li>
+<li>一个类中包含一个或多个抽象方法，必须被声明为抽象类</li>
+<li>导出类继承抽象类，要么实现抽象类中的抽象方法，要么声明为抽象类</li>
+</ul>
+<h4 id="48-接口相关"><a href="#48-接口相关" class="headerlink" title="48.接口相关"></a>48.接口相关</h4><ul>
+<li>接口中的任何域都是static和final的，初始化可以发生在编译阶段和运行阶段</li>
+<li>接口只有public和默认(包访问权限)两种权限</li>
+<li>接口中的元素的都是public的</li>
+<li>接口实现工厂方法</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">interface Service &#123;</span><br><span class="line">    void method1();</span><br><span class="line"></span><br><span class="line">    void method2();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">interface ServiceFactory &#123;</span><br><span class="line">    Service getService();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Implementation1 implements Service &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void method1() &#123;</span><br><span class="line">        System.out.println(&quot;Implementation1:method1&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void method2() &#123;</span><br><span class="line">        System.out.println(&quot;Implementation1:method2&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Implementation1Factory implements ServiceFactory &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public Service getService() &#123;</span><br><span class="line">        return new Implementation1();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Implementation2 implements Service &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void method1() &#123;</span><br><span class="line">        System.out.println(&quot;Implemention2:method1&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void method2() &#123;</span><br><span class="line">        System.out.println(&quot;Implemention2:method2&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Implementation2Factory implements ServiceFactory &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public Service getService() &#123;</span><br><span class="line">        return new Implementation2();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public class FactoriesPrice &#123;</span><br><span class="line">    public static void serviceConsumer(ServiceFactory factory) &#123;</span><br><span class="line">        Service s = factory.getService();</span><br><span class="line">        s.method1();</span><br><span class="line">        s.method2();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        serviceConsumer(new Implementation1Factory());</span><br><span class="line">        serviceConsumer(new Implementation2Factory());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div><div class="tags"><a href="/tags/编程思想/">编程思想</a></div><div class="post-nav"><a class="pre" href="/2018/07/22/快捷键/">快捷键</a><a class="next" href="/2018/05/15/博客添加订阅/">博客添加订阅</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank"><input type="text" name="q" maxlength="20" placeholder="Search"/><input type="hidden" name="sitesearch" value="https://dongme.site"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/music/">music</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/schedule/">schedule</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring-cloud/">spring cloud</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/名词解释/">名词解释</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/工具/">工具</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/杂记/">杂记</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/B2C/" style="font-size: 15px;">B2C</a> <a href="/tags/B2B/" style="font-size: 15px;">B2B</a> <a href="/tags/P2P/" style="font-size: 15px;">P2P</a> <a href="/tags/C2C/" style="font-size: 15px;">C2C</a> <a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/编程思想/" style="font-size: 15px;">编程思想</a> <a href="/tags/jdk/" style="font-size: 15px;">jdk</a> <a href="/tags/markdown/" style="font-size: 15px;">markdown</a> <a href="/tags/小记/" style="font-size: 15px;">小记</a> <a href="/tags/快捷键/" style="font-size: 15px;">快捷键</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/09/26/jdk新特性之jdk7/">jdk新特性之jdk7</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/26/jdk新特性之jdk6/">jdk新特性之jdk6</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/26/java编程思想-21/">java编程思想[21]-并发</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/25/java编程思想-17/">java编程思想[17]-容器</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/23/java编程思想-16/">java编程思想[16]-数组</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/23/java编程思想-15/">java编程思想[15]-范型</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/16/java编程思想-14/">java编程思想[14]-RTTI</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/16/java编程思想-10-13/">java编程思想[10-13]-内部类、持有对象、异常</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/22/快捷键/">快捷键</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/06/java编程思想-1/">java编程思想[1-9]</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="http://www.example1.com/" title="site-name1" target="_blank">site-name1</a><ul></ul><a href="http://www.example2.com/" title="site-name2" target="_blank">site-name2</a><ul></ul><a href="http://www.example3.com/" title="site-name3" target="_blank">site-name3</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2018 <a href="/." rel="nofollow">alvin's blog.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
