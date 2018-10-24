@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://dongme.site/"/>
-  <updated>2018-10-24T16:15:49.524Z</updated>
+  <updated>2018-10-24T16:28:54.446Z</updated>
   <id>https://dongme.site/</id>
   
   <author>
@@ -21,9 +21,9 @@
     <link href="https://dongme.site/2018/10/24/%E9%A3%8E%E6%9A%B4%E4%B9%8B%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/"/>
     <id>https://dongme.site/2018/10/24/风暴之分布式事务/</id>
     <published>2018-10-23T16:23:00.000Z</published>
-    <updated>2018-10-24T16:15:49.524Z</updated>
+    <updated>2018-10-24T16:28:54.446Z</updated>
     
-    <content type="html"><![CDATA[<p>分布式事务是企业集成中的一个技术难点，也是每一个分布式系统架构中都会涉及到的一个东西，特别是在微服务架构中，几乎可以说是无法避免，本文通过思维导图做一个简单的知识梳理。<br><a id="more"></a></p><p><img src="http://ombpxfki1.bkt.clouddn.com/154031193881752wfhtwt.png?imageslim" alt="分布式事务知识梳理">  </p><h3 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h3><p>[1] <a href="https://draveness.me/distributed-transaction-principle" target="_blank" rel="noopener">分布式事务的实现原理</a><br>[2] <a href="https://www.cnblogs.com/savorboard/p/distributed-system-transaction-consistency.html" target="_blank" rel="noopener">聊聊分布式事务，再说说解决方案</a></p>]]></content>
+    <content type="html"><![CDATA[<p>分布式事务是企业集成中的一个技术难点，也是每一个分布式系统架构中都会涉及到的一个东西，特别是在微服务架构中，几乎可以说是无法避免，本文通过思维导图做一个简单的知识梳理。<br><a id="more"></a></p><p><img src="http://ombpxfki1.bkt.clouddn.com/15403984905918gwnbtzc.png?imageslim" alt="分布式事务知识梳理"></p><h3 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h3><p>[1] <a href="https://draveness.me/distributed-transaction-principle" target="_blank" rel="noopener">分布式事务的实现原理</a><br>[2] <a href="https://www.cnblogs.com/savorboard/p/distributed-system-transaction-consistency.html" target="_blank" rel="noopener">聊聊分布式事务，再说说解决方案</a></p>]]></content>
     
     <summary type="html">
     
