@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://dongme.site/"/>
-  <updated>2018-10-24T16:28:54.446Z</updated>
+  <updated>2018-10-24T16:40:36.522Z</updated>
   <id>https://dongme.site/</id>
   
   <author>
@@ -15,6 +15,46 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>风暴之Aop</title>
+    <link href="https://dongme.site/2018/10/25/%E9%A3%8E%E6%9A%B4%E4%B9%8BAop/"/>
+    <id>https://dongme.site/2018/10/25/风暴之Aop/</id>
+    <published>2018-10-24T16:34:44.000Z</published>
+    <updated>2018-10-24T16:40:36.522Z</updated>
+    
+    <content type="html"><![CDATA[<p>面向切面编程<br><a id="more"></a></p><p><img src="http://ombpxfki1.bkt.clouddn.com/154039903920073m0fn4x.png?imageslim" alt="paste image"></p><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>[1] <a href="https://www.ibm.com/developerworks/cn/java/j-lo-springaopcglib/index.html" target="_blank" rel="noopener">Spring AOP 实现原理与 CGLIB 应用</a><br>[2] <a href="http://www.importnew.com/24305.html" target="_blank" rel="noopener">Spring AOP的实现原理</a><br>[3] <a href="https://juejin.im/post/5af3bd6f518825673954bf22" target="_blank" rel="noopener">Spring AOP实现原理</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;面向切面编程&lt;br&gt;
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>风暴之Rocketmq消息有序</title>
+    <link href="https://dongme.site/2018/10/25/%E9%A3%8E%E6%9A%B4%E4%B9%8BRocketmq%E6%B6%88%E6%81%AF%E6%9C%89%E5%BA%8F/"/>
+    <id>https://dongme.site/2018/10/25/风暴之Rocketmq消息有序/</id>
+    <published>2018-10-24T16:17:00.000Z</published>
+    <updated>2018-10-24T16:33:30.443Z</updated>
+    
+    <content type="html"><![CDATA[<p>Rocketmq消息有序知识梳理<br><a id="more"></a></p><p><img src="http://ombpxfki1.bkt.clouddn.com/154039862934934w47u0d.png?imageslim" alt="paste image"></p><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>[1] <a href="https://www.zhihu.com/question/30195969" target="_blank" rel="noopener">rocketmq怎么保证队列完全顺序消费？</a><br>[2] <a href="https://www.jianshu.com/p/453c6e7ff81c" target="_blank" rel="noopener">分布式开放消息系统(RocketMQ)的原理与实践</a> </p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Rocketmq消息有序知识梳理&lt;br&gt;
+    
+    </summary>
+    
+      <category term="消息" scheme="https://dongme.site/categories/%E6%B6%88%E6%81%AF/"/>
+    
+    
+      <category term="rocketmq" scheme="https://dongme.site/tags/rocketmq/"/>
+    
+  </entry>
   
   <entry>
     <title>风暴之分布式事务</title>
@@ -412,50 +452,6 @@
     
     
       <category term="中介者模式" scheme="https://dongme.site/tags/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>设计模式之解释器模式</title>
-    <link href="https://dongme.site/2018/10/21/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8B%E8%A7%A3%E9%87%8A%E5%99%A8%E6%A8%A1%E5%BC%8F/"/>
-    <id>https://dongme.site/2018/10/21/设计模式之解释器模式/</id>
-    <published>2018-10-21T04:19:00.000Z</published>
-    <updated>2018-10-21T04:20:34.800Z</updated>
-    
-    <content type="html"><![CDATA[<p>解释器模式（Interpreter Pattern）提供了评估语言的语法或表达式的方式，它属于行为型模式。这种模式实现了一个表达式接口，该接口解释一个特定的上下文。这种模式被用在 SQL 解析、符号处理引擎等。<br><a id="more"></a></p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;解释器模式（Interpreter Pattern）提供了评估语言的语法或表达式的方式，它属于行为型模式。这种模式实现了一个表达式接口，该接口解释一个特定的上下文。这种模式被用在 SQL 解析、符号处理引擎等。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="设计模式" scheme="https://dongme.site/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"/>
-    
-    
-      <category term="解释器模式" scheme="https://dongme.site/tags/%E8%A7%A3%E9%87%8A%E5%99%A8%E6%A8%A1%E5%BC%8F/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>设计模式之命令模式</title>
-    <link href="https://dongme.site/2018/10/21/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8B%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/"/>
-    <id>https://dongme.site/2018/10/21/设计模式之命令模式/</id>
-    <published>2018-10-21T04:17:00.000Z</published>
-    <updated>2018-10-21T04:19:45.879Z</updated>
-    
-    <content type="html"><![CDATA[<p>命令模式（Command Pattern）是一种数据驱动的设计模式，它属于行为型模式。请求以命令的形式包裹在对象中，并传给调用对象。调用对象寻找可以处理该命令的合适的对象，并把该命令传给相应的对象，该对象执行命令。<br><a id="more"></a></p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;命令模式（Command Pattern）是一种数据驱动的设计模式，它属于行为型模式。请求以命令的形式包裹在对象中，并传给调用对象。调用对象寻找可以处理该命令的合适的对象，并把该命令传给相应的对象，该对象执行命令。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="设计模式" scheme="https://dongme.site/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"/>
-    
-    
-      <category term="命令模式" scheme="https://dongme.site/tags/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/"/>
     
   </entry>
   
