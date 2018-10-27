@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://dongme.site/"/>
-  <updated>2018-10-24T16:44:34.761Z</updated>
+  <updated>2018-10-27T02:23:14.618Z</updated>
   <id>https://dongme.site/</id>
   
   <author>
@@ -17,11 +17,29 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>风暴之Spring事务</title>
+    <link href="https://dongme.site/2018/10/27/%E9%A3%8E%E6%9A%B4%E4%B9%8BSpring%E4%BA%8B%E5%8A%A1/"/>
+    <id>https://dongme.site/2018/10/27/风暴之Spring事务/</id>
+    <published>2018-10-27T02:14:00.000Z</published>
+    <updated>2018-10-27T02:23:14.618Z</updated>
+    
+    <content type="html"><![CDATA[<p>Spring 简单而强大的事务管理功能，包括编程式事务和声明式事务。通过对相关知识梳理，能够理解 Spring 事务管理的本质，并灵活运用之。<br><a id="more"></a></p><p><img src="http://ombpxfki1.bkt.clouddn.com/1540606563030n05o8ot0.png?imageslim" alt="Spring事务"></p><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>[1] <a href="https://www.ibm.com/developerworks/cn/education/opensource/os-cn-spring-trans/index.html" target="_blank" rel="noopener">全面分析 Spring 的编程式事务管理及声明式事务管理</a><br>[2] <a href="https://juejin.im/post/5b00c52ef265da0b95276091" target="_blank" rel="noopener">可能是最漂亮的Spring事务管理详解</a><br>[3] <a href="https://juejin.im/post/5a5c631e6fb9a01cb508cd3d" target="_blank" rel="noopener">Spring核心系列之Spring中的事务</a>  </p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Spring 简单而强大的事务管理功能，包括编程式事务和声明式事务。通过对相关知识梳理，能够理解 Spring 事务管理的本质，并灵活运用之。&lt;br&gt;
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
     <title>风暴之Aop</title>
     <link href="https://dongme.site/2018/10/25/%E9%A3%8E%E6%9A%B4%E4%B9%8BAop/"/>
     <id>https://dongme.site/2018/10/25/风暴之Aop/</id>
-    <published>2018-10-24T16:34:44.000Z</published>
-    <updated>2018-10-24T16:44:34.761Z</updated>
+    <published>2018-10-24T16:34:00.000Z</published>
+    <updated>2018-10-27T02:22:16.271Z</updated>
     
     <content type="html"><![CDATA[<p>面向切面编程<br><a id="more"></a></p><p><img src="http://ombpxfki1.bkt.clouddn.com/154039903920073m0fn4x.png?imageslim" alt=""></p><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>[1] <a href="https://www.ibm.com/developerworks/cn/java/j-lo-springaopcglib/index.html" target="_blank" rel="noopener">Spring AOP 实现原理与 CGLIB 应用</a><br>[2] <a href="http://www.importnew.com/24305.html" target="_blank" rel="noopener">Spring AOP的实现原理</a><br>[3] <a href="https://juejin.im/post/5af3bd6f518825673954bf22" target="_blank" rel="noopener">Spring AOP实现原理</a></p>]]></content>
     
@@ -31,6 +49,10 @@
     
     </summary>
     
+      <category term="java" scheme="https://dongme.site/categories/java/"/>
+    
+    
+      <category term="aop" scheme="https://dongme.site/tags/aop/"/>
     
   </entry>
   
@@ -430,28 +452,6 @@
     
     </summary>
     
-    
-  </entry>
-  
-  <entry>
-    <title>设计模式之中介者模式</title>
-    <link href="https://dongme.site/2018/10/21/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8B%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/"/>
-    <id>https://dongme.site/2018/10/21/设计模式之中介者模式/</id>
-    <published>2018-10-21T04:21:00.000Z</published>
-    <updated>2018-10-21T04:22:37.553Z</updated>
-    
-    <content type="html"><![CDATA[<p>中介者模式（Mediator Pattern）是用来降低多个对象和类之间的通信复杂性。这种模式提供了一个中介类，该类通常处理不同类之间的通信，并支持松耦合，使代码易于维护。中介者模式属于行为型模式。<br><a id="more"></a></p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;中介者模式（Mediator Pattern）是用来降低多个对象和类之间的通信复杂性。这种模式提供了一个中介类，该类通常处理不同类之间的通信，并支持松耦合，使代码易于维护。中介者模式属于行为型模式。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="设计模式" scheme="https://dongme.site/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"/>
-    
-    
-      <category term="中介者模式" scheme="https://dongme.site/tags/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/"/>
     
   </entry>
   
