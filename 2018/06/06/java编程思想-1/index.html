@@ -1,4 +1,201 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="Maybe is Maybe"><title>java编程思想[1-9] | alvin's blog</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/8.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">java编程思想[1-9]</h1><a id="logo" href="/.">alvin's blog</a><p class="description">Good memory is worse than bad writing</p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">java编程思想[1-9]</h1><div class="post-meta">Jun 6, 2018<span> | </span><span class="category"><a href="/categories/java/">java</a></span></div><div class="post-content"><p>最近看java编程思想，对看过的前1-9章一些似懂非懂的知识点做个记录吧。<br><a id="more"></a></p>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>java编程思想[1-9] | alvin&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="keywords" content="编程思想" />
+  
+  
+  
+  
+  <meta name="description" content="最近看java编程思想，对看过的前1-9章一些似懂非懂的知识点做个记录吧。">
+<meta name="keywords" content="编程思想">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java编程思想[1-9]">
+<meta property="og:url" content="https://dongme.site/2018/06/06/java编程思想-1/index.html">
+<meta property="og:site_name" content="alvin&#39;s blog">
+<meta property="og:description" content="最近看java编程思想，对看过的前1-9章一些似懂非懂的知识点做个记录吧。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-08-29T16:10:58.308Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java编程思想[1-9]">
+<meta name="twitter:description" content="最近看java编程思想，对看过的前1-9章一些似懂非懂的知识点做个记录吧。">
+  
+    <link rel="alternate" href="/atom.xml" title="alvin&#39;s blog" type="application/atom+xml">
+  
+
+  
+
+  <link rel="icon" href="/css/images/mylogo.jpg">
+  <link rel="apple-touch-icon" href="/css/images/mylogo.jpg">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
+  <link rel="stylesheet" href="/css/style.css">
+
+  <script src="/js/jquery-3.1.1.min.js"></script>
+  <script src="/js/bootstrap.js"></script>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+
+  
+    <link rel="stylesheet" href="/css/dialog.css">
+  
+
+  
+
+  
+    <link rel="stylesheet" href="/css/header-post.css" >
+  
+
+  
+  
+  
+    <link rel="stylesheet" href="/css/vdonate.css" >
+  
+
+</head>
+
+
+
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
+
+
+  
+  <div id="container">
+    <div id="wrap">
+      
+        <header>
+
+    <div id="allheader" class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="navbar-inner">
+          
+          <div class="container"> 
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+
+            
+              <a class="brand" style="
+                 margin-top: 0px;"  
+                href="#" data-toggle="modal" data-target="#myModal" >
+                  <img width="124px" height="124px" alt="Hike News" src="/css/images/mylogo.jpg">
+              </a>
+            
+            
+            <div class="navbar-collapse collapse">
+              <ul class="hnav navbar-nav">
+                
+                  <li> <a class="main-nav-link" href="/">首页</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/archives">归档</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/categories">分类</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/tags">标签</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/about">关于</a> </li>
+                
+                  <li><div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="请输入关键词..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(无标题)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div></li>
+            </div>
+          </div>
+                
+      </div>
+    </div>
+
+</header>
+
+
+
+      
+            
+      <div id="content" class="outer">
+        
+          <section id="main" style="float:none;"><article id="post-java编程思想-1" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" class="article-title" itemprop="name">
+      java编程思想[1-9]
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2018/06/06/java编程思想-1/" class="article-date">
+	  <time datetime="2018-06-05T16:00:00.000Z" itemprop="datePublished">2018-06-06</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/java/">java</a>
+
+      
+	<a class="article-views">
+	<span id="busuanzi_container_page_pv">
+		阅读量<span id="busuanzi_value_page_pv"></span>
+	</span>
+	</a>
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近看java编程思想，对看过的前1-9章一些似懂非懂的知识点做个记录吧。<br><a id="more"></a></p>
 <h4 id="1-”是一个”与”像是一个”的关系"><a href="#1-”是一个”与”像是一个”的关系" class="headerlink" title="1.”是一个”与”像是一个”的关系"></a>1.”是一个”与”像是一个”的关系</h4><ul>
 <li>导出类只覆盖基类的方法，导出类和基类是完全相同的类型，基类和导出类的关系是一个关系。</li>
 <li>导出类添加新的接口元素，基类无法访问导出类的新接口元素，基类和导出类之间的关系是”像是一个的关系”</li>
@@ -130,4 +327,292 @@
 <li>接口中的元素的都是public的</li>
 <li>接口实现工厂方法</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">interface Service &#123;</span><br><span class="line">    void method1();</span><br><span class="line"></span><br><span class="line">    void method2();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">interface ServiceFactory &#123;</span><br><span class="line">    Service getService();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Implementation1 implements Service &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void method1() &#123;</span><br><span class="line">        System.out.println(&quot;Implementation1:method1&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void method2() &#123;</span><br><span class="line">        System.out.println(&quot;Implementation1:method2&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Implementation1Factory implements ServiceFactory &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public Service getService() &#123;</span><br><span class="line">        return new Implementation1();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Implementation2 implements Service &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void method1() &#123;</span><br><span class="line">        System.out.println(&quot;Implemention2:method1&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void method2() &#123;</span><br><span class="line">        System.out.println(&quot;Implemention2:method2&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Implementation2Factory implements ServiceFactory &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public Service getService() &#123;</span><br><span class="line">        return new Implementation2();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public class FactoriesPrice &#123;</span><br><span class="line">    public static void serviceConsumer(ServiceFactory factory) &#123;</span><br><span class="line">        Service s = factory.getService();</span><br><span class="line">        s.method1();</span><br><span class="line">        s.method2();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        serviceConsumer(new Implementation1Factory());</span><br><span class="line">        serviceConsumer(new Implementation2Factory());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div><div class="tags"><a href="/tags/编程思想/">编程思想</a></div><div class="post-nav"><a class="pre" href="/2018/07/22/快捷键/">快捷键</a><a class="next" href="/2018/05/15/博客添加订阅/">博客添加订阅</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank"><input type="text" name="q" maxlength="20" placeholder="Search"/><input type="hidden" name="sitesearch" value="https://dongme.site"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/music/">music</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/schedule/">schedule</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring-cloud/">spring cloud</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式/"> 分布式</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/名词解释/">名词解释</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/工具/">工具</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/杂记/">杂记</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/消息/">消息</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/前端控制器模式/" style="font-size: 15px;">前端控制器模式</a> <a href="/tags/B2C/" style="font-size: 15px;">B2C</a> <a href="/tags/P2P/" style="font-size: 15px;">P2P</a> <a href="/tags/C2C/" style="font-size: 15px;">C2C</a> <a href="/tags/编程思想/" style="font-size: 15px;">编程思想</a> <a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/jdk/" style="font-size: 15px;">jdk</a> <a href="/tags/小记/" style="font-size: 15px;">小记</a> <a href="/tags/markdown/" style="font-size: 15px;">markdown</a> <a href="/tags/快捷键/" style="font-size: 15px;">快捷键</a> <a href="/tags/适配器模式/" style="font-size: 15px;">适配器模式</a> <a href="/tags/桥接模式/" style="font-size: 15px;">桥接模式</a> <a href="/tags/中介者模式/" style="font-size: 15px;">中介者模式</a> <a href="/tags/传输对象模式/" style="font-size: 15px;">传输对象模式</a> <a href="/tags/B2B/" style="font-size: 15px;">B2B</a> <a href="/tags/命令模式/" style="font-size: 15px;">命令模式</a> <a href="/tags/外观模式/" style="font-size: 15px;">外观模式</a> <a href="/tags/拦截过滤器模式/" style="font-size: 15px;">拦截过滤器模式</a> <a href="/tags/数据访问对象模式/" style="font-size: 15px;">数据访问对象模式</a> <a href="/tags/服务器定位模式/" style="font-size: 15px;">服务器定位模式</a> <a href="/tags/组合模式/" style="font-size: 15px;">组合模式</a> <a href="/tags/装饰器模式/" style="font-size: 15px;">装饰器模式</a> <a href="/tags/解释器模式/" style="font-size: 15px;">解释器模式</a> <a href="/tags/访问者模式/" style="font-size: 15px;">访问者模式</a> <a href="/tags/过滤器模式/" style="font-size: 15px;">过滤器模式</a> <a href="/tags/分布式事务/" style="font-size: 15px;">分布式事务</a> <a href="/tags/rocketmq/" style="font-size: 15px;">rocketmq</a> <a href="/tags/aop/" style="font-size: 15px;">aop</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/10/27/风暴之Spring事务/">风暴之Spring事务</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/10/25/风暴之Aop/">风暴之Aop</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/10/25/风暴之Rocketmq消息有序/">风暴之Rocketmq消息有序</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/10/24/风暴之分布式事务/">风暴之分布式事务</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/10/21/设计模式之传输对象模式/">设计模式之传输对象模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/10/21/设计模式之服务定位器模式/">设计模式之服务定位器模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/10/21/设计模式之拦截过滤器模式/">设计模式之拦截过滤器模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/10/21/设计模式之前端控制器模式/">设计模式之前端控制器模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/10/21/设计模式之数据访问对象模式/">设计模式之数据访问对象模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/10/21/设计模式之组合实体模式/">设计模式之组合实体模式</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="http://www.example1.com/" title="site-name1" target="_blank">site-name1</a><ul></ul><a href="http://www.example2.com/" title="site-name2" target="_blank">site-name2</a><ul></ul><a href="http://www.example3.com/" title="site-name3" target="_blank">site-name3</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2018 <a href="/." rel="nofollow">alvin's blog.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">interface Service &#123;</span><br><span class="line">    void method1();</span><br><span class="line"></span><br><span class="line">    void method2();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">interface ServiceFactory &#123;</span><br><span class="line">    Service getService();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Implementation1 implements Service &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void method1() &#123;</span><br><span class="line">        System.out.println(&quot;Implementation1:method1&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void method2() &#123;</span><br><span class="line">        System.out.println(&quot;Implementation1:method2&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Implementation1Factory implements ServiceFactory &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public Service getService() &#123;</span><br><span class="line">        return new Implementation1();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Implementation2 implements Service &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void method1() &#123;</span><br><span class="line">        System.out.println(&quot;Implemention2:method1&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void method2() &#123;</span><br><span class="line">        System.out.println(&quot;Implemention2:method2&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Implementation2Factory implements ServiceFactory &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public Service getService() &#123;</span><br><span class="line">        return new Implementation2();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public class FactoriesPrice &#123;</span><br><span class="line">    public static void serviceConsumer(ServiceFactory factory) &#123;</span><br><span class="line">        Service s = factory.getService();</span><br><span class="line">        s.method1();</span><br><span class="line">        s.method2();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        serviceConsumer(new Implementation1Factory());</span><br><span class="line">        serviceConsumer(new Implementation2Factory());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      
+        <div id="donation_div"></div>
+
+<script src="/js/vdonate.js"></script>
+<script>
+var a = new Donate({
+  title: '如果觉得我的文章对您有用，请随意打赏。您的支持将鼓励我继续创作!', // 可选参数，打赏标题
+  btnText: '打赏支持', // 可选参数，打赏按钮文字
+  el: document.getElementById('donation_div'),
+  wechatImage: 'css/images/WechatPay.png',
+  alipayImage: 'css/images/avatar.jpg'
+});
+</script>
+      
+      
+      <div>
+        <ul class="post-copyright">
+          <li class="post-copyright-author">
+          <strong>本文作者:  </strong>alvin dong</a>
+          </li>
+          <li class="post-copyright-link">
+          <strong>本文链接:  </strong>
+          <a href="/2018/06/06/java编程思想-1/" target="_blank" title="java编程思想[1-9]">https://dongme.site/2018/06/06/java编程思想-1/</a>
+          </li>
+          <li class="post-copyright-license">
+            <strong>版权声明:   </strong>
+            本博客所有文章除特别声明外，均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+            许可协议。转载请注明出处
+          </li>
+         
+        </ul>
+<div>
+
+      
+      
+        
+	<div id="comment">
+		<!-- 来必力City版安装代码 -->
+		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
+		<script type="text/javascript">
+		   (function(d, s) {
+		       var j, e = d.getElementsByTagName(s)[0];
+
+		       if (typeof LivereTower === 'function') { return; }
+
+		       j = d.createElement(s);
+		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+		       j.async = true;
+
+		       e.parentNode.insertBefore(j, e);
+		   })(document, 'script');
+		</script>
+		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+		</div>
+		<!-- City版安装代码已完成 -->
+	</div>
+
+
+
+      
+      
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/07/22/快捷键/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          快捷键
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/05/15/博客添加订阅/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">博客添加订阅</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- Table of Contents -->
+
+  <aside id="toc-sidebar">
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    
+        <ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-”是一个”与”像是一个”的关系"><span class="nav-number">1.</span> <span class="nav-text">1.”是一个”与”像是一个”的关系</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-伴随多态的可互换对象"><span class="nav-number">2.</span> <span class="nav-text">2.伴随多态的可互换对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-为什么支持多种类型容器"><span class="nav-number">3.</span> <span class="nav-text">3.为什么支持多种类型容器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-对象和其它变量存储空间、生命周期"><span class="nav-number">4.</span> <span class="nav-text">4.对象和其它变量存储空间、生命周期</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-异常处理不是面向对象的特征。"><span class="nav-number">5.</span> <span class="nav-text">5.异常处理不是面向对象的特征。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-java基本类型"><span class="nav-number">6.</span> <span class="nav-text">6.java基本类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-BigInteger-amp-BigDecimal"><span class="nav-number">7.</span> <span class="nav-text">7. BigInteger&amp;BigDecimal</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8-java数组对比C和C"><span class="nav-number">8.</span> <span class="nav-text">8.java数组对比C和C++</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#9-java类中基本类型成员会自动初始化，但局部变量并不会-非某个类的字段"><span class="nav-number">9.</span> <span class="nav-text">9. java类中基本类型成员会自动初始化，但局部变量并不会(非某个类的字段)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#10-方法签名（方法名和参数列表）唯一标识某个方法"><span class="nav-number">10.</span> <span class="nav-text">10.方法签名（方法名和参数列表）唯一标识某个方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#11-static方法牧羊人角色-创建或使用同类型的被命名对象"><span class="nav-number">11.</span> <span class="nav-text">11.static方法牧羊人角色-创建或使用同类型的被命名对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#12-java-lang默认导入到每个java文件中"><span class="nav-number">12.</span> <span class="nav-text">12.java.lang默认导入到每个java文件中</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#13-文档注释"><span class="nav-number">13.</span> <span class="nav-text">13.文档注释</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#14-javadoc命令只能出现在-中，可嵌入html"><span class="nav-number">14.</span> <span class="nav-text">14.javadoc命令只能出现在/**中，可嵌入html</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#15-几乎所有操作类型只能操作基本类型，例外的操作符是“-”，“-”，“-”可以操作所有对象"><span class="nav-number">15.</span> <span class="nav-text">15.几乎所有操作类型只能操作基本类型，例外的操作符是“=”，“!=”，“==”可以操作所有对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#16-随机数的生成"><span class="nav-number">16.</span> <span class="nav-text">16.随机数的生成</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#17-对象的等价性"><span class="nav-number">17.</span> <span class="nav-text">17.对象的等价性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#18-指数计数法"><span class="nav-number">18.</span> <span class="nav-text">18.指数计数法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#19-java位运算"><span class="nav-number">19.</span> <span class="nav-text">19.java位运算</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#20-java类型转换，扩展转换是自动的，窄化转换是强制的，而且数值窄化转换会强制截尾（Math-round-x-可实现四舍五入）"><span class="nav-number">20.</span> <span class="nav-text">20.java类型转换，扩展转换是自动的，窄化转换是强制的，而且数值窄化转换会强制截尾（Math.round(x)可实现四舍五入）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#21-while-x-y-除非x和y都是boolean类型，否则编译报错"><span class="nav-number">21.</span> <span class="nav-text">21. while(x=y)除非x和y都是boolean类型，否则编译报错</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#22-void方法中有隐含的return，另外return会退出当前方法"><span class="nav-number">22.</span> <span class="nav-text">22. void方法中有隐含的return，另外return会退出当前方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#23-break-lable和continue-lable的区别"><span class="nav-number">23.</span> <span class="nav-text">23. break lable和continue lable的区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#24-多个构造器也是方法重载的使用"><span class="nav-number">24.</span> <span class="nav-text">24.多个构造器也是方法重载的使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#25-this代表调用方法的那个对象，会隐式的作为方法的第一个参数传过去，并通过this进行引用"><span class="nav-number">25.</span> <span class="nav-text">25. this代表调用方法的那个对象，会隐式的作为方法的第一个参数传过去，并通过this进行引用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#26-构造器中调用构造器，可用this-参数列表-且必须放第一行且只能通过该形式调用一次"><span class="nav-number">26.</span> <span class="nav-text">26. 构造器中调用构造器，可用this(参数列表)且必须放第一行且只能通过该形式调用一次</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#27-static的含义"><span class="nav-number">27.</span> <span class="nav-text">27. static的含义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#28-finalize-用法"><span class="nav-number">28.</span> <span class="nav-text">28. finalize()用法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#29-类的数据成员如果是基本类型会被自动初始化为默认值"><span class="nav-number">29.</span> <span class="nav-text">29. 类的数据成员如果是基本类型会被自动初始化为默认值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#30-类成员初始化顺序依次"><span class="nav-number">30.</span> <span class="nav-text">30. 类成员初始化顺序依次</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#31-对象创建过程及成员初始化"><span class="nav-number">31.</span> <span class="nav-text">31. 对象创建过程及成员初始化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#32-数组初始化"><span class="nav-number">32.</span> <span class="nav-text">32. 数组初始化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#33-可变参数列表"><span class="nav-number">33.</span> <span class="nav-text">33. 可变参数列表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#34-enum枚举类型可以结合switch语句使用"><span class="nav-number">34.</span> <span class="nav-text">34.enum枚举类型可以结合switch语句使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#35-一个java源代码文件有且只能有一个public类"><span class="nav-number">35.</span> <span class="nav-text">35.一个java源代码文件有且只能有一个public类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#36-package语言必须出现在除注释外的第一行"><span class="nav-number">36.</span> <span class="nav-text">36.package语言必须出现在除注释外的第一行</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#37-java类中不指定package，会使用默认包"><span class="nav-number">37.</span> <span class="nav-text">37.java类中不指定package，会使用默认包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#38-运行java-类名会自动运行该类下的main方法"><span class="nav-number">38.</span> <span class="nav-text">38.运行java 类名会自动运行该类下的main方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#39-继承类的构造过程是从内向外，先调用基类构造器后调用导出类构造器"><span class="nav-number">39.</span> <span class="nav-text">39.继承类的构造过程是从内向外，先调用基类构造器后调用导出类构造器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#40-子类调用父类带参构造器使用super"><span class="nav-number">40.</span> <span class="nav-text">40.子类调用父类带参构造器使用super</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#41-复用类之组合、继承、代理"><span class="nav-number">41.</span> <span class="nav-text">41.复用类之组合、继承、代理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#42-导出类可以向上自动转型为基类类型"><span class="nav-number">42.</span> <span class="nav-text">42.导出类可以向上自动转型为基类类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#43-继承or组合"><span class="nav-number">43.</span> <span class="nav-text">43.继承or组合</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#44-final相关"><span class="nav-number">44.</span> <span class="nav-text">44.final相关</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#45-域和静态方法"><span class="nav-number">45.</span> <span class="nav-text">45.域和静态方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#46-构造器是隐式的static"><span class="nav-number">46.</span> <span class="nav-text">46.构造器是隐式的static</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#47-抽象类和抽象方法"><span class="nav-number">47.</span> <span class="nav-text">47.抽象类和抽象方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#48-接口相关"><span class="nav-number">48.</span> <span class="nav-text">48.接口相关</span></a></li></ol>
+    
+    </div>
+  </aside>
+
+</section>
+        
+      </div>
+      
+      <footer id="footer">
+  
+
+  <div class="container">
+      	<div class="row">
+	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
+	      <p id="copyRightEn">Copyright &copy; 2013 - 2018 alvin&#39;s blog All Rights Reserved.</p>
+	      
+	      
+    		<p class="busuanzi_uv">
+				访客数 : <span id="busuanzi_value_site_uv"></span> |  
+				访问量 : <span id="busuanzi_value_site_pv"></span>
+		    </p>
+  		   
+		</div>
+
+		
+  </div>
+</footer>
+
+
+<!-- min height -->
+
+<script>
+    var wrapdiv = document.getElementById("wrap");
+    var contentdiv = document.getElementById("content");
+    var allheader = document.getElementById("allheader");
+
+    wrapdiv.style.minHeight = document.body.offsetHeight + "px";
+    if (allheader != null) {
+      contentdiv.style.minHeight = document.body.offsetHeight - allheader.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    } else {
+      contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    }
+</script>
+    </div>
+    <!-- <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/categories" class="mobile-nav-link">Categories</a>
+  
+    <a href="/tags" class="mobile-nav-link">Tags</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav> -->
+    
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/scripts.js"></script>
+
+
+
+
+  <script src="/js/dialog.js"></script>
+
+
+
+
+
+
+
+
+	<div style="display: none;">
+    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
+  </div>
+
+
+
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+	</script>
+
+
+
+
+
+
+  </div>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">设置</h2>
+      </div>
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+
+
+      <div class="modal-body">
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="javascript:setFontSize();" aria-expanded="true" aria-controls="collapseOne">
+              正文字号大小
+            </a>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body">
+            您已调整页面字体大小
+          </div>
+        </div>
+      
+
+
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="javascript:setBackground();" aria-expanded="true" aria-controls="collapseTwo">
+              夜间护眼模式
+            </a>
+        </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="panel-body">
+            夜间模式已经开启，再次单击按钮即可关闭 
+          </div>
+        </div>
+
+        <div>
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关 于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>
+         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+          <div class="panel-body">
+            alvin&#39;s blog
+          </div>
+          <div class="panel-body">
+            Copyright © 2018 alvin dong All Rights Reserved.
+          </div>
+        </div>
+      </div>
+
+
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+  
+    <a id="menu-switch"><i class="fa fa-bars fa-lg"></i></a>
+  
+</body>
+</html>
