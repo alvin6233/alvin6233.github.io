@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="alvin&#39;s blog">
 <meta property="og:description" content="泛型正如其名称暗示的：它是一种方法，通过它可以写出更泛化的代码，这些代码对于它们所操作的类型有更少的限制，因此单个代码段可以应用到更多的类型上，减少重复编码。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-11-25T16:42:28.437Z">
+<meta property="og:updated_time" content="2018-11-26T15:24:53.515Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java编程思想[15]-范型">
 <meta name="twitter:description" content="泛型正如其名称暗示的：它是一种方法，通过它可以写出更泛化的代码，这些代码对于它们所操作的类型有更少的限制，因此单个代码段可以应用到更多的类型上，减少重复编码。">
@@ -201,133 +201,32 @@
 <p><strong>可以通过继承实现更长的元组：</strong>      </p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class TwoTuple&lt;A, B&gt; &#123;</span><br><span class="line">    public final A first;</span><br><span class="line">    public  final B second;</span><br><span class="line"></span><br><span class="line">    public TwoTuple(A a, B b) &#123;</span><br><span class="line">        this.first = a;</span><br><span class="line">        this.second = b;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;(&quot; + first + &quot;，&quot; + second + &quot;)&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        TwoTuple&lt;String, Integer&gt; ttsi = new TwoTuple&lt;&gt;(&quot;hi&quot;, 666);</span><br><span class="line">        System.out.println(ttsi.first);</span><br><span class="line">        System.out.println(ttsi.second);</span><br><span class="line">        System.out.println(ttsi.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ul>
-<li>泛型实现一个堆栈类<br>不使用已有的Stack和LinkedList实现一个堆栈类  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">public class LinkedStack&lt;T&gt; &#123;</span><br><span class="line">    private static class Node&lt;U&gt; &#123;</span><br><span class="line">        U item;</span><br><span class="line">        Node&lt;U&gt; next;</span><br><span class="line">        Node() &#123;</span><br><span class="line">            item = null;</span><br><span class="line">            next = null;</span><br><span class="line">        &#125;</span><br><span class="line">        Node(U item, Node&lt;U&gt; next) &#123;</span><br><span class="line">            this.item = item;</span><br><span class="line">            this.next = next;</span><br><span class="line">        &#125;</span><br><span class="line">        boolean end() &#123;</span><br><span class="line">            return item == null &amp;&amp; next == null;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private Node&lt;T&gt; top = new Node&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    public void push(T item) &#123;</span><br><span class="line">        top = new Node&lt;&gt;(item, top);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public T pop() &#123;</span><br><span class="line">        T result = top.item;</span><br><span class="line">        if (!top.end()) &#123;</span><br><span class="line">            top = top.next;</span><br><span class="line">        &#125;</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">```  </span><br><span class="line">##### 泛型接口  </span><br><span class="line">泛型也可以应用于接口。如生成器</span><br><span class="line"></span><br><span class="line">接口类：</span><br></pre></td></tr></table></figure>
+<li>泛型实现一个堆栈类<br>不使用已有的Stack和LinkedList实现一个堆栈类  </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">public class LinkedStack&lt;T&gt; &#123;</span><br><span class="line">    private static class Node&lt;U&gt; &#123;</span><br><span class="line">        U item;</span><br><span class="line">        Node&lt;U&gt; next;</span><br><span class="line">        Node() &#123;</span><br><span class="line">            item = null;</span><br><span class="line">            next = null;</span><br><span class="line">        &#125;</span><br><span class="line">        Node(U item, Node&lt;U&gt; next) &#123;</span><br><span class="line">            this.item = item;</span><br><span class="line">            this.next = next;</span><br><span class="line">        &#125;</span><br><span class="line">        boolean end() &#123;</span><br><span class="line">            return item == null &amp;&amp; next == null;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private Node&lt;T&gt; top = new Node&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    public void push(T item) &#123;</span><br><span class="line">        top = new Node&lt;&gt;(item, top);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public T pop() &#123;</span><br><span class="line">        T result = top.item;</span><br><span class="line">        if (!top.end()) &#123;</span><br><span class="line">            top = top.next;</span><br><span class="line">        &#125;</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="泛型接口"><a href="#泛型接口" class="headerlink" title="泛型接口"></a>泛型接口</h5><p>泛型也可以应用于接口。如生成器</p>
+<p>接口类： </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public interface Generator&lt;T&gt; &#123;</span><br><span class="line">    T next();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以生成各类咖啡对象为例，这里准备一些Coffee类：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">public class Coffee &#123;</span><br><span class="line">    private static long counter = 0;</span><br><span class="line">    private final long id = counter++;</span><br><span class="line"></span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return getClass().getSimpleName() + &quot; &quot; + id;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class Americano extends Coffee &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class Breve extends Coffee &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class Cappuccino extends Coffee &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class Latte extends Coffee &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class Mocha extends Coffee &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编写CoffeeGenerator类实现Generator<coffee>接口，随机生成不同类型的Coffee对象：  </coffee></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">public class CoffeeGenerator implements Generator&lt;Coffee&gt;, Iterable&lt;Coffee&gt;&#123;</span><br><span class="line"></span><br><span class="line">    private Class[] types = &#123;Latte.class, Mocha.class, Cappuccino.class, Americano.class, Breve.class&#125;;</span><br><span class="line">    private static Random rand = new Random(47);</span><br><span class="line"></span><br><span class="line">    public CoffeeGenerator() &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private int size = 0;</span><br><span class="line"></span><br><span class="line">    public CoffeeGenerator(int sz) &#123;</span><br><span class="line">        this.size = sz;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Iterator&lt;Coffee&gt; iterator() &#123;</span><br><span class="line">        return new CoffeeIterator();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Coffee next() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            return (Coffee)types[rand.nextInt(types.length)].newInstance();</span><br><span class="line">        &#125;  catch (Exception e) &#123;</span><br><span class="line">            throw new RuntimeException(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    class CoffeeIterator implements Iterator&lt;Coffee&gt; &#123;</span><br><span class="line">        int count = size;</span><br><span class="line">        @Override</span><br><span class="line">        public Coffee next() &#123;</span><br><span class="line">            count--;</span><br><span class="line">            return CoffeeGenerator.this.next();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void remove() &#123;</span><br><span class="line">            throw new UnsupportedOperationException();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public boolean hasNext() &#123;</span><br><span class="line">            return count &gt; 0;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        CoffeeGenerator gen = new CoffeeGenerator();</span><br><span class="line">        for (int i = 0; i &lt; 5; i++) &#123;</span><br><span class="line">            System.out.println(gen.next());</span><br><span class="line">        &#125;</span><br><span class="line">        for (Coffee c : new CoffeeGenerator(5)) &#123;</span><br><span class="line">            System.out.println(c);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="泛型方法"><a href="#泛型方法" class="headerlink" title="泛型方法"></a>泛型方法</h5><blockquote>
+<p>泛型方法所在的类可以是泛型类，也可以不是泛型类<br>能用泛型方法，尽量不用泛型类，更清楚明白<br>static方法无法使用泛型类的类型参数，static要使用泛型能力，就必须成为泛型方法  </p>
+</blockquote>
+<p>要定义泛型方法，只需将泛型参数列表置于返回值之前：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class GenericMethods &#123;</span><br><span class="line">    public &lt;T&gt; void f(T x) &#123;</span><br><span class="line">        System.out.println(x.getClass().getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        GenericMethods gm = new GenericMethods();</span><br><span class="line">        gm.f(&quot;&quot;);</span><br><span class="line">        gm.f(1);</span><br><span class="line">        gm.f(1.0);</span><br><span class="line">        gm.f(1.0f);</span><br><span class="line">        gm.f(&apos;c&apos;);</span><br><span class="line">        gm.f(gm);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>类型参数推断<br>当使用泛型类时，必须在创建对象的时候指定类型参数的值，而使用泛型方法的时候，通常不必指明参数类型，因为编译器会为我们找出具体的类型。  </p>
+</li>
+<li><p>可变参数与泛型方法<br>泛型方法与可变参数列表可以很好的共存  </p>
 </li>
 </ul>
-<p>public interface Generator<t> {<br>    T next();<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">以生成各类咖啡对象为例，这里准备一些Coffee类：</span><br></pre></td></tr></table></figure></t></p>
-<p>public class Coffee {<br>    private static long counter = 0;<br>    private final long id = counter++;</p>
-<pre><code>public String toString() {
-    return getClass().getSimpleName() + &quot; &quot; + id;
-}
-</code></pre><p>}</p>
-<p>public class Americano extends Coffee {<br>}</p>
-<p>public class Breve extends Coffee {<br>}</p>
-<p>public class Cappuccino extends Coffee {<br>}</p>
-<p>public class Latte extends Coffee {<br>}</p>
-<p>public class Mocha extends Coffee {<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">编写CoffeeGenerator类实现Generator&lt;Coffee&gt;接口，随机生成不同类型的Coffee对象：</span><br></pre></td></tr></table></figure></p>
-<p>public class CoffeeGenerator implements Generator<coffee>, Iterable<coffee>{</coffee></coffee></p>
-<pre><code>private Class[] types = {Latte.class, Mocha.class, Cappuccino.class, Americano.class, Breve.class};
-private static Random rand = new Random(47);
-
-public CoffeeGenerator() {
-}
-
-private int size = 0;
-
-public CoffeeGenerator(int sz) {
-    this.size = sz;
-}
-
-@Override
-public Iterator&lt;Coffee&gt; iterator() {
-    return new CoffeeIterator();
-}
-
-@Override
-public Coffee next() {
-    try {
-        return (Coffee)types[rand.nextInt(types.length)].newInstance();
-    }  catch (Exception e) {
-        throw new RuntimeException(e);
-    }
-}
-
-class CoffeeIterator implements Iterator&lt;Coffee&gt; {
-    int count = size;
-    @Override
-    public Coffee next() {
-        count--;
-        return CoffeeGenerator.this.next();
-    }
-
-    @Override
-    public void remove() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean hasNext() {
-        return count &gt; 0;
-    }
-}
-
-
-public static void main(String[] args) {
-    CoffeeGenerator gen = new CoffeeGenerator();
-    for (int i = 0; i &lt; 5; i++) {
-        System.out.println(gen.next());
-    }
-    for (Coffee c : new CoffeeGenerator(5)) {
-        System.out.println(c);
-    }
-}
-</code></pre><p>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">##### 泛型方法  </span><br><span class="line"></span><br><span class="line">&gt; 泛型方法所在的类可以是泛型类，也可以不是泛型类  </span><br><span class="line">&gt; 能用泛型方法，尽量不用泛型类，更清楚明白  </span><br><span class="line">&gt; static方法无法使用泛型类的类型参数，static要使用泛型能力，就必须成为泛型方法  </span><br><span class="line"></span><br><span class="line">要定义泛型方法，只需将泛型参数列表置于返回值之前：</span><br></pre></td></tr></table></figure></p>
-<p>public class GenericMethods {<br>    public <t> void f(T x) {<br>        System.out.println(x.getClass().getName());<br>    }</t></p>
-<pre><code>public static void main(String[] args) {
-    GenericMethods gm = new GenericMethods();
-    gm.f(&quot;&quot;);
-    gm.f(1);
-    gm.f(1.0);
-    gm.f(1.0f);
-    gm.f(&apos;c&apos;);
-    gm.f(gm);
-}
-</code></pre><p>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">+ 类型参数推断  </span><br><span class="line">当使用泛型类时，必须在创建对象的时候指定类型参数的值，而使用泛型方法的时候，通常不必指明参数类型，因为编译器会为我们找出具体的类型。  </span><br><span class="line"></span><br><span class="line">+ 可变参数与泛型方法  </span><br><span class="line">泛型方法与可变参数列表可以很好的共存</span><br></pre></td></tr></table></figure></p>
-<p>public class GenericVarargs {<br>    public static <t> List<t> makeList(T… args) {<br>        List<t> result = new ArrayList&lt;&gt;();<br>        for (T item : args) {<br>            result.add(item);<br>        }<br>        return result;<br>    }</t></t></t></p>
-<pre><code>public static void main(String[] args) {
-    List&lt;String&gt; ls = makeList(&quot;A&quot;);
-    System.out.println(ls);
-    ls = makeList(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;);
-    System.out.println(ls);
-    ls = makeList(&quot;ABCDEFGHIJKLMNOPQ&quot;.split(&quot;&quot;));
-    System.out.println(ls);
-}
-</code></pre><p>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">##### 泛型应用到内部类及匿名内部类  </span><br><span class="line">Customer和Teller只有private构造器，必须使用Generator对象。Customer中generator方法，每次生成一个Generator&lt;Customer&gt;对象。</span><br><span class="line">其实不需要这么多Generator对象，Teller只创建了一个public的generator对象。</span><br></pre></td></tr></table></figure></p>
-<p>class Customer {<br>    private static long counter = 1;<br>    private final long id = counter++;<br>    private Customer() {</p>
-<pre><code>}
-
-@Override
-public String toString() {
-    return &quot;Customer &quot; + id;
-}
-public static Generator&lt;Customer&gt; generator() {
-    return new Generator&lt;Customer&gt;() {
-        @Override
-        public Customer next() {
-            return new Customer();
-        }
-    };
-}
-</code></pre><p>}</p>
-<p>class Teller {<br>    private static long counter = 1;<br>    private final long id = counter++;</p>
-<pre><code>private Teller() {
-
-}
-
-@Override
-public String toString() {
-    return &quot;teller: &quot; + id;
-}
-public static Generator&lt;Teller&gt; generator =
-        new Generator&lt;Teller&gt;() {
-            @Override
-            public Teller next() {
-                return new Teller();
-            }
-        };
-</code></pre><p>}</p>
-<p>public class BankTeller {<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">##### 擦除的神秘之处  </span><br><span class="line">ArrayList&lt;String&gt;和ArrayList&lt;Integer&gt;很容易被认为是不同的类型，其实不然：</span><br></pre></td></tr></table></figure></p>
-<p>public class ErasedTypeEquivalence {<br>    public static void main(String[] args) {<br>        Class c1 = new ArrayList<string>().getClass();<br>        Class c2 = new ArrayList<integer>().getClass();<br>        System.out.println(c1 == c2);<br>    }<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">上面运行返回true，下面示例是解答：</span><br></pre></td></tr></table></figure></integer></string></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public class GenericVarargs &#123;</span><br><span class="line">    public static &lt;T&gt; List&lt;T&gt; makeList(T... args) &#123;</span><br><span class="line">        List&lt;T&gt; result = new ArrayList&lt;&gt;();</span><br><span class="line">        for (T item : args) &#123;</span><br><span class="line">            result.add(item);</span><br><span class="line">        &#125;</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        List&lt;String&gt; ls = makeList(&quot;A&quot;);</span><br><span class="line">        System.out.println(ls);</span><br><span class="line">        ls = makeList(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;);</span><br><span class="line">        System.out.println(ls);</span><br><span class="line">        ls = makeList(&quot;ABCDEFGHIJKLMNOPQ&quot;.split(&quot;&quot;));</span><br><span class="line">        System.out.println(ls);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="泛型应用到内部类及匿名内部类"><a href="#泛型应用到内部类及匿名内部类" class="headerlink" title="泛型应用到内部类及匿名内部类"></a>泛型应用到内部类及匿名内部类</h5><p>Customer和Teller只有private构造器，必须使用Generator对象。Customer中generator方法，每次生成一个Generator<customer>对象。<br>其实不需要这么多Generator对象，Teller只创建了一个public的generator对象。  </customer></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">class Customer &#123;</span><br><span class="line">    private static long counter = 1;</span><br><span class="line">    private final long id = counter++;</span><br><span class="line">    private Customer() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;Customer &quot; + id;</span><br><span class="line">    &#125;</span><br><span class="line">    public static Generator&lt;Customer&gt; generator() &#123;</span><br><span class="line">        return new Generator&lt;Customer&gt;() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public Customer next() &#123;</span><br><span class="line">                return new Customer();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Teller &#123;</span><br><span class="line">    private static long counter = 1;</span><br><span class="line">    private final long id = counter++;</span><br><span class="line"></span><br><span class="line">    private Teller() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;teller: &quot; + id;</span><br><span class="line">    &#125;</span><br><span class="line">    public static Generator&lt;Teller&gt; generator =</span><br><span class="line">            new Generator&lt;Teller&gt;() &#123;</span><br><span class="line">                @Override</span><br><span class="line">                public Teller next() &#123;</span><br><span class="line">                    return new Teller();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class BankTeller &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="擦除的神秘之处"><a href="#擦除的神秘之处" class="headerlink" title="擦除的神秘之处"></a>擦除的神秘之处</h5><p>ArrayList<string>和ArrayList<integer>很容易被认为是不同的类型，其实不然：  </integer></string></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public class ErasedTypeEquivalence &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Class c1 = new ArrayList&lt;String&gt;().getClass();</span><br><span class="line">        Class c2 = new ArrayList&lt;Integer&gt;().getClass();</span><br><span class="line">        System.out.println(c1 == c2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">```  </span><br><span class="line"></span><br><span class="line">上面运行返回true，下面示例是解答：</span><br></pre></td></tr></table></figure>
 <p>class Frob {</p>
 <p>}</p>
 <p>class Fnorkle {</p>
@@ -575,7 +474,7 @@ var a = new Donate({
     <div id="toc" class="toc-article">
     <strong class="toc-title">文章目录</strong>
     
-        <ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#泛型"><span class="nav-number">1.</span> <span class="nav-text">泛型</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#简单泛型"><span class="nav-number">1.1.</span> <span class="nav-text">简单泛型</span></a></li></ol></li></ol>
+        <ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#泛型"><span class="nav-number">1.</span> <span class="nav-text">泛型</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#简单泛型"><span class="nav-number">1.1.</span> <span class="nav-text">简单泛型</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#泛型接口"><span class="nav-number">1.2.</span> <span class="nav-text">泛型接口</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#泛型方法"><span class="nav-number">1.3.</span> <span class="nav-text">泛型方法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#泛型应用到内部类及匿名内部类"><span class="nav-number">1.4.</span> <span class="nav-text">泛型应用到内部类及匿名内部类</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#擦除的神秘之处"><span class="nav-number">1.5.</span> <span class="nav-text">擦除的神秘之处</span></a></li></ol></li></ol>
     
     </div>
   </aside>
