@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="alvin&#39;s blog">
 <meta property="og:description" content="jdk9新特性。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-10-16T16:40:02.565Z">
+<meta property="og:updated_time" content="2018-11-26T15:55:44.303Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="jdk新特性之jdk9">
 <meta name="twitter:description" content="jdk9新特性。">
@@ -386,10 +386,10 @@
 <p>如果没有在给定的 timeout 内完成，就以 java.util.concurrent.TimeoutException 完成这个 CompletableFutrue，并返回这个 CompletableFutrue。  </p>
 <h5 id="增强了对子类化的支持"><a href="#增强了对子类化的支持" class="headerlink" title="增强了对子类化的支持"></a>增强了对子类化的支持</h5><p>做了许多改进使得 CompletableFuture 可以被更简单的继承。比如，你也许想重写新的 public Executor defaultExecutor() 方法来代替默认的 executor。<br>另一个新的使子类化更容易的方法是：  </p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public &lt;U&gt; CompletableFuture&lt;U&gt; newIncompleteFuture()</span><br></pre></td></tr></table></figure>
-<h5 id="新的工厂方法"><a href="#新的工厂方法" class="headerlink" title="新的工厂方法"></a>新的工厂方法</h5><p>Java 8引入了 <u> CompletableFuture<u> completedFuture(U value) 工厂方法来返回一个已经以给定 value 完成了的 CompletableFuture。<br>Java 9以 一个新的 <u> CompletableFuture<u> failedFuture(Throwable ex) 来补充了这个方法，可以返回一个以给定异常完成的 CompletableFuture。<br>除此以外，Java 9 引入了下面这对 stage-oriented 工厂方法，返回完成的或异常完成的 completion stages:  </u></u></u></u></p>
+<h5 id="新的工厂方法"><a href="#新的工厂方法" class="headerlink" title="新的工厂方法"></a>新的工厂方法</h5><p>Java 8引入了  CompletableFuture， completedFuture(U value) 工厂方法来返回一个已经以给定 value 完成了的 CompletableFuture。<br>Java 9以 一个新的  CompletableFuture failedFuture(Throwable ex) 来补充了这个方法，可以返回一个以给定异常完成的 CompletableFuture。<br>除此以外，Java 9 引入了下面这对 stage-oriented 工厂方法，返回完成的或异常完成的 completion stages:  </p>
 <ul>
-<li><strong><u> CompletionStage<u> completedStage(U value):</u></u></strong> 返回一个新的以指定 value 完成的CompletionStage ，并且只支持 CompletionStage 里的接口。  </li>
-<li><strong><u> CompletionStage<u> failedStage(Throwable ex):</u></u></strong> 返回一个新的以指定异常完成的CompletionStage ，并且只支持 CompletionStage 里的接口。  </li>
+<li><strong> CompletionStage completedStage(U value):</strong> 返回一个新的以指定 value 完成的CompletionStage ，并且只支持 CompletionStage 里的接口。  </li>
+<li><strong>CompletionStage failedStage(Throwable ex):</strong> 返回一个新的以指定异常完成的CompletionStage ，并且只支持 CompletionStage 里的接口。     </li>
 </ul>
 <h4 id="改进的-Javadoc"><a href="#改进的-Javadoc" class="headerlink" title="改进的 Javadoc"></a>改进的 Javadoc</h4><h4 id="Deprecated"><a href="#Deprecated" class="headerlink" title="@Deprecated"></a>@Deprecated</h4>
       
