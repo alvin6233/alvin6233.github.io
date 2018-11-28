@@ -3,25 +3,25 @@
 <head>
   <meta charset="utf-8">
   
-  <title>风暴之spring事务 | alvin&#39;s blog</title>
+  <title>风暴之jvm | alvin&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
   
   
   
-  <meta name="description" content="Spring 简单而强大的事务管理功能，包括编程式事务和声明式事务。通过对相关知识梳理，能够理解 Spring 事务管理的本质，并灵活运用之。">
+  <meta name="description" content="Java语言的一个非常重要的特点就是与平台的无关性。而使用Java虚拟机是实现这一特点的关键。Java语言使用Java虚拟机屏蔽了与具体平台相关的信息，使得Java语言编译程序只需生成在Java虚拟机上运行的目标代码（字节码），就可以在多种平台上不加修改地运行。Java虚拟机在执行字节码时，把字节码解释成具体平台上的机器指令执行。这就是Java的能够”一次编译，到处运行“的原因。了解JVM底层有助">
 <meta property="og:type" content="article">
-<meta property="og:title" content="风暴之Spring事务">
-<meta property="og:url" content="https://dongme.site/2018/10/27/风暴之Spring事务/index.html">
+<meta property="og:title" content="风暴之JVM">
+<meta property="og:url" content="https://dongme.site/2018/11/28/风暴之JVM/index.html">
 <meta property="og:site_name" content="alvin&#39;s blog">
-<meta property="og:description" content="Spring 简单而强大的事务管理功能，包括编程式事务和声明式事务。通过对相关知识梳理，能够理解 Spring 事务管理的本质，并灵活运用之。">
+<meta property="og:description" content="Java语言的一个非常重要的特点就是与平台的无关性。而使用Java虚拟机是实现这一特点的关键。Java语言使用Java虚拟机屏蔽了与具体平台相关的信息，使得Java语言编译程序只需生成在Java虚拟机上运行的目标代码（字节码），就可以在多种平台上不加修改地运行。Java虚拟机在执行字节码时，把字节码解释成具体平台上的机器指令执行。这就是Java的能够”一次编译，到处运行“的原因。了解JVM底层有助">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://coding.net/u/alvin_me/p/blogpics/git/raw/master/spring%E4%BA%8B%E5%8A%A1.jpg">
-<meta property="og:updated_time" content="2018-11-28T15:47:51.672Z">
+<meta property="og:image" content="https://coding.net/u/alvin_me/p/blogpics/git/raw/master/jvm%E7%9B%B8%E5%85%B3.jpg">
+<meta property="og:updated_time" content="2018-11-28T16:00:48.606Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="风暴之Spring事务">
-<meta name="twitter:description" content="Spring 简单而强大的事务管理功能，包括编程式事务和声明式事务。通过对相关知识梳理，能够理解 Spring 事务管理的本质，并灵活运用之。">
-<meta name="twitter:image" content="https://coding.net/u/alvin_me/p/blogpics/git/raw/master/spring%E4%BA%8B%E5%8A%A1.jpg">
+<meta name="twitter:title" content="风暴之JVM">
+<meta name="twitter:description" content="Java语言的一个非常重要的特点就是与平台的无关性。而使用Java虚拟机是实现这一特点的关键。Java语言使用Java虚拟机屏蔽了与具体平台相关的信息，使得Java语言编译程序只需生成在Java虚拟机上运行的目标代码（字节码），就可以在多种平台上不加修改地运行。Java虚拟机在执行字节码时，把字节码解释成具体平台上的机器指令执行。这就是Java的能够”一次编译，到处运行“的原因。了解JVM底层有助">
+<meta name="twitter:image" content="https://coding.net/u/alvin_me/p/blogpics/git/raw/master/jvm%E7%9B%B8%E5%85%B3.jpg">
   
     <link rel="alternate" href="/atom.xml" title="alvin&#39;s blog" type="application/atom+xml">
   
@@ -161,7 +161,7 @@
             
       <div id="content" class="outer">
         
-          <section id="main" style="float:none;"><article id="post-风暴之Spring事务" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+          <section id="main" style="float:none;"><article id="post-风暴之JVM" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
   <div id="articleInner" class="article-inner">
     
     
@@ -169,7 +169,7 @@
         
   
     <h1 class="thumb" class="article-title" itemprop="name">
-      风暴之Spring事务
+      风暴之JVM
     </h1>
   
 
@@ -177,8 +177,8 @@
     
     <div class="article-meta">
       
-	<a href="/2018/10/27/风暴之Spring事务/" class="article-date">
-	  <time datetime="2018-10-27T02:14:00.000Z" itemprop="datePublished">2018-10-27</time>
+	<a href="/2018/11/28/风暴之JVM/" class="article-date">
+	  <time datetime="2018-11-28T15:51:00.000Z" itemprop="datePublished">2018-11-28</time>
 	</a>
 
       
@@ -192,10 +192,9 @@
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        <p>Spring 简单而强大的事务管理功能，包括编程式事务和声明式事务。通过对相关知识梳理，能够理解 Spring 事务管理的本质，并灵活运用之。<br><a id="more"></a></p>
-<p><img src="https://coding.net/u/alvin_me/p/blogpics/git/raw/master/spring%E4%BA%8B%E5%8A%A1.jpg" alt="Spring事务"></p>
-<p><a href="http://www.edrawsoft.cn/viewer/public/s/4cbc1230271951" target="_blank" rel="noopener">看大图</a></p>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>[1] <a href="https://www.ibm.com/developerworks/cn/education/opensource/os-cn-spring-trans/index.html" target="_blank" rel="noopener">全面分析 Spring 的编程式事务管理及声明式事务管理</a><br>[2] <a href="https://juejin.im/post/5b00c52ef265da0b95276091" target="_blank" rel="noopener">可能是最漂亮的Spring事务管理详解</a><br>[3] <a href="https://juejin.im/post/5a5c631e6fb9a01cb508cd3d" target="_blank" rel="noopener">Spring核心系列之Spring中的事务</a></p>
+        <p>Java语言的一个非常重要的特点就是与平台的无关性。而使用Java虚拟机是实现这一特点的关键。Java语言使用Java虚拟机屏蔽了与具体平台相关的信息，使得Java语言编译程序只需生成在Java虚拟机上运行的目标代码（字节码），就可以在多种平台上不加修改地运行。Java虚拟机在执行字节码时，把字节码解释成具体平台上的机器指令执行。这就是Java的能够”一次编译，到处运行“的原因。了解JVM底层有助于理解Java工作原理，更好的编程。<br><a id="more"></a></p>
+<p><img src="https://coding.net/u/alvin_me/p/blogpics/git/raw/master/jvm%E7%9B%B8%E5%85%B3.jpg" alt="">  </p>
+<p><a href="http://www.edrawsoft.cn/viewer/public/s/41a60748487374" target="_blank" rel="noopener">看大图</a></p>
 
       
     </div>
@@ -222,7 +221,7 @@ var a = new Donate({
           </li>
           <li class="post-copyright-link">
           <strong>本文链接:  </strong>
-          <a href="/2018/10/27/风暴之Spring事务/" target="_blank" title="风暴之Spring事务">https://dongme.site/2018/10/27/风暴之Spring事务/</a>
+          <a href="/2018/11/28/风暴之JVM/" target="_blank" title="风暴之JVM">https://dongme.site/2018/11/28/风暴之JVM/</a>
           </li>
           <li class="post-copyright-license">
             <strong>版权声明:   </strong>
@@ -268,19 +267,19 @@ var a = new Donate({
     
 <nav id="article-nav">
   
-    <a href="/2018/11/28/风暴之JVM/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2018/11/29/风暴之Redis/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">上一篇</strong>
       <div class="article-nav-title">
         
-          风暴之JVM
+          风暴之Redis
         
       </div>
     </a>
   
   
-    <a href="/2018/10/25/风暴之Aop/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2018/10/27/风暴之Spring事务/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">下一篇</strong>
-      <div class="article-nav-title">风暴之Aop</div>
+      <div class="article-nav-title">风暴之Spring事务</div>
     </a>
   
 </nav>
@@ -294,7 +293,7 @@ var a = new Donate({
     <div id="toc" class="toc-article">
     <strong class="toc-title">文章目录</strong>
     
-        <ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-number">1.</span> <span class="nav-text">参考</span></a></li></ol>
+        <ol class="nav">无</ol>
     
     </div>
   </aside>
