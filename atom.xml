@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://dongz.me/"/>
-  <updated>2018-12-02T14:24:08.408Z</updated>
+  <updated>2018-12-10T17:01:35.394Z</updated>
   <id>https://dongz.me/</id>
   
   <author>
@@ -17,11 +17,33 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>风暴之mysql</title>
+    <link href="https://dongz.me/2018/12/11/%E9%A3%8E%E6%9A%B4%E4%B9%8Bmysql/"/>
+    <id>https://dongz.me/2018/12/11/风暴之mysql/</id>
+    <published>2018-12-10T16:40:00.000Z</published>
+    <updated>2018-12-10T17:01:35.394Z</updated>
+    
+    <content type="html"><![CDATA[<p>本篇以mysql常见维度展开头脑风暴。维度包括数据的存储结构、数据库事务、mysql中常见的锁、mysql使用优化、mysql中常见日志。图中有不当的地方请留言指出～～<br><a id="more"></a>  </p><h1 id="风暴之mysql"><a href="#风暴之mysql" class="headerlink" title="风暴之mysql"></a>风暴之mysql</h1><p><img src="https://coding.net/u/alvin_me/p/blogpics/git/raw/master/mysql.jpg" alt=""></p><p><a href="http://www.edrawsoft.cn/viewer/public/s/b8368745248662" target="_blank" rel="noopener">看大图</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本篇以mysql常见维度展开头脑风暴。维度包括数据的存储结构、数据库事务、mysql中常见的锁、mysql使用优化、mysql中常见日志。图中有不当的地方请留言指出～～&lt;br&gt;
+    
+    </summary>
+    
+      <category term="数据存储" scheme="https://dongz.me/categories/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/"/>
+    
+    
+      <category term="mysql" scheme="https://dongz.me/tags/mysql/"/>
+    
+  </entry>
+  
+  <entry>
     <title>风暴之线上问题排查</title>
     <link href="https://dongz.me/2018/11/29/%E9%A3%8E%E6%9A%B4%E4%B9%8B%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/"/>
     <id>https://dongz.me/2018/11/29/风暴之线上问题排查/</id>
-    <published>2018-11-28T16:23:48.000Z</published>
-    <updated>2018-12-02T14:24:08.408Z</updated>
+    <published>2018-11-28T16:23:00.000Z</published>
+    <updated>2018-12-10T17:02:37.966Z</updated>
     
     <content type="html"><![CDATA[<p>实际生产环境下，应用不可避免的会遇到各种各样的问题，要熟练掌握一些命令和工具，以快速排查定位线上问题。<br><a id="more"></a>  </p><h1 id="风暴之线上问题排查"><a href="#风暴之线上问题排查" class="headerlink" title="风暴之线上问题排查"></a>风暴之线上问题排查</h1><p><img src="https://coding.net/u/alvin_me/p/blogpics/git/raw/master/%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5.png" alt=""></p><p><a href="http://www.edrawsoft.cn/viewer/public/s/72167602893328" target="_blank" rel="noopener">看大图</a></p>]]></content>
     
@@ -31,6 +53,10 @@
     
     </summary>
     
+      <category term="积累" scheme="https://dongz.me/categories/%E7%A7%AF%E7%B4%AF/"/>
+    
+    
+      <category term="问题排查" scheme="https://dongz.me/tags/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/"/>
     
   </entry>
   
@@ -38,8 +64,8 @@
     <title>风暴之并发和多线程</title>
     <link href="https://dongz.me/2018/11/29/%E9%A3%8E%E6%9A%B4%E4%B9%8B%E5%B9%B6%E5%8F%91%E5%92%8C%E5%A4%9A%E7%BA%BF%E7%A8%8B/"/>
     <id>https://dongz.me/2018/11/29/风暴之并发和多线程/</id>
-    <published>2018-11-28T16:18:27.000Z</published>
-    <updated>2018-12-02T14:24:31.131Z</updated>
+    <published>2018-11-28T16:18:00.000Z</published>
+    <updated>2018-12-10T17:03:00.135Z</updated>
     
     <content type="html"><![CDATA[<p>并发和多线程是Java编程中避不开的话题，今天主要对并发和多线程相关知识进行下头脑风暴。<br><a id="more"></a></p><h1 id="风暴之并发和多线程"><a href="#风暴之并发和多线程" class="headerlink" title="风暴之并发和多线程"></a>风暴之并发和多线程</h1><p><img src="https://coding.net/u/alvin_me/p/blogpics/git/raw/master/%E5%B9%B6%E5%8F%91%E5%92%8C%E5%A4%9A%E7%BA%BF%E7%A8%8B.png" alt=""></p><p><a href="http://www.edrawsoft.cn/viewer/public/s/7e9bd056155369" target="_blank" rel="noopener">看大图</a></p>]]></content>
     
@@ -49,6 +75,12 @@
     
     </summary>
     
+      <category term="java" scheme="https://dongz.me/categories/java/"/>
+    
+    
+      <category term="并发" scheme="https://dongz.me/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+      <category term="多线程" scheme="https://dongz.me/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"/>
     
   </entry>
   
@@ -56,8 +88,8 @@
     <title>风暴之Redis</title>
     <link href="https://dongz.me/2018/11/29/%E9%A3%8E%E6%9A%B4%E4%B9%8BRedis/"/>
     <id>https://dongz.me/2018/11/29/风暴之Redis/</id>
-    <published>2018-11-28T16:01:48.000Z</published>
-    <updated>2018-12-02T14:24:49.225Z</updated>
+    <published>2018-11-28T16:01:00.000Z</published>
+    <updated>2018-12-10T17:03:26.961Z</updated>
     
     <content type="html"><![CDATA[<p>Redis 是一个开源（BSD许可）的，内存中的数据结构存储系统，它可以用作数据库、缓存和消息中间件。 它支持多种类型的数据结构，如 字符串（strings）， 散列（hashes）， 列表（lists）， 集合（sets）， 有序集合（sorted sets） 与范围查询， bitmaps， hyperloglogs 和 地理空间（geospatial） 索引半径查询。 Redis 内置了 复制（replication），LUA脚本（Lua scripting）， LRU驱动事件（LRU eviction），事务（transactions） 和不同级别的 磁盘持久化（persistence）， 并通过 Redis哨兵（Sentinel）和自动 分区（Cluster）提供高可用性（high availability）。<br><a id="more"></a></p><h1 id="风暴之Redis"><a href="#风暴之Redis" class="headerlink" title="风暴之Redis"></a>风暴之Redis</h1><p><img src="https://coding.net/u/alvin_me/p/blogpics/git/raw/master/redis%E7%9F%A5%E8%AF%86.png" alt=""></p><p><a href="http://www.edrawsoft.cn/viewer/public/s/0be97318174746" target="_blank" rel="noopener">看大图</a></p>]]></content>
     
@@ -67,6 +99,10 @@
     
     </summary>
     
+      <category term="数据存储" scheme="https://dongz.me/categories/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/"/>
+    
+    
+      <category term="redis" scheme="https://dongz.me/tags/redis/"/>
     
   </entry>
   
@@ -75,7 +111,7 @@
     <link href="https://dongz.me/2018/11/28/%E9%A3%8E%E6%9A%B4%E4%B9%8BJVM/"/>
     <id>https://dongz.me/2018/11/28/风暴之JVM/</id>
     <published>2018-11-28T15:51:00.000Z</published>
-    <updated>2018-12-02T14:25:03.639Z</updated>
+    <updated>2018-12-10T17:03:39.290Z</updated>
     
     <content type="html"><![CDATA[<p>Java语言的一个非常重要的特点就是与平台的无关性。而使用Java虚拟机是实现这一特点的关键。Java语言使用Java虚拟机屏蔽了与具体平台相关的信息，使得Java语言编译程序只需生成在Java虚拟机上运行的目标代码（字节码），就可以在多种平台上不加修改地运行。Java虚拟机在执行字节码时，把字节码解释成具体平台上的机器指令执行。这就是Java的能够”一次编译，到处运行“的原因。了解JVM底层有助于理解Java工作原理，更好的编程。<br><a id="more"></a></p><h1 id="风暴之JVM"><a href="#风暴之JVM" class="headerlink" title="风暴之JVM"></a>风暴之JVM</h1><p><img src="https://coding.net/u/alvin_me/p/blogpics/git/raw/master/jvm%E7%9B%B8%E5%85%B3.jpg" alt="">  </p><p><a href="http://www.edrawsoft.cn/viewer/public/s/41a60748487374" target="_blank" rel="noopener">看大图</a></p>]]></content>
     
@@ -85,6 +121,10 @@
     
     </summary>
     
+      <category term="java" scheme="https://dongz.me/categories/java/"/>
+    
+    
+      <category term="jvm" scheme="https://dongz.me/tags/jvm/"/>
     
   </entry>
   
@@ -93,7 +133,7 @@
     <link href="https://dongz.me/2018/10/27/%E9%A3%8E%E6%9A%B4%E4%B9%8BSpring%E4%BA%8B%E5%8A%A1/"/>
     <id>https://dongz.me/2018/10/27/风暴之Spring事务/</id>
     <published>2018-10-27T02:14:00.000Z</published>
-    <updated>2018-12-02T14:25:28.506Z</updated>
+    <updated>2018-12-10T17:04:18.020Z</updated>
     
     <content type="html"><![CDATA[<p>Spring 简单而强大的事务管理功能，包括编程式事务和声明式事务。通过对相关知识梳理，能够理解 Spring 事务管理的本质，并灵活运用之。<br><a id="more"></a></p><h1 id="风暴之Spring事务"><a href="#风暴之Spring事务" class="headerlink" title="风暴之Spring事务"></a>风暴之Spring事务</h1><p><img src="https://coding.net/u/alvin_me/p/blogpics/git/raw/master/spring%E4%BA%8B%E5%8A%A1.jpg" alt="Spring事务"></p><p><a href="http://www.edrawsoft.cn/viewer/public/s/4cbc1230271951" target="_blank" rel="noopener">看大图</a></p><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>[1] <a href="https://www.ibm.com/developerworks/cn/education/opensource/os-cn-spring-trans/index.html" target="_blank" rel="noopener">全面分析 Spring 的编程式事务管理及声明式事务管理</a><br>[2] <a href="https://juejin.im/post/5b00c52ef265da0b95276091" target="_blank" rel="noopener">可能是最漂亮的Spring事务管理详解</a><br>[3] <a href="https://juejin.im/post/5a5c631e6fb9a01cb508cd3d" target="_blank" rel="noopener">Spring核心系列之Spring中的事务</a></p>]]></content>
     
@@ -103,6 +143,12 @@
     
     </summary>
     
+      <category term="java" scheme="https://dongz.me/categories/java/"/>
+    
+    
+      <category term="spring" scheme="https://dongz.me/tags/spring/"/>
+    
+      <category term="事务" scheme="https://dongz.me/tags/%E4%BA%8B%E5%8A%A1/"/>
     
   </entry>
   
@@ -155,7 +201,7 @@
     <link href="https://dongz.me/2018/10/24/%E9%A3%8E%E6%9A%B4%E4%B9%8B%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/"/>
     <id>https://dongz.me/2018/10/24/风暴之分布式事务/</id>
     <published>2018-10-23T16:23:00.000Z</published>
-    <updated>2018-12-02T14:26:08.924Z</updated>
+    <updated>2018-12-10T17:00:01.169Z</updated>
     
     <content type="html"><![CDATA[<p>分布式事务是企业集成中的一个技术难点，也是每一个分布式系统架构中都会涉及到的一个东西，特别是在微服务架构中，几乎可以说是无法避免，本文通过思维导图做一个简单的知识梳理。<br><a id="more"></a></p><h1 id="风暴之分布式事务"><a href="#风暴之分布式事务" class="headerlink" title="风暴之分布式事务"></a>风暴之分布式事务</h1><iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="800" height="800" src="http://edrawcloudpubliccn.oss-cn-shenzhen.aliyuncs.com/viewer/self/220828/share/2018-10-31/1540946315/main.svg"></iframe><p><a href="http://www.edrawsoft.cn/viewer/public/s/4c0fe347331170" target="_blank" rel="noopener">看大图</a></p><h3 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h3><p>[1] <a href="https://draveness.me/distributed-transaction-principle" target="_blank" rel="noopener">分布式事务的实现原理</a><br>[2] <a href="https://www.cnblogs.com/savorboard/p/distributed-system-transaction-consistency.html" target="_blank" rel="noopener">聊聊分布式事务，再说说解决方案</a></p>]]></content>
     
@@ -428,25 +474,6 @@
     
       &lt;p&gt;在策略模式（Strategy Pattern）中，一个类的行为或其算法可以在运行时更改。这种类型的设计模式属于行为型模式。&lt;/p&gt;
 &lt;p&gt;在策略模式中，我们创建表示各种策略的对象和一个行为随着策略对象改变而改变的 context 对象。策略对象改变 context 对象的执行算法。&lt;br&gt;
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>设计模式之空对象模式</title>
-    <link href="https://dongz.me/2018/10/21/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8B%E7%A9%BA%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%BC%8F/"/>
-    <id>https://dongz.me/2018/10/21/设计模式之空对象模式/</id>
-    <published>2018-10-21T04:25:52.000Z</published>
-    <updated>2018-10-21T04:26:21.415Z</updated>
-    
-    <content type="html"><![CDATA[<p>在空对象模式（Null Object Pattern）中，一个空对象取代 NULL 对象实例的检查。Null 对象不是检查空值，而是反应一个不做任何动作的关系。这样的 Null 对象也可以在数据不可用的时候提供默认的行为。</p><p>在空对象模式中，我们创建一个指定各种要执行的操作的抽象类和扩展该类的实体类，还创建一个未对该类做任何实现的空对象类，该空对象类将无缝地使用在需要检查空值的地方。<br><a id="more"></a></p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;在空对象模式（Null Object Pattern）中，一个空对象取代 NULL 对象实例的检查。Null 对象不是检查空值，而是反应一个不做任何动作的关系。这样的 Null 对象也可以在数据不可用的时候提供默认的行为。&lt;/p&gt;
-&lt;p&gt;在空对象模式中，我们创建一个指定各种要执行的操作的抽象类和扩展该类的实体类，还创建一个未对该类做任何实现的空对象类，该空对象类将无缝地使用在需要检查空值的地方。&lt;br&gt;
     
     </summary>
     
