@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://dongz.me/"/>
-  <updated>2018-12-10T17:01:35.394Z</updated>
+  <updated>2018-12-11T16:57:41.497Z</updated>
   <id>https://dongz.me/</id>
   
   <author>
@@ -15,6 +15,28 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>风暴之集合</title>
+    <link href="https://dongz.me/2018/12/12/%E9%A3%8E%E6%9A%B4%E4%B9%8B%E9%9B%86%E5%90%88/"/>
+    <id>https://dongz.me/2018/12/12/风暴之集合/</id>
+    <published>2018-12-11T16:51:00.000Z</published>
+    <updated>2018-12-11T16:57:41.497Z</updated>
+    
+    <content type="html"><![CDATA[<p>java中容器，也称集合可以容纳其它类型数据。在平时也接触类不少比如ArrayList、HashSet、LinkedList、HashMap、TreeMap等等，但真要细说还真一知半解，大体风暴类一下，有不当的地方欢迎评论中指出～～<br><a id="more"></a>  </p><h1 id="风暴之集合"><a href="#风暴之集合" class="headerlink" title="风暴之集合"></a>风暴之集合</h1><p><img src="https://coding.net/u/alvin_me/p/blogpics/git/raw/master/rongqiorjihe.jpg" alt=""></p><p><a href="http://www.edrawsoft.cn/viewer/public/s/ec6e5017846566" target="_blank" rel="noopener">看大图</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;java中容器，也称集合可以容纳其它类型数据。在平时也接触类不少比如ArrayList、HashSet、LinkedList、HashMap、TreeMap等等，但真要细说还真一知半解，大体风暴类一下，有不当的地方欢迎评论中指出～～&lt;br&gt;
+    
+    </summary>
+    
+      <category term="集合" scheme="https://dongz.me/categories/%E9%9B%86%E5%90%88/"/>
+    
+    
+      <category term="集合" scheme="https://dongz.me/tags/%E9%9B%86%E5%90%88/"/>
+    
+  </entry>
   
   <entry>
     <title>风暴之mysql</title>
@@ -455,25 +477,6 @@
     <summary type="html">
     
       &lt;p&gt;在模板模式（Template Pattern）中，一个抽象类公开定义了执行它的方法的方式/模板。它的子类可以按需要重写方法实现，但调用将以抽象类中定义的方式进行。这种类型的设计模式属于行为型模式。&lt;br&gt;
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>设计模式之策略模式</title>
-    <link href="https://dongz.me/2018/10/21/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8B%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/"/>
-    <id>https://dongz.me/2018/10/21/设计模式之策略模式/</id>
-    <published>2018-10-21T04:26:45.000Z</published>
-    <updated>2018-10-21T04:27:05.278Z</updated>
-    
-    <content type="html"><![CDATA[<p>在策略模式（Strategy Pattern）中，一个类的行为或其算法可以在运行时更改。这种类型的设计模式属于行为型模式。</p><p>在策略模式中，我们创建表示各种策略的对象和一个行为随着策略对象改变而改变的 context 对象。策略对象改变 context 对象的执行算法。<br><a id="more"></a></p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;在策略模式（Strategy Pattern）中，一个类的行为或其算法可以在运行时更改。这种类型的设计模式属于行为型模式。&lt;/p&gt;
-&lt;p&gt;在策略模式中，我们创建表示各种策略的对象和一个行为随着策略对象改变而改变的 context 对象。策略对象改变 context 对象的执行算法。&lt;br&gt;
     
     </summary>
     
