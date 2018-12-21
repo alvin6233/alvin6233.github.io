@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>函数式编程 | alvin&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+  
+  <meta name="description" content="最早是从一些博客上看到过函数式编程，但是没有太在意。js支持将函数作为传出/传入参数，可以存储在变量中。java8中Lambda表达式 、Stream流处理等功能等闪亮登场，除此之外还支持函数接口。越来越多语言中引入函数式编程的特性，种种苗头都预示着函数式编程越来越得到重视。这里主要对函数式编程思想做一些理解和认识。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="函数式编程">
+<meta property="og:url" content="https://dongz.me/2018/12/21/函数式编程/index.html">
+<meta property="og:site_name" content="alvin&#39;s blog">
+<meta property="og:description" content="最早是从一些博客上看到过函数式编程，但是没有太在意。js支持将函数作为传出/传入参数，可以存储在变量中。java8中Lambda表达式 、Stream流处理等功能等闪亮登场，除此之外还支持函数接口。越来越多语言中引入函数式编程的特性，种种苗头都预示着函数式编程越来越得到重视。这里主要对函数式编程思想做一些理解和认识。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-12-21T13:38:09.162Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="函数式编程">
+<meta name="twitter:description" content="最早是从一些博客上看到过函数式编程，但是没有太在意。js支持将函数作为传出/传入参数，可以存储在变量中。java8中Lambda表达式 、Stream流处理等功能等闪亮登场，除此之外还支持函数接口。越来越多语言中引入函数式编程的特性，种种苗头都预示着函数式编程越来越得到重视。这里主要对函数式编程思想做一些理解和认识。">
+  
+    <link rel="alternate" href="/atom.xml" title="alvin&#39;s blog" type="application/atom+xml">
+  
+
+  
+
+  <link rel="icon" href="/css/images/mylogo.jpg">
+  <link rel="apple-touch-icon" href="/css/images/mylogo.jpg">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
+  <link rel="stylesheet" href="/css/style.css">
+
+  <script src="/js/jquery-3.1.1.min.js"></script>
+  <script src="/js/bootstrap.js"></script>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+
+  
+    <link rel="stylesheet" href="/css/dialog.css">
+  
+
+  
+
+  
+    <link rel="stylesheet" href="/css/header-post.css" >
+  
+
+  
+  
+  
+    <link rel="stylesheet" href="/css/vdonate.css" >
+  
+
+</head>
+
+
+
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
+
+
+  
+  <div id="container">
+    <div id="wrap">
+      
+        <header>
+
+    <div id="allheader" class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="navbar-inner">
+          
+          <div class="container"> 
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+
+            
+              <a class="brand" style="
+                 margin-top: 0px;"  
+                href="#" data-toggle="modal" data-target="#myModal" >
+                  <img width="124px" height="124px" alt="Hike News" src="/css/images/mylogo.jpg">
+              </a>
+            
+            
+            <div class="navbar-collapse collapse">
+              <ul class="hnav navbar-nav">
+                
+                  <li> <a class="main-nav-link" href="/">首页</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/archives">归档</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/categories">分类</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/tags">标签</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/about">关于</a> </li>
+                
+                  <li><div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="请输入关键词..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(无标题)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div></li>
+            </div>
+          </div>
+                
+      </div>
+    </div>
+
+</header>
+
+
+
+      
+            
+      <div id="content" class="outer">
+        
+          <section id="main" style="float:none;"><article id="post-函数式编程" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" class="article-title" itemprop="name">
+      函数式编程
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2018/12/21/函数式编程/" class="article-date">
+	  <time datetime="2018-12-20T16:27:00.000Z" itemprop="datePublished">2018-12-21</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/名词解释/">名词解释</a>
+
+      
+	<a class="article-views">
+	<span id="busuanzi_container_page_pv">
+		阅读量<span id="busuanzi_value_page_pv"></span>
+	</span>
+	</a>
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最早是从一些博客上看到过函数式编程，但是没有太在意。js支持将函数作为传出/传入参数，可以存储在变量中。java8中Lambda表达式 、Stream流处理等功能等闪亮登场，除此之外还支持函数接口。越来越多语言中引入函数式编程的特性，种种苗头都预示着函数式编程越来越得到重视。这里主要对函数式编程思想做一些理解和认识。<br><a id="more"></a></p>
+<h2 id="发展历史"><a href="#发展历史" class="headerlink" title="发展历史"></a>发展历史</h2><h3 id="形式系统"><a href="#形式系统" class="headerlink" title="形式系统"></a>形式系统</h3><blockquote>
+<p>概念：先是确立一些互不冲突的基础原理，以及一些操作这些原理的规则，然后就可以把这些原理以及规则拼凑起来形成新的更加复杂的规则或是定理了。数学家把这种方法称为“形式系统”或是“演算”。    </p>
+<p>理解：<br>示例1-没有人见过这样的一个圆，但是我们知道怎样的圆是完美的圆，而且可以用公式把它描述出来。<br>示例2-自然数，很难说所有的自然数都与客观世界有关，随便举一个超级大的数，这个数可能就和世界上任何事物无关，因为这个世界可能不是无穷大的。</p>
+</blockquote>
+<p><strong>notice:</strong> 形式系统是客观存在的，虽然不同文明不同智慧生物对它们的存在和理解方式有差异，与客观世界有关的更容易被发现和理解，而与客观世界无关的不容易被发现和理解。</p>
+<h3 id="发展"><a href="#发展" class="headerlink" title="发展"></a>发展</h3><blockquote>
+<p>阿隆佐设计了一个名为<a href="https://zh.wikipedia.org/wiki/%CE%9B%E6%BC%94%E7%AE%97" target="_blank" rel="noopener">lambda演算</a>的形式系统。这个系统实质上是为其中一个超级机器设计的编程语言。在这种语言里面，函数的参数是函数，返回值也是函数。  </p>
+<p>艾伦·图灵设计了一种完全不同的系统（后来被称为图灵机），并用这种系统得出了和阿隆佐相似的答案。到了后来人们证明了图灵机和lambda演算的能力是一样的。  </p>
+<p>二战时期IBM制造了第一台机器Mark一号用来计算各种火炮发射数据表。Mark一号重5吨，由75万个零部件构成，每一秒可以完成3次运算。</p>
+<p>1949年第一台电子离散变量自动计算机诞生并取得了巨大的成功。它是冯·诺伊曼设计架构的第一个实例，也是一台现实世界中实现的图灵机。</p>
+<p>1958年John McCarthy的MIT教授发明了一种列表处理语言（Lisp），这种语言是一种阿隆佐lambda演算在现实世界的实现，而且它能在冯·诺伊曼计算机上运行！很多计算机科学家都认识到了Lisp强大的能力。</p>
+<p>1973年在MIT人工智能实验室的一些程序员研发出一种机器，并把它叫做Lisp机。于是阿隆佐的lambda演算也有自己的硬件实现了！</p>
+</blockquote>
+<h2 id="函数式编程-FP"><a href="#函数式编程-FP" class="headerlink" title="函数式编程(FP)"></a>函数式编程(FP)</h2><blockquote>
+<p>函数式编程是阿隆佐思想的在现实世界中的实现。不过不是全部的lambda演算思想都可以运用到实际中，因lambda演算在设计的时候就不是为了在各种现实世界中的限制下工作的。函数式编程只是一系列想法，而不是一套严苛的规定。</p>
+<p>Lambda演算在最初设计的时候就是为了研究计算相关的问题，所以函数式编程主要解决的也是计算问题。</p>
+<p>函数就是函数式编程中的基础元素，可以完成几乎所有的操作，哪怕最简单的计算，也是用函数完成的。</p>
+<p>FP中变量称为符号，且都是final的。</p>
+<p>函数式程序可以通过函数参数保存状态。</p>
+</blockquote>
+<h3 id="FP的优点"><a href="#FP的优点" class="headerlink" title="FP的优点"></a>FP的优点</h3><h4 id="单元测试"><a href="#单元测试" class="headerlink" title="单元测试"></a>单元测试</h4><blockquote>
+<p>因为FP中的每个符号都是final的，所以没有什么函数会有副作用。函数不会修改外部状态值，测试不需要关心外部状态值，也不需要关心函数调用顺序，唯一需要关心的仅仅是函数参数。  </p>
+</blockquote>
+<h4 id="调试查错"><a href="#调试查错" class="headerlink" title="调试查错"></a>调试查错</h4><blockquote>
+<p>只要传递参数一致，错误百分百可以重现。<br>返回值异常时，检查栈上的数据，查看哪些参数传给了哪些函数，函数返回值是什么。跳进对应函数步进调试定位问题即可。</p>
+</blockquote>
+<h4 id="并发执行"><a href="#并发执行" class="headerlink" title="并发执行"></a>并发执行</h4><blockquote>
+<p>不需要任何改动，所有FP程序都是可以并发执行的。<br>由于根本不需要采用锁机制，因此完全不需要担心死锁或是并发竞争的发生。<br>编译器可以对函数式代码进行分析，对耗时的函数并行调用。</p>
+</blockquote>
+<h4 id="热部署"><a href="#热部署" class="headerlink" title="热部署"></a>热部署</h4><blockquote>
+<p>FP的程序中所有状态就是传给函数的参数，而参数都是储存在栈上的，这一特性让实现热部署变的简单。<br>只要比较一下正在运行的代码以及新的代码获得一个diff，然后用这个diff更新现有的代码，新代码的热部署就完成了。</p>
+</blockquote>
+<h4 id="机器辅助优化及证明"><a href="#机器辅助优化及证明" class="headerlink" title="机器辅助优化及证明"></a>机器辅助优化及证明</h4><blockquote>
+<p>FP语言是可以用数学方法来分析的。只要是能在纸上写出来的数学运算就可以用这种语言表述出来。<br>可以用这种方法来证明代码的正确性，甚至可以设计出能够自动分析代码并为单元测试自动生成边缘测试用例的工具出来。</p>
+</blockquote>
+<h3 id="高阶函数"><a href="#高阶函数" class="headerlink" title="高阶函数"></a>高阶函数</h3><blockquote>
+<p>所谓的高阶函数就是对其他函数进行操作（比如说把这些函数当成参数）的函数。</p>
+</blockquote>
+<p>如下：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">class MessageHandler &#123;</span><br><span class="line">    void handleMessage(Message msg, Function getClientCode) &#123;</span><br><span class="line">        // ...</span><br><span class="line">        Message msg1 = msg.setClientCode(getClientCode());</span><br><span class="line">        // ...</span><br><span class="line"></span><br><span class="line">        sendMessage(msg1);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">String getClientCodeOne() &#123;</span><br><span class="line">    return &quot;ABCD_123&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">String getClientCodeTwo() &#123;</span><br><span class="line">    return &quot;123_ABCD&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">MessageHandler handler = new MessageHandler();</span><br><span class="line">handler.handleMessage(someMsg, getClientCodeOne);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>好处：一是不再受限于多层类的结构。这样做可以在运行时传递新的函数，可以在任何时候改变这些函数，而且这些改变不仅更加精准而且触碰的代码更少。</p>
+</blockquote>
+<h3 id="柯里化-Currying"><a href="#柯里化-Currying" class="headerlink" title="柯里化(Currying)"></a>柯里化(Currying)</h3><blockquote>
+<p>是把接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，并且返回接受余下的参数而且返回结果的新函数的技术。<br>使用匿名单参数函数来实现多参数函数的方法，如下：  </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var foo = function(a) &#123;</span><br><span class="line">  return function(b) &#123;</span><br><span class="line">    return a * a + b * b;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>好处：可以快速且简单的实现函数封装，让我们更专注于自己的设计；可以实现概念编程，从而完全不需要设计模式。<br><a href="https://zh.wikipedia.org/wiki/%E6%9F%AF%E9%87%8C%E5%8C%96" target="_blank" rel="noopener">了解更多</a></p>
+</blockquote>
+<h3 id="惰性求值"><a href="#惰性求值" class="headerlink" title="惰性求值"></a>惰性求值</h3><p>如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">String s1 = somewhatLongOperation1();</span><br><span class="line">String s2 = somewhatLongOperation2();</span><br><span class="line">String s3 = concatenate(s1, s2);</span><br></pre></td></tr></table></figure></p>
+<p>其中s1和s2函数作为函数concatenate的参数，执行concatenate需要用到s1和s2的时候才去执行s1和s2函数。  </p>
+<blockquote>
+<p>支持惰性求值的编译器可以抵消相同项从而避免执行无谓的代码，安排代码执行顺序从而实现更高的执行效率甚至是减少错误。<br>惰性求值技术允许定义无穷数据结构，把很多问题抽象化，然后在更高的层面上解决它们。如定义一个Fibonacci数列的无穷列表结构，列表中只有真正会被用到的数才会被计算出来。<br>不足：因为不支持顺序执行，不能处理IO等必须顺序执行的操作。解决方案-continuations，monads以及uniqueness typing。</p>
+</blockquote>
+<h3 id="链式风格-continuation"><a href="#链式风格-continuation" class="headerlink" title="链式风格(continuation)"></a>链式风格(continuation)</h3><blockquote>
+<p>continuation又称CPS（Continuation Programming Style）就是一种特别的参数，把这种参数传到函数中，函数就能够根据continuation将返回值传递到程序中的某段代码中。</p>
+</blockquote>
+<p>如下示例：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">int i = add(5, 10);</span><br><span class="line">int j = square(i);</span><br></pre></td></tr></table></figure>
+<p>add这个函数将返回15然后这个值会赋给i，这也是add被调用的地方。接下来i的值又会被用于调用square。用Continuation Pass Style（CPS）技术重写如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int j = add(5, 10, square);</span><br></pre></td></tr></table></figure>
+<p>add多了一个参数：一个函数，add必须在完成自己的计算后，调用这个函数并把结果传给它。这时square就是add的一个continuation。</p>
+<blockquote>
+<p>用CPS风格写出来的程序不需要栈，但是每次调用函数的时候都会要多加一个参数。<br>continuation和栈上指示函数返回地址的指针其实是同一样东西，只是continuation是显式的传递该地址并且因此代码就不局限于只能返回到函数被调用的地方了。  </p>
+</blockquote>
+<h3 id="模式匹配"><a href="#模式匹配" class="headerlink" title="模式匹配"></a>模式匹配</h3><blockquote>
+<p>模式匹配并不是什么新功能。而事实上它和函数式编程也没有什么太大的关系。<br>有点类似重载，几个同名函数会根据具体参数选择最佳的执行函数。</p>
+</blockquote>
+<p>普通Fibonacci函数：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">int fib(int n) &#123;</span><br><span class="line">    if(n == 0) return 1;</span><br><span class="line">    if(n == 1) return 1;</span><br><span class="line"></span><br><span class="line">    return fib(n - 2) + fib(n - 1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>利用模式匹配重写过的Fibonacci函数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">int fib(0) &#123;</span><br><span class="line">    return 1;</span><br><span class="line">&#125;</span><br><span class="line">int fib(1) &#123;</span><br><span class="line">    return 1;</span><br><span class="line">&#125;</span><br><span class="line">int fib(int n) &#123;</span><br><span class="line">    return fib(n - 2) + fib(n - 1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当n为0时，可以用函数int fib(int n)，不过真正调用的是int fib(0)因为这个函数更具体更接近调用者的要求。</p>
+<h3 id="闭包-Closure"><a href="#闭包-Closure" class="headerlink" title="闭包(Closure)"></a>闭包(Closure)</h3><blockquote>
+<p>在指令式语言中变量不是final，可以读写外部的状态的情况下，又想使用FP的高阶函数等特性，需要通过lexical closure支持。<br>返回类型为函数的函数，closure保存了指向其外部变量的引用。如下示例：</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Function makeIncrementer() &#123;</span><br><span class="line">   int n = 0;</span><br><span class="line"></span><br><span class="line">   int increment() &#123;</span><br><span class="line">       return ++n;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Function inc1 = makeIncrementer();</span><br><span class="line">Function inc2 = makeIncrementer();</span><br><span class="line"></span><br><span class="line">inc1(); // returns 1;</span><br><span class="line">inc1(); // returns 2;</span><br><span class="line">inc1(); // returns 3;</span><br><span class="line">inc2(); // returns 1;</span><br><span class="line">inc2(); // returns 2;</span><br><span class="line">inc2(); // returns 3;</span><br></pre></td></tr></table></figure>
+<p>参考：<br><a href="https://github.com/justinyhuang/Functional-Programming-For-The-Rest-of-Us-Cn" target="_blank" rel="noopener">傻瓜函数编程(https://github.com/justinyhuang/Functional-Programming-For-The-Rest-of-Us-Cn)</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <div id="donation_div"></div>
+
+<script src="/js/vdonate.js"></script>
+<script>
+var a = new Donate({
+  title: '如果觉得我的文章对您有用，请随意打赏。您的支持将鼓励我继续创作!', // 可选参数，打赏标题
+  btnText: '打赏支持', // 可选参数，打赏按钮文字
+  el: document.getElementById('donation_div'),
+  wechatImage: 'https://raw.githubusercontent.com/alvin6233/alvin6233.github.io/master/css/images/WechatPay.png',
+  alipayImage: 'https://raw.githubusercontent.com/alvin6233/alvin6233.github.io/master/css/images/AliPay.png'
+});
+</script>
+      
+      
+      <div>
+        <ul class="post-copyright">
+          <li class="post-copyright-author">
+          <strong>本文作者:  </strong>alvin dong</a>
+          </li>
+          <li class="post-copyright-link">
+          <strong>本文链接:  </strong>
+          <a href="/2018/12/21/函数式编程/" target="_blank" title="函数式编程">https://dongz.me/2018/12/21/函数式编程/</a>
+          </li>
+          <li class="post-copyright-license">
+            <strong>版权声明:   </strong>
+            本博客所有文章除特别声明外，均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+            许可协议。转载请注明出处
+          </li>
+         
+        </ul>
+<div>
+
+      
+      
+        
+	<div id="comment">
+		<!-- 来必力City版安装代码 -->
+		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
+		<script type="text/javascript">
+		   (function(d, s) {
+		       var j, e = d.getElementsByTagName(s)[0];
+
+		       if (typeof LivereTower === 'function') { return; }
+
+		       j = d.createElement(s);
+		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+		       j.async = true;
+
+		       e.parentNode.insertBefore(j, e);
+		   })(document, 'script');
+		</script>
+		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+		</div>
+		<!-- City版安装代码已完成 -->
+	</div>
+
+
+
+      
+      
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/12/18/oracle递归查询/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">oracle递归查询</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- Table of Contents -->
+
+  <aside id="toc-sidebar">
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#发展历史"><span class="nav-number">1.</span> <span class="nav-text">发展历史</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#形式系统"><span class="nav-number">1.1.</span> <span class="nav-text">形式系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发展"><span class="nav-number">1.2.</span> <span class="nav-text">发展</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#函数式编程-FP"><span class="nav-number">2.</span> <span class="nav-text">函数式编程(FP)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#FP的优点"><span class="nav-number">2.1.</span> <span class="nav-text">FP的优点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#单元测试"><span class="nav-number">2.1.1.</span> <span class="nav-text">单元测试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#调试查错"><span class="nav-number">2.1.2.</span> <span class="nav-text">调试查错</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#并发执行"><span class="nav-number">2.1.3.</span> <span class="nav-text">并发执行</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#热部署"><span class="nav-number">2.1.4.</span> <span class="nav-text">热部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#机器辅助优化及证明"><span class="nav-number">2.1.5.</span> <span class="nav-text">机器辅助优化及证明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#高阶函数"><span class="nav-number">2.2.</span> <span class="nav-text">高阶函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#柯里化-Currying"><span class="nav-number">2.3.</span> <span class="nav-text">柯里化(Currying)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#惰性求值"><span class="nav-number">2.4.</span> <span class="nav-text">惰性求值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#链式风格-continuation"><span class="nav-number">2.5.</span> <span class="nav-text">链式风格(continuation)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#模式匹配"><span class="nav-number">2.6.</span> <span class="nav-text">模式匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#闭包-Closure"><span class="nav-number">2.7.</span> <span class="nav-text">闭包(Closure)</span></a></li></ol></li></ol>
+    
+    </div>
+  </aside>
+
+</section>
+        
+      </div>
+      
+      <footer id="footer">
+  
+
+  <div class="container">
+      	<div class="row">
+	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
+	      <p id="copyRightEn">Copyright &copy; 2013 - 2018 alvin&#39;s blog All Rights Reserved.</p>
+	      
+	      
+    		<p class="busuanzi_uv">
+				访客数 : <span id="busuanzi_value_site_uv"></span> |  
+				访问量 : <span id="busuanzi_value_site_pv"></span>
+		    </p>
+  		   
+		</div>
+
+		
+  </div>
+</footer>
+
+
+<!-- min height -->
+
+<script>
+    var wrapdiv = document.getElementById("wrap");
+    var contentdiv = document.getElementById("content");
+    var allheader = document.getElementById("allheader");
+
+    wrapdiv.style.minHeight = document.body.offsetHeight + "px";
+    if (allheader != null) {
+      contentdiv.style.minHeight = document.body.offsetHeight - allheader.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    } else {
+      contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    }
+</script>
+    </div>
+    <!-- <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">home</a>
+  
+    <a href="/archives" class="mobile-nav-link">archives</a>
+  
+    <a href="/categories" class="mobile-nav-link">categories</a>
+  
+    <a href="/tags" class="mobile-nav-link">tags</a>
+  
+    <a href="/about" class="mobile-nav-link">about</a>
+  
+</nav> -->
+    
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/scripts.js"></script>
+
+
+
+
+  <script src="/js/dialog.js"></script>
+
+
+
+
+
+
+
+
+	<div style="display: none;">
+    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
+  </div>
+
+
+
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+	</script>
+
+
+
+
+
+
+  </div>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">设置</h2>
+      </div>
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+
+
+      <div class="modal-body">
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="javascript:setFontSize();" aria-expanded="true" aria-controls="collapseOne">
+              正文字号大小
+            </a>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body">
+            您已调整页面字体大小
+          </div>
+        </div>
+      
+
+
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="javascript:setBackground();" aria-expanded="true" aria-controls="collapseTwo">
+              夜间护眼模式
+            </a>
+        </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="panel-body">
+            夜间模式已经开启，再次单击按钮即可关闭 
+          </div>
+        </div>
+
+        <div>
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关 于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>
+         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+          <div class="panel-body">
+            alvin&#39;s blog
+          </div>
+          <div class="panel-body">
+            Copyright © 2018 alvin dong All Rights Reserved.
+          </div>
+        </div>
+      </div>
+
+
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+  
+    <a id="menu-switch"><i class="fa fa-bars fa-lg"></i></a>
+  
+</body>
+</html>
