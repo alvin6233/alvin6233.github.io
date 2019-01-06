@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>redis哨兵 | alvin&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="keywords" content="redis" />
+  
+  
+  
+  
+  <meta name="description" content="哨兵在复制的基础上，哨兵实现了自动化的故障恢复。缺陷：写操作无法负载均衡；存储能力受到单机的限制。Redis2.8引入哨兵，主要功能如下：  监控（Monitoring： 哨兵会不断地检查主节点和从节点是否运作正常。 自动故障转移（Automatic failover）： 当主节点不能正常工作时，哨兵会开始自动故障转移操作，它会将失效主节点的其中一个从节点升级为新的主节点，并让其他从节点改为复制新">
+<meta name="keywords" content="redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis哨兵">
+<meta property="og:url" content="https://dongz.me/2019/01/06/Redis哨兵/index.html">
+<meta property="og:site_name" content="alvin&#39;s blog">
+<meta property="og:description" content="哨兵在复制的基础上，哨兵实现了自动化的故障恢复。缺陷：写操作无法负载均衡；存储能力受到单机的限制。Redis2.8引入哨兵，主要功能如下：  监控（Monitoring： 哨兵会不断地检查主节点和从节点是否运作正常。 自动故障转移（Automatic failover）： 当主节点不能正常工作时，哨兵会开始自动故障转移操作，它会将失效主节点的其中一个从节点升级为新的主节点，并让其他从节点改为复制新">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://coding.net/u/alvin_me/p/blogpics/git/raw/master/shaobingdesign.png">
+<meta property="og:updated_time" content="2019-01-06T04:25:27.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis哨兵">
+<meta name="twitter:description" content="哨兵在复制的基础上，哨兵实现了自动化的故障恢复。缺陷：写操作无法负载均衡；存储能力受到单机的限制。Redis2.8引入哨兵，主要功能如下：  监控（Monitoring： 哨兵会不断地检查主节点和从节点是否运作正常。 自动故障转移（Automatic failover）： 当主节点不能正常工作时，哨兵会开始自动故障转移操作，它会将失效主节点的其中一个从节点升级为新的主节点，并让其他从节点改为复制新">
+<meta name="twitter:image" content="https://coding.net/u/alvin_me/p/blogpics/git/raw/master/shaobingdesign.png">
+  
+    <link rel="alternate" href="/atom.xml" title="alvin&#39;s blog" type="application/atom+xml">
+  
+
+  
+
+  <link rel="icon" href="/css/images/mylogo.jpg">
+  <link rel="apple-touch-icon" href="/css/images/mylogo.jpg">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
+  <link rel="stylesheet" href="/css/style.css">
+
+  <script src="/js/jquery-3.1.1.min.js"></script>
+  <script src="/js/bootstrap.js"></script>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+
+  
+    <link rel="stylesheet" href="/css/dialog.css">
+  
+
+  
+
+  
+    <link rel="stylesheet" href="/css/header-post.css" >
+  
+
+  
+  
+  
+    <link rel="stylesheet" href="/css/vdonate.css" >
+  
+
+</head>
+
+
+
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
+
+
+  
+  <div id="container">
+    <div id="wrap">
+      
+        <header>
+
+    <div id="allheader" class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="navbar-inner">
+          
+          <div class="container"> 
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+
+            
+              <a class="brand" style="
+                 margin-top: 0px;"  
+                href="#" data-toggle="modal" data-target="#myModal" >
+                  <img width="124px" height="124px" alt="Hike News" src="/css/images/mylogo.jpg">
+              </a>
+            
+            
+            <div class="navbar-collapse collapse">
+              <ul class="hnav navbar-nav">
+                
+                  <li> <a class="main-nav-link" href="/">首页</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/archives">归档</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/categories">分类</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/tags">标签</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/about">关于</a> </li>
+                
+                  <li><div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="请输入关键词..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(无标题)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div></li>
+            </div>
+          </div>
+                
+      </div>
+    </div>
+
+</header>
+
+
+
+      
+            
+      <div id="content" class="outer">
+        
+          <section id="main" style="float:none;"><article id="post-Redis哨兵" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" class="article-title" itemprop="name">
+      Redis哨兵
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2019/01/06/Redis哨兵/" class="article-date">
+	  <time datetime="2019-01-06T04:24:00.000Z" itemprop="datePublished">2019-01-06</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/数据存储/">数据存储</a>
+
+      
+	<a class="article-views">
+	<span id="busuanzi_container_page_pv">
+		阅读量<span id="busuanzi_value_page_pv"></span>
+	</span>
+	</a>
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>哨兵在复制的基础上，哨兵实现了自动化的故障恢复。缺陷：写操作无法负载均衡；存储能力受到单机的限制。<br>Redis2.8引入哨兵，主要功能如下：</p>
+<ul>
+<li><strong>监控（Monitoring：</strong> 哨兵会不断地检查主节点和从节点是否运作正常。</li>
+<li><strong>自动故障转移（Automatic failover）：</strong> 当主节点不能正常工作时，哨兵会开始自动故障转移操作，它会将失效主节点的其中一个从节点升级为新的主节点，并让其他从节点改为复制新的主节点。</li>
+<li><strong>配置提供者（Configuration provider）：</strong> 客户端在初始化时，通过连接哨兵来获得当前Redis服务的主节点地址。</li>
+<li><strong>通知（Notification）：</strong> 哨兵可以将故障转移的结果发送给客户端。</li>
+</ul>
+<p>本文哨兵系统，包含1个主节点、2个从节点和3个哨兵节点。<br><a id="more"></a></p>
+<h2 id="高可用哨兵实战"><a href="#高可用哨兵实战" class="headerlink" title="高可用哨兵实战"></a>高可用哨兵实战</h2><h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><p>搭建主从复制集群，参考《主从复制实战》，包括master(172.16.6.242)、slave1(172.16.6.243)、slave2(172.16.6.244)。在此基础上，三个哨兵节点分散部署在每个主从复制Redis节点上。</p>
+<h3 id="配置启动哨兵"><a href="#配置启动哨兵" class="headerlink" title="配置启动哨兵"></a>配置启动哨兵</h3><h4 id="主节点master上配置并启动哨兵节点"><a href="#主节点master上配置并启动哨兵节点" class="headerlink" title="主节点master上配置并启动哨兵节点"></a>主节点master上配置并启动哨兵节点</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# vim /etc/redis-sentinel.conf</span><br><span class="line">port 26379</span><br><span class="line">bind 0.0.0.0</span><br><span class="line">dir /tmp</span><br><span class="line">sentinel monitor mymaster 172.16.6.242 6379 2</span><br><span class="line">sentinel auth-pass mymaster ialvin</span><br><span class="line">sentinel down-after-milliseconds mymaster 5000</span><br><span class="line">sentinel parallel-syncs mymaster 1</span><br><span class="line">sentinel failover-timeout mymaster 180000</span><br><span class="line">logfile &quot;/var/log/redis/sentinel.log&quot;</span><br><span class="line"></span><br><span class="line">[root@master ~]# systemctl start redis-sentinel.service</span><br><span class="line">[root@master ~]# ss -ntl # 端口26379已开启</span><br><span class="line">State      Recv-Q Send-Q Local Address:Port               Peer Address:Port</span><br><span class="line">LISTEN     0      128          *:26379                    *:*</span><br><span class="line">LISTEN     0      128          *:6379                     *:*</span><br><span class="line">LISTEN     0      128          *:111                      *:*</span><br></pre></td></tr></table></figure>
+<h4 id="从节点slave1和slave2配置并启动哨兵"><a href="#从节点slave1和slave2配置并启动哨兵" class="headerlink" title="从节点slave1和slave2配置并启动哨兵"></a>从节点slave1和slave2配置并启动哨兵</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# scp /etc/redis-sentinel.conf 172.16.6.243:/etc/     # 复制主节点哨兵配置文件到slave1；</span><br><span class="line">[root@master ~]# scp /etc/redis-sentinel.conf 172.16.6.243:/etc/     # 复制主节点哨兵配置文件到slave2；</span><br><span class="line"></span><br><span class="line"># 启动slave1上哨兵服务</span><br><span class="line">[root@slave1 ~]# systemctl start redis-sentinel.service</span><br><span class="line">[root@slave1 ~]# ss -ntl</span><br><span class="line">State      Recv-Q Send-Q Local Address:Port               Peer Address:Port</span><br><span class="line">LISTEN     0      128    172.16.6.243:7946                     *:*</span><br><span class="line">LISTEN     0      128          *:27018                    *:*</span><br><span class="line">LISTEN     0      128          *:26379                    *:*</span><br><span class="line">LISTEN     0      128          *:6379                     *:*</span><br><span class="line"></span><br><span class="line"># 启动slave2上哨兵服务</span><br><span class="line">[root@slave2 ~]# systemctl start redis-sentinel.service</span><br><span class="line">[root@slave2 ~]# ss -ntl</span><br><span class="line">State      Recv-Q Send-Q Local Address:Port               Peer Address:Port</span><br><span class="line">LISTEN     0      128          *:26379                    *:*</span><br><span class="line">LISTEN     0      128          *:6379                     *:*</span><br><span class="line">LISTEN     0      128          *:111                      *:*</span><br></pre></td></tr></table></figure>
+<h4 id="从master节点上的哨兵查看相关信息"><a href="#从master节点上的哨兵查看相关信息" class="headerlink" title="从master节点上的哨兵查看相关信息"></a>从master节点上的哨兵查看相关信息</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# redis-cli -h 172.16.6.242 -p 26379      # 连接redis-sentinel，指定端口26379；</span><br><span class="line">172.16.6.242:26379&gt; sentinel masters                     # 通过哨兵查看主节点信息；</span><br><span class="line">1)  1) &quot;name&quot;</span><br><span class="line">    2) &quot;mymaster&quot;</span><br><span class="line">    3) &quot;ip&quot;</span><br><span class="line">    4) &quot;172.16.6.242&quot;</span><br><span class="line">    5) &quot;port&quot;</span><br><span class="line">    6) &quot;6379&quot;</span><br><span class="line">    7) &quot;runid&quot;</span><br><span class="line">    8) &quot;099f4715cadd5e7b204d510eda834d9aa584eb6f&quot;</span><br><span class="line">    9) &quot;flags&quot;</span><br><span class="line">   10) &quot;master&quot;</span><br><span class="line">   11) &quot;link-pending-commands&quot;</span><br><span class="line">   12) &quot;0&quot;</span><br><span class="line">   13) &quot;link-refcount&quot;</span><br><span class="line">   14) &quot;1&quot;</span><br><span class="line">   15) &quot;last-ping-sent&quot;</span><br><span class="line">   16) &quot;0&quot;</span><br><span class="line">   17) &quot;last-ok-ping-reply&quot;</span><br><span class="line">   18) &quot;304&quot;</span><br><span class="line">   19) &quot;last-ping-reply&quot;</span><br><span class="line">   20) &quot;304&quot;</span><br><span class="line">   21) &quot;down-after-milliseconds&quot;</span><br><span class="line">   22) &quot;30000&quot;</span><br><span class="line">   23) &quot;info-refresh&quot;</span><br><span class="line">   24) &quot;1610&quot;</span><br><span class="line">   25) &quot;role-reported&quot;</span><br><span class="line">   26) &quot;master&quot;</span><br><span class="line">   27) &quot;role-reported-time&quot;</span><br><span class="line">   28) &quot;59678249&quot;</span><br><span class="line">   29) &quot;config-epoch&quot;</span><br><span class="line">   30) &quot;0&quot;</span><br><span class="line">   31) &quot;num-slaves&quot;</span><br><span class="line">   32) &quot;2&quot;</span><br><span class="line">   33) &quot;num-other-sentinels&quot;</span><br><span class="line">   34) &quot;0&quot;</span><br><span class="line">   35) &quot;quorum&quot;</span><br><span class="line">   36) &quot;2&quot;</span><br><span class="line">   37) &quot;failover-timeout&quot;</span><br><span class="line">   38) &quot;180000&quot;</span><br><span class="line">   39) &quot;parallel-syncs&quot;</span><br><span class="line">   40) &quot;1&quot;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">172.16.6.242:26379&gt; sentinel slaves mymaster                     # 通过哨兵查看主节点名称为mymaster对应的从节点；</span><br><span class="line">1)  1) &quot;name&quot;</span><br><span class="line">    2) &quot;172.16.6.244:6379&quot;</span><br><span class="line">    3) &quot;ip&quot;</span><br><span class="line">    4) &quot;172.16.6.244&quot;</span><br><span class="line">    5) &quot;port&quot;</span><br><span class="line">    6) &quot;6379&quot;</span><br><span class="line">    7) &quot;runid&quot;</span><br><span class="line">    8) &quot;5c34cdad4c9c8623bf5ebdf388d01d410e464fdc&quot;</span><br><span class="line">    9) &quot;flags&quot;</span><br><span class="line">   10) &quot;slave&quot;</span><br><span class="line">   11) &quot;link-pending-commands&quot;</span><br><span class="line">   12) &quot;0&quot;</span><br><span class="line">   13) &quot;link-refcount&quot;</span><br><span class="line">   14) &quot;1&quot;</span><br><span class="line">   15) &quot;last-ping-sent&quot;</span><br><span class="line">   16) &quot;0&quot;</span><br><span class="line">   17) &quot;last-ok-ping-reply&quot;</span><br><span class="line">   18) &quot;858&quot;</span><br><span class="line">   19) &quot;last-ping-reply&quot;</span><br><span class="line">   20) &quot;858&quot;</span><br><span class="line">   21) &quot;down-after-milliseconds&quot;</span><br><span class="line">   22) &quot;30000&quot;</span><br><span class="line">   23) &quot;info-refresh&quot;</span><br><span class="line">   24) &quot;1610&quot;</span><br><span class="line">   25) &quot;role-reported&quot;</span><br><span class="line">   26) &quot;slave&quot;</span><br><span class="line">   27) &quot;role-reported-time&quot;</span><br><span class="line">   28) &quot;59960910&quot;</span><br><span class="line">   29) &quot;master-link-down-time&quot;</span><br><span class="line">   30) &quot;0&quot;</span><br><span class="line">   31) &quot;master-link-status&quot;</span><br><span class="line">   32) &quot;ok&quot;</span><br><span class="line">   33) &quot;master-host&quot;</span><br><span class="line">   34) &quot;172.16.6.242&quot;</span><br><span class="line">   35) &quot;master-port&quot;</span><br><span class="line">   36) &quot;6379&quot;</span><br><span class="line">   37) &quot;slave-priority&quot;</span><br><span class="line">   38) &quot;100&quot;</span><br><span class="line">   39) &quot;slave-repl-offset&quot;</span><br><span class="line">   40) &quot;13193196&quot;</span><br><span class="line">2)  1) &quot;name&quot;</span><br><span class="line">    2) &quot;172.16.6.243:6379&quot;</span><br><span class="line">    3) &quot;ip&quot;</span><br><span class="line">    4) &quot;172.16.6.243&quot;</span><br><span class="line">    5) &quot;port&quot;</span><br><span class="line">    6) &quot;6379&quot;</span><br><span class="line">    7) &quot;runid&quot;</span><br><span class="line">    8) &quot;154d2e317cff5e0b1672f2b4f385b481ce560b55&quot;</span><br><span class="line">    9) &quot;flags&quot;</span><br><span class="line">   10) &quot;slave&quot;</span><br><span class="line">   11) &quot;link-pending-commands&quot;</span><br><span class="line">   12) &quot;0&quot;</span><br><span class="line">   13) &quot;link-refcount&quot;</span><br><span class="line">   14) &quot;1&quot;</span><br><span class="line">   15) &quot;last-ping-sent&quot;</span><br><span class="line">   16) &quot;0&quot;</span><br><span class="line">   17) &quot;last-ok-ping-reply&quot;</span><br><span class="line">   18) &quot;858&quot;</span><br><span class="line">   19) &quot;last-ping-reply&quot;</span><br><span class="line">   20) &quot;858&quot;</span><br><span class="line">   21) &quot;down-after-milliseconds&quot;</span><br><span class="line">   22) &quot;30000&quot;</span><br><span class="line">   23) &quot;info-refresh&quot;</span><br><span class="line">   24) &quot;1610&quot;</span><br><span class="line">   25) &quot;role-reported&quot;</span><br><span class="line">   26) &quot;slave&quot;</span><br><span class="line">   27) &quot;role-reported-time&quot;</span><br><span class="line">   28) &quot;59960909&quot;</span><br><span class="line">   29) &quot;master-link-down-time&quot;</span><br><span class="line">   30) &quot;0&quot;</span><br><span class="line">   31) &quot;master-link-status&quot;</span><br><span class="line">   32) &quot;ok&quot;</span><br><span class="line">   33) &quot;master-host&quot;</span><br><span class="line">   34) &quot;172.16.6.242&quot;</span><br><span class="line">   35) &quot;master-port&quot;</span><br><span class="line">   36) &quot;6379&quot;</span><br><span class="line">   37) &quot;slave-priority&quot;</span><br><span class="line">   38) &quot;100&quot;</span><br><span class="line">   39) &quot;slave-repl-offset&quot;</span><br><span class="line">   40) &quot;13193196&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="主节点故障转移测试"><a href="#主节点故障转移测试" class="headerlink" title="主节点故障转移测试"></a>主节点故障转移测试</h3><h4 id="模拟主节点master宕机"><a href="#模拟主节点master宕机" class="headerlink" title="模拟主节点master宕机"></a>模拟主节点master宕机</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# systemctl stop redis.service        # 停止主节点redis服务；</span><br><span class="line">[root@master ~]# ss -ntl        # 6379端口已关闭；</span><br><span class="line">State      Recv-Q Send-Q Local Address:Port               Peer Address:Port</span><br><span class="line">LISTEN     0      128          *:26379                    *:*</span><br><span class="line">LISTEN     0      128          *:111                      *:*</span><br><span class="line">LISTEN     0      128          *:22                       *:*</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@master ~]# redis-cli -h 172.16.6.242 -p 26379  # 连接redis-sentinel，指定端口26379；</span><br><span class="line">172.16.6.242:26379&gt; sentinel masters             # 查看当前主节点相关信息；</span><br><span class="line">1)  1) &quot;name&quot;</span><br><span class="line">    2) &quot;mymaster&quot;</span><br><span class="line">    3) &quot;ip&quot;</span><br><span class="line">    4) &quot;172.16.6.243&quot;</span><br><span class="line">    5) &quot;port&quot;</span><br><span class="line">    6) &quot;6379&quot;</span><br><span class="line">    7) &quot;runid&quot;</span><br><span class="line">    8) &quot;154d2e317cff5e0b1672f2b4f385b481ce560b55&quot;</span><br><span class="line">    9) &quot;flags&quot;</span><br><span class="line">   10) &quot;master&quot;</span><br><span class="line">   11) &quot;link-pending-commands&quot;</span><br><span class="line">   12) &quot;0&quot;</span><br><span class="line">   13) &quot;link-refcount&quot;</span><br><span class="line">   14) &quot;1&quot;</span><br><span class="line">   15) &quot;last-ping-sent&quot;</span><br><span class="line">   16) &quot;0&quot;</span><br><span class="line">   17) &quot;last-ok-ping-reply&quot;</span><br><span class="line">   18) &quot;296&quot;</span><br><span class="line">   19) &quot;last-ping-reply&quot;</span><br><span class="line">   20) &quot;296&quot;</span><br><span class="line">   21) &quot;down-after-milliseconds&quot;</span><br><span class="line">   22) &quot;30000&quot;</span><br><span class="line">   23) &quot;info-refresh&quot;</span><br><span class="line">   24) &quot;357&quot;</span><br><span class="line">   25) &quot;role-reported&quot;</span><br><span class="line">   26) &quot;master&quot;</span><br><span class="line">   27) &quot;role-reported-time&quot;</span><br><span class="line">   28) &quot;71092&quot;</span><br><span class="line">   29) &quot;config-epoch&quot;</span><br><span class="line">   30) &quot;1&quot;</span><br><span class="line">   31) &quot;num-slaves&quot;</span><br><span class="line">   32) &quot;2&quot;</span><br><span class="line">   33) &quot;num-other-sentinels&quot;</span><br><span class="line">   34) &quot;2&quot;</span><br><span class="line">   35) &quot;quorum&quot;</span><br><span class="line">   36) &quot;2&quot;</span><br><span class="line">   37) &quot;failover-timeout&quot;</span><br><span class="line">   38) &quot;180000&quot;</span><br><span class="line">   39) &quot;parallel-syncs&quot;</span><br><span class="line">   40) &quot;1&quot;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">172.16.6.242:26379&gt; sentinel slaves mymaster        # 查看当前从节点，可以看到原来的主节点242变成了从节点；</span><br><span class="line">1)  1) &quot;name&quot;</span><br><span class="line">    2) &quot;172.16.6.242:6379&quot;</span><br><span class="line">    3) &quot;ip&quot;</span><br><span class="line">    4) &quot;172.16.6.242&quot;</span><br><span class="line">    5) &quot;port&quot;</span><br><span class="line">    6) &quot;6379&quot;</span><br><span class="line">    7) &quot;runid&quot;</span><br><span class="line">    8) &quot;&quot;</span><br><span class="line">    9) &quot;flags&quot;</span><br><span class="line">   10) &quot;s_down,slave,disconnected&quot;</span><br><span class="line">   11) &quot;link-pending-commands&quot;</span><br><span class="line">   12) &quot;3&quot;</span><br><span class="line">   13) &quot;link-refcount&quot;</span><br><span class="line">   14) &quot;1&quot;</span><br><span class="line">   15) &quot;last-ping-sent&quot;</span><br><span class="line">   16) &quot;141427&quot;</span><br><span class="line">   17) &quot;last-ok-ping-reply&quot;</span><br><span class="line">   18) &quot;141427&quot;</span><br><span class="line">   19) &quot;last-ping-reply&quot;</span><br><span class="line">   20) &quot;141427&quot;</span><br><span class="line">   21) &quot;s-down-time&quot;</span><br><span class="line">   22) &quot;111358&quot;</span><br><span class="line">   23) &quot;down-after-milliseconds&quot;</span><br><span class="line">   24) &quot;30000&quot;</span><br><span class="line">   25) &quot;info-refresh&quot;</span><br><span class="line">   26) &quot;1546599601970&quot;</span><br><span class="line">   27) &quot;role-reported&quot;</span><br><span class="line">   28) &quot;slave&quot;</span><br><span class="line">   29) &quot;role-reported-time&quot;</span><br><span class="line">   30) &quot;141427&quot;</span><br><span class="line">   31) &quot;master-link-down-time&quot;</span><br><span class="line">   32) &quot;0&quot;</span><br><span class="line">   33) &quot;master-link-status&quot;</span><br><span class="line">   34) &quot;err&quot;</span><br><span class="line">   35) &quot;master-host&quot;</span><br><span class="line">   36) &quot;?&quot;</span><br><span class="line">   37) &quot;master-port&quot;</span><br><span class="line">   38) &quot;0&quot;</span><br><span class="line">   39) &quot;slave-priority&quot;</span><br><span class="line">   40) &quot;100&quot;</span><br><span class="line">   41) &quot;slave-repl-offset&quot;</span><br><span class="line">   42) &quot;0&quot;</span><br><span class="line">2)  1) &quot;name&quot;</span><br><span class="line">    2) &quot;172.16.6.244:6379&quot;</span><br><span class="line">    3) &quot;ip&quot;</span><br><span class="line">    4) &quot;172.16.6.244&quot;</span><br><span class="line">    5) &quot;port&quot;</span><br><span class="line">    6) &quot;6379&quot;</span><br><span class="line">    7) &quot;runid&quot;</span><br><span class="line">    8) &quot;5c34cdad4c9c8623bf5ebdf388d01d410e464fdc&quot;</span><br><span class="line">    9) &quot;flags&quot;</span><br><span class="line">   10) &quot;slave&quot;</span><br><span class="line">   11) &quot;link-pending-commands&quot;</span><br><span class="line">   12) &quot;0&quot;</span><br><span class="line">   13) &quot;link-refcount&quot;</span><br><span class="line">   14) &quot;1&quot;</span><br><span class="line">   15) &quot;last-ping-sent&quot;</span><br><span class="line">   16) &quot;0&quot;</span><br><span class="line">   17) &quot;last-ok-ping-reply&quot;</span><br><span class="line">   18) &quot;283&quot;</span><br><span class="line">   19) &quot;last-ping-reply&quot;</span><br><span class="line">   20) &quot;283&quot;</span><br><span class="line">   21) &quot;down-after-milliseconds&quot;</span><br><span class="line">   22) &quot;30000&quot;</span><br><span class="line">   23) &quot;info-refresh&quot;</span><br><span class="line">   24) &quot;784&quot;</span><br><span class="line">   25) &quot;role-reported&quot;</span><br><span class="line">   26) &quot;slave&quot;</span><br><span class="line">   27) &quot;role-reported-time&quot;</span><br><span class="line">   28) &quot;141427&quot;</span><br><span class="line">   29) &quot;master-link-down-time&quot;</span><br><span class="line">   30) &quot;0&quot;</span><br><span class="line">   31) &quot;master-link-status&quot;</span><br><span class="line">   32) &quot;ok&quot;</span><br><span class="line">   33) &quot;master-host&quot;</span><br><span class="line">   34) &quot;172.16.6.243&quot;</span><br><span class="line">   35) &quot;master-port&quot;</span><br><span class="line">   36) &quot;6379&quot;</span><br><span class="line">   37) &quot;slave-priority&quot;</span><br><span class="line">   38) &quot;100&quot;</span><br><span class="line">   39) &quot;slave-repl-offset&quot;</span><br><span class="line">   40) &quot;2485282&quot;</span><br></pre></td></tr></table></figure>
+<h4 id="恢复原主节点master"><a href="#恢复原主节点master" class="headerlink" title="恢复原主节点master"></a>恢复原主节点master</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# vim /etc/redis.conf         # 修改配置文件；</span><br><span class="line">masterauth ialvin</span><br><span class="line"></span><br><span class="line">[root@master ~]# systemctl restart redis.service         # 重启redis；</span><br><span class="line">[root@master ~]# redis-cli</span><br><span class="line">127.0.0.1:6379&gt; auth ialvin</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; info replication        # master节点已变成从节点</span><br><span class="line"># Replication</span><br><span class="line">role:slave</span><br><span class="line">master_host:172.16.6.243</span><br><span class="line">master_port:6379</span><br><span class="line">master_link_status:up</span><br><span class="line">master_last_io_seconds_ago:0</span><br><span class="line">master_sync_in_progress:0</span><br><span class="line">slave_repl_offset:2662497</span><br><span class="line">slave_priority:100</span><br><span class="line">slave_read_only:1</span><br><span class="line">connected_slaves:0</span><br><span class="line">master_replid:93005e7b0ff1af41731dac92725041afbfd01809</span><br><span class="line">master_replid2:0000000000000000000000000000000000000000</span><br><span class="line">master_repl_offset:2662497</span><br><span class="line">second_repl_offset:-1</span><br><span class="line">repl_backlog_active:1</span><br><span class="line">repl_backlog_size:1048576</span><br><span class="line">repl_backlog_first_byte_offset:2650868</span><br><span class="line">repl_backlog_histlen:11630</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@master ~]# redis-cli -h 172.16.6.242 -p 26379   # 连接redis-sentinel查看所有从节点</span><br><span class="line">172.16.6.242:26379&gt; sentinel slaves mymaster</span><br><span class="line">1)  1) &quot;name&quot;</span><br><span class="line">    2) &quot;172.16.6.242:6379&quot;</span><br><span class="line">    3) &quot;ip&quot;</span><br><span class="line">    4) &quot;172.16.6.242&quot;</span><br><span class="line">    5) &quot;port&quot;</span><br><span class="line">    6) &quot;6379&quot;</span><br><span class="line">    7) &quot;runid&quot;</span><br><span class="line">    8) &quot;e93cddd24e01de32f189e48aba3945ba3460d2c5&quot;</span><br><span class="line">    9) &quot;flags&quot;</span><br><span class="line">   10) &quot;slave&quot;</span><br><span class="line">   11) &quot;link-pending-commands&quot;</span><br><span class="line">   12) &quot;0&quot;</span><br><span class="line">   13) &quot;link-refcount&quot;</span><br><span class="line">   14) &quot;1&quot;</span><br><span class="line">   15) &quot;last-ping-sent&quot;</span><br><span class="line">   16) &quot;0&quot;</span><br><span class="line">   17) &quot;last-ok-ping-reply&quot;</span><br><span class="line">   18) &quot;694&quot;</span><br><span class="line">   19) &quot;last-ping-reply&quot;</span><br><span class="line">   20) &quot;694&quot;</span><br><span class="line">   21) &quot;down-after-milliseconds&quot;</span><br><span class="line">   22) &quot;30000&quot;</span><br><span class="line">   23) &quot;info-refresh&quot;</span><br><span class="line">   24) &quot;5921&quot;</span><br><span class="line">   25) &quot;role-reported&quot;</span><br><span class="line">   26) &quot;slave&quot;</span><br><span class="line">   27) &quot;role-reported-time&quot;</span><br><span class="line">   28) &quot;538314&quot;</span><br><span class="line">   29) &quot;master-link-down-time&quot;</span><br><span class="line">   30) &quot;0&quot;</span><br><span class="line">   31) &quot;master-link-status&quot;</span><br><span class="line">   32) &quot;ok&quot;</span><br><span class="line">   33) &quot;master-host&quot;</span><br><span class="line">   34) &quot;172.16.6.243&quot;</span><br><span class="line">   35) &quot;master-port&quot;</span><br><span class="line">   36) &quot;6379&quot;</span><br><span class="line">   37) &quot;slave-priority&quot;</span><br><span class="line">   38) &quot;100&quot;</span><br><span class="line">   39) &quot;slave-repl-offset&quot;</span><br><span class="line">   40) &quot;2692453&quot;</span><br><span class="line">2)  1) &quot;name&quot;</span><br><span class="line">    2) &quot;172.16.6.244:6379&quot;</span><br><span class="line">    3) &quot;ip&quot;</span><br><span class="line">    4) &quot;172.16.6.244&quot;</span><br><span class="line">    5) &quot;port&quot;</span><br><span class="line">    6) &quot;6379&quot;</span><br><span class="line">    7) &quot;runid&quot;</span><br><span class="line">    8) &quot;5c34cdad4c9c8623bf5ebdf388d01d410e464fdc&quot;</span><br><span class="line">    9) &quot;flags&quot;</span><br><span class="line">   10) &quot;slave&quot;</span><br><span class="line">   11) &quot;link-pending-commands&quot;</span><br><span class="line">   12) &quot;0&quot;</span><br><span class="line">   13) &quot;link-refcount&quot;</span><br><span class="line">   14) &quot;1&quot;</span><br><span class="line">   15) &quot;last-ping-sent&quot;</span><br><span class="line">   16) &quot;0&quot;</span><br><span class="line">   17) &quot;last-ok-ping-reply&quot;</span><br><span class="line">   18) &quot;694&quot;</span><br><span class="line">   19) &quot;last-ping-reply&quot;</span><br><span class="line">   20) &quot;694&quot;</span><br><span class="line">   21) &quot;down-after-milliseconds&quot;</span><br><span class="line">   22) &quot;30000&quot;</span><br><span class="line">   23) &quot;info-refresh&quot;</span><br><span class="line">   24) &quot;7809&quot;</span><br><span class="line">   25) &quot;role-reported&quot;</span><br><span class="line">   26) &quot;slave&quot;</span><br><span class="line">   27) &quot;role-reported-time&quot;</span><br><span class="line">   28) &quot;1152017&quot;</span><br><span class="line">   29) &quot;master-link-down-time&quot;</span><br><span class="line">   30) &quot;0&quot;</span><br><span class="line">   31) &quot;master-link-status&quot;</span><br><span class="line">   32) &quot;ok&quot;</span><br><span class="line">   33) &quot;master-host&quot;</span><br><span class="line">   34) &quot;172.16.6.243&quot;</span><br><span class="line">   35) &quot;master-port&quot;</span><br><span class="line">   36) &quot;6379&quot;</span><br><span class="line">   37) &quot;slave-priority&quot;</span><br><span class="line">   38) &quot;100&quot;</span><br><span class="line">   39) &quot;slave-repl-offset&quot;</span><br><span class="line">   40) &quot;2692036&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="搭建过程注意事项"><a href="#搭建过程注意事项" class="headerlink" title="搭建过程注意事项"></a>搭建过程注意事项</h3><p>1.哨兵系统中的主从节点，与普通的主从节点并没有什么区别，故障发现和转移是由哨兵来控制和完成的。<br>2.哨兵节点本质上是Redis节点。<br>3.每个哨兵节点，只需要配置监控主节点，便可以自动发现其他的哨兵节点和从节点。<br>4.在哨兵节点启动和故障转移阶段，各个节点的配置文件会被重写(config rewrite)。<br>5.例子中，一个哨兵只监控了一个主节点；实际上，一个哨兵可以监控多个主节点，通过配置多条sentinel monitor即可实现。<br>6.每个哨兵有唯一标示myid，在copy配置文件时，若存在该配置要删掉，哨兵启动后会自动生成新的myid。  </p>
+<h2 id="哨兵原理"><a href="#哨兵原理" class="headerlink" title="哨兵原理"></a>哨兵原理</h2><h3 id="架构如下图"><a href="#架构如下图" class="headerlink" title="架构如下图"></a>架构如下图</h3><p><img src="https://coding.net/u/alvin_me/p/blogpics/git/raw/master/shaobingdesign.png" alt="">  </p>
+<h3 id="哨兵相关命令"><a href="#哨兵相关命令" class="headerlink" title="哨兵相关命令"></a>哨兵相关命令</h3><blockquote>
+<p>info sentinel：获取监控的所有主节点的基本信息<br>sentinel masters：获取监控的所有主节点的详细信息<br>sentinel master mymaster：获取监控的主节点mymaster的详细信息<br>sentinel slaves mymaster：获取监控的主节点mymaster的从节点的详细信息<br>sentinel sentinels mymaster：获取监控的主节点mymaster的哨兵节点的详细信息<br>sentinel get-master-addr-by-name mymaster：获取监控的主节点mymaster的地址信息<br>sentinel is-master-down-by-addr：哨兵节点之间可以通过该命令询问主节点是否下线，从而对是否客观下线做出判断<br>sentinel monitor mymaster 172.16.6.242 6379 2：与部署哨兵节点时配置文件中的sentinel monitor功能完全一样<br>sentinel remove mymaster：取消当前哨兵节点对主节点mymaster的监控<br>sentinel failover mymaster：强制对mymaster执行故障转移，即便当前的主节点运行完好   </p>
+</blockquote>
+<h3 id="相关概念及原理"><a href="#相关概念及原理" class="headerlink" title="相关概念及原理"></a>相关概念及原理</h3><blockquote>
+<p>定时任务：每个哨兵节点维护了3个定时任务。定时任务的功能分别如下：通过向主从节点发送info命令获取最新的主从结构；通过发布订阅功能获取其他哨兵节点的信息；通过向其他节点发送ping命令进行心跳检测，判断是否下线。<br>主观下线：在心跳检测的定时任务中，如果其他节点超过一定时间没有回复，哨兵节点就会将其进行主观下线。顾名思义，主观下线的意思是一个哨兵节点“主观地”判断下线；与主观下线相对应的是客观下线。<br>客观下线：哨兵节点在对主节点进行主观下线后，会通过sentinel is-master-down-by-addr命令询问其他哨兵节点该主节点的状态；如果判断主节点下线的哨兵数量达到一定数值，则对该主节点进行客观下线。<br><strong>需要特别注意的是，客观下线是主节点才有的概念；如果从节点和哨兵节点发生故障，被哨兵主观下线后，不会再有后续的客观下线和故障转移操作。</strong><br>选举领导者哨兵节点：当主节点被判断客观下线以后，各个哨兵节点会进行协商，选举出一个领导者哨兵节点，并由该领导者节点对其进行故障转移操作。<br><strong>监视该主节点的所有哨兵都有可能被选为领导者，选举使用的算法是Raft算法；Raft算法的基本思路是先到先得：即在一轮选举中，哨兵A向哨兵B发送成为领导者的申请，如果B没有同意过其他哨兵，则会同意A成为领导者。选举的具体过程这里不做详细描述，一般来说，哨兵选择的过程很快，谁先完成客观下线，一般就能成为领导者。</strong><br>故障转移：选举出的领导者哨兵，开始进行故障转移操作，该操作大体可以分为3个步骤：    </p>
+</blockquote>
+<p>1.在从节点中选择新的主节点：选择的原则是，首先过滤掉不健康的从节点；然后选择优先级最高的从节点(由slave-priority指定)；如果优先级无法区分，则选择复制偏移量最大的从节点；如果仍无法区分，则选择runid最小的从节点。<br>2.更新主从状态：通过slaveof no one命令，让选出来的从节点成为主节点；并通过slaveof命令让其他节点成为其从节点。<br>3.将已经下线的主节点(即6379)设置为新的主节点的从节点，当6379重新上线后，它会成为新的主节点的从节点。  </p>
+<h3 id="配置建议"><a href="#配置建议" class="headerlink" title="配置建议"></a>配置建议</h3><h4 id="配置参数"><a href="#配置参数" class="headerlink" title="配置参数"></a>配置参数</h4><blockquote>
+<p>sentinel monitor <master-name> <ip> <redis-port> <quorum>  </quorum></redis-port></ip></master-name></p>
+</blockquote>
+<p>sentinel monitor是哨兵最核心的配置，在前文讲述部署哨兵节点时已说明，其中：master-name指定了主节点名称，ip和redis-port指定了主节点地址，quorum是判断主节点客观下线的哨兵数量阈值：当判定主节点下线的哨兵数量达到quorum时，对主节点进行客观下线。建议取值为哨兵数量的一半加1。  </p>
+<blockquote>
+<p>sentinel down-after-milliseconds <master-name> <milliseconds>  </milliseconds></master-name></p>
+</blockquote>
+<p>sentinel down-after-milliseconds与主观下线的判断有关：哨兵使用ping命令对其他节点进行心跳检测，如果其他节点超过milliseconds没有回复，哨兵就会将其进行主观下线。该配置对主节点、从节点和哨兵节点的主观下线判定都有效。</p>
+<p>down-after-milliseconds的默认值是30000，即30s；可以根据不同的网络环境和应用要求来调整：值越大，对主观下线的判定会越宽松，好处是误判的可能性小，坏处是故障发现和故障转移的时间变长，客户端等待的时间也会变长。例如，如果应用对可用性要求较高，则可以将值适当调小，当故障发生时尽快完成转移；如果网络环境相对较差，可以适当提高该阈值，避免频繁误判。  </p>
+<blockquote>
+<p>sentinel parallel-syncs <master-name> <numreplicas>  </numreplicas></master-name></p>
+</blockquote>
+<p>sentinel parallel-syncs与故障转移之后从节点的复制有关：它规定了每次向新的主节点发起复制操作的从节点个数。例如，假设主节点切换完成之后，有3个从节点要向新的主节点发起复制；如果parallel-syncs=1，则从节点会一个一个开始复制；如果parallel-syncs=3，则3个从节点会一起开始复制。</p>
+<p>parallel-syncs取值越大，从节点完成复制的时间越快，但是对主节点的网络负载、硬盘负载造成的压力也越大；应根据实际情况设置。例如，如果主节点的负载较低，而从节点对服务可用的要求较高，可以适量增加parallel-syncs取值。parallel-syncs的默认值是1。</p>
+<blockquote>
+<p>sentinel failover-timeout <master-name> <milliseconds>   </milliseconds></master-name></p>
+</blockquote>
+<p>sentinel failover-timeout与故障转移超时的判断有关，但是该参数不是用来判断整个故障转移阶段的超时，而是其几个子阶段的超时，例如如果主节点晋升从节点时间超过timeout，或从节点向新的主节点发起复制操作的时间(不包括复制数据的时间)超过timeout，都会导致故障转移超时失败。</p>
+<p>failover-timeout的默认值是180000，即180s；如果超时，则下一次该值会变为原来的2倍。</p>
+<h4 id="操作建议"><a href="#操作建议" class="headerlink" title="操作建议"></a>操作建议</h4><ol>
+<li>哨兵节点的数量应不止一个，一方面增加哨兵节点的冗余，避免哨兵本身成为高可用的瓶颈；另一方面减少对下线的误判。此外，这些不同的哨兵节点应部署在不同的物理机上。  </li>
+<li>哨兵节点的数量应该是奇数，便于哨兵通过投票做出“决策”：领导者选举的决策、客观下线的决策等。  </li>
+<li>各个哨兵节点的配置应一致，包括硬件、参数等；此外，所有节点都应该使用<code>ntp</code>或类似服务，保证时间准确、一致。  </li>
+<li>哨兵的配置提供者和通知客户端功能，需要客户端的支持才能实现，如前文所说的Jedis；如果开发者使用的库未提供相应支持，则可能需要开发者自己实现。  </li>
+<li>当哨兵系统中的节点在docker（或其他可能进行端口映射的软件）中部署时，应特别注意端口映射可能会导致哨兵系统无法正常工作，因为哨兵的工作基于与其他节点的通信，而docker的端口映射可能导致哨兵无法连接到其他节点。例如，哨兵之间互相发现，依赖于它们对外宣称的IP和port，如果某个哨兵A部署在做了端口映射的docker中，那么其他哨兵使用A宣称的port无法连接到A。  </li>
+</ol>
+<p>参考：  </p>
+<ol>
+<li><a href="https://www.cnblogs.com/kismetv/p/9609938.html" target="_blank" rel="noopener">深入学习Redis（4）：哨兵</a></li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <div id="donation_div"></div>
+
+<script src="/js/vdonate.js"></script>
+<script>
+var a = new Donate({
+  title: '如果觉得我的文章对您有用，请随意打赏。您的支持将鼓励我继续创作!', // 可选参数，打赏标题
+  btnText: '打赏支持', // 可选参数，打赏按钮文字
+  el: document.getElementById('donation_div'),
+  wechatImage: 'https://raw.githubusercontent.com/alvin6233/alvin6233.github.io/master/css/images/WechatPay.png',
+  alipayImage: 'https://raw.githubusercontent.com/alvin6233/alvin6233.github.io/master/css/images/AliPay.png'
+});
+</script>
+      
+      
+      <div>
+        <ul class="post-copyright">
+          <li class="post-copyright-author">
+          <strong>本文作者:  </strong>alvin dong</a>
+          </li>
+          <li class="post-copyright-link">
+          <strong>本文链接:  </strong>
+          <a href="/2019/01/06/Redis哨兵/" target="_blank" title="Redis哨兵">https://dongz.me/2019/01/06/Redis哨兵/</a>
+          </li>
+          <li class="post-copyright-license">
+            <strong>版权声明:   </strong>
+            本博客所有文章除特别声明外，均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+            许可协议。转载请注明出处
+          </li>
+         
+        </ul>
+<div>
+
+      
+      
+        
+	<div id="comment">
+		<!-- 来必力City版安装代码 -->
+		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
+		<script type="text/javascript">
+		   (function(d, s) {
+		       var j, e = d.getElementsByTagName(s)[0];
+
+		       if (typeof LivereTower === 'function') { return; }
+
+		       j = d.createElement(s);
+		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+		       j.async = true;
+
+		       e.parentNode.insertBefore(j, e);
+		   })(document, 'script');
+		</script>
+		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+		</div>
+		<!-- City版安装代码已完成 -->
+	</div>
+
+
+
+      
+      
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2019/01/06/Redis主从复制/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">Redis主从复制</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- Table of Contents -->
+
+  <aside id="toc-sidebar">
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#高可用哨兵实战"><span class="nav-number">1.</span> <span class="nav-text">高可用哨兵实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#准备"><span class="nav-number">1.1.</span> <span class="nav-text">准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置启动哨兵"><span class="nav-number">1.2.</span> <span class="nav-text">配置启动哨兵</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#主节点master上配置并启动哨兵节点"><span class="nav-number">1.2.1.</span> <span class="nav-text">主节点master上配置并启动哨兵节点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#从节点slave1和slave2配置并启动哨兵"><span class="nav-number">1.2.2.</span> <span class="nav-text">从节点slave1和slave2配置并启动哨兵</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#从master节点上的哨兵查看相关信息"><span class="nav-number">1.2.3.</span> <span class="nav-text">从master节点上的哨兵查看相关信息</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主节点故障转移测试"><span class="nav-number">1.3.</span> <span class="nav-text">主节点故障转移测试</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#模拟主节点master宕机"><span class="nav-number">1.3.1.</span> <span class="nav-text">模拟主节点master宕机</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#恢复原主节点master"><span class="nav-number">1.3.2.</span> <span class="nav-text">恢复原主节点master</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#搭建过程注意事项"><span class="nav-number">1.4.</span> <span class="nav-text">搭建过程注意事项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#哨兵原理"><span class="nav-number">2.</span> <span class="nav-text">哨兵原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#架构如下图"><span class="nav-number">2.1.</span> <span class="nav-text">架构如下图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#哨兵相关命令"><span class="nav-number">2.2.</span> <span class="nav-text">哨兵相关命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关概念及原理"><span class="nav-number">2.3.</span> <span class="nav-text">相关概念及原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置建议"><span class="nav-number">2.4.</span> <span class="nav-text">配置建议</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置参数"><span class="nav-number">2.4.1.</span> <span class="nav-text">配置参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#操作建议"><span class="nav-number">2.4.2.</span> <span class="nav-text">操作建议</span></a></li></ol></li></ol></li></ol>
+    
+    </div>
+  </aside>
+
+</section>
+        
+      </div>
+      
+      <footer id="footer">
+  
+
+  <div class="container">
+      	<div class="row">
+	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
+	      <p id="copyRightEn">Copyright &copy; 2013 - 2019 alvin&#39;s blog All Rights Reserved.</p>
+	      
+	      
+    		<p class="busuanzi_uv">
+				访客数 : <span id="busuanzi_value_site_uv"></span> |  
+				访问量 : <span id="busuanzi_value_site_pv"></span>
+		    </p>
+  		   
+		</div>
+
+		
+  </div>
+</footer>
+
+
+<!-- min height -->
+
+<script>
+    var wrapdiv = document.getElementById("wrap");
+    var contentdiv = document.getElementById("content");
+    var allheader = document.getElementById("allheader");
+
+    wrapdiv.style.minHeight = document.body.offsetHeight + "px";
+    if (allheader != null) {
+      contentdiv.style.minHeight = document.body.offsetHeight - allheader.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    } else {
+      contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    }
+</script>
+    </div>
+    <!-- <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">home</a>
+  
+    <a href="/archives" class="mobile-nav-link">archives</a>
+  
+    <a href="/categories" class="mobile-nav-link">categories</a>
+  
+    <a href="/tags" class="mobile-nav-link">tags</a>
+  
+    <a href="/about" class="mobile-nav-link">about</a>
+  
+</nav> -->
+    
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/scripts.js"></script>
+
+
+
+
+  <script src="/js/dialog.js"></script>
+
+
+
+
+
+
+
+
+	<div style="display: none;">
+    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
+  </div>
+
+
+
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+	</script>
+
+
+
+
+
+
+  </div>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">设置</h2>
+      </div>
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+
+
+      <div class="modal-body">
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="javascript:setFontSize();" aria-expanded="true" aria-controls="collapseOne">
+              正文字号大小
+            </a>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body">
+            您已调整页面字体大小
+          </div>
+        </div>
+      
+
+
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="javascript:setBackground();" aria-expanded="true" aria-controls="collapseTwo">
+              夜间护眼模式
+            </a>
+        </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="panel-body">
+            夜间模式已经开启，再次单击按钮即可关闭 
+          </div>
+        </div>
+
+        <div>
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关 于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>
+         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+          <div class="panel-body">
+            alvin&#39;s blog
+          </div>
+          <div class="panel-body">
+            Copyright © 2019 alvin dong All Rights Reserved.
+          </div>
+        </div>
+      </div>
+
+
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+  
+    <a id="menu-switch"><i class="fa fa-bars fa-lg"></i></a>
+  
+</body>
+</html>

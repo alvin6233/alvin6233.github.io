@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>redis主从复制 | alvin&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="keywords" content="redis" />
+  
+  
+  
+  
+  <meta name="description" content="主从复制，就是把一台Redis服务的数据拷贝到另一台Redis服务器。前者称为主节点，后者称为从节点。数据只能从主节点流向从节点。一个主节点可以有多个从节点，一个从节点只能有一个主节点。Redis的主从架构主要有两种模式：主从复制模式和链式主从复制模式。 主从复制的作用主要有以下几点：  数据冗余：实现数据热备份，提供多个数据冗余备份保证数据安全性。 增强容错：主节点故障，从节点仍可以对外提供读服">
+<meta name="keywords" content="redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis主从复制">
+<meta property="og:url" content="https://dongz.me/2019/01/06/Redis主从复制/index.html">
+<meta property="og:site_name" content="alvin&#39;s blog">
+<meta property="og:description" content="主从复制，就是把一台Redis服务的数据拷贝到另一台Redis服务器。前者称为主节点，后者称为从节点。数据只能从主节点流向从节点。一个主节点可以有多个从节点，一个从节点只能有一个主节点。Redis的主从架构主要有两种模式：主从复制模式和链式主从复制模式。 主从复制的作用主要有以下几点：  数据冗余：实现数据热备份，提供多个数据冗余备份保证数据安全性。 增强容错：主节点故障，从节点仍可以对外提供读服">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-01-06T04:24:40.682Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis主从复制">
+<meta name="twitter:description" content="主从复制，就是把一台Redis服务的数据拷贝到另一台Redis服务器。前者称为主节点，后者称为从节点。数据只能从主节点流向从节点。一个主节点可以有多个从节点，一个从节点只能有一个主节点。Redis的主从架构主要有两种模式：主从复制模式和链式主从复制模式。 主从复制的作用主要有以下几点：  数据冗余：实现数据热备份，提供多个数据冗余备份保证数据安全性。 增强容错：主节点故障，从节点仍可以对外提供读服">
+  
+    <link rel="alternate" href="/atom.xml" title="alvin&#39;s blog" type="application/atom+xml">
+  
+
+  
+
+  <link rel="icon" href="/css/images/mylogo.jpg">
+  <link rel="apple-touch-icon" href="/css/images/mylogo.jpg">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
+  <link rel="stylesheet" href="/css/style.css">
+
+  <script src="/js/jquery-3.1.1.min.js"></script>
+  <script src="/js/bootstrap.js"></script>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+
+  
+    <link rel="stylesheet" href="/css/dialog.css">
+  
+
+  
+
+  
+    <link rel="stylesheet" href="/css/header-post.css" >
+  
+
+  
+  
+  
+    <link rel="stylesheet" href="/css/vdonate.css" >
+  
+
+</head>
+
+
+
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
+
+
+  
+  <div id="container">
+    <div id="wrap">
+      
+        <header>
+
+    <div id="allheader" class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="navbar-inner">
+          
+          <div class="container"> 
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+
+            
+              <a class="brand" style="
+                 margin-top: 0px;"  
+                href="#" data-toggle="modal" data-target="#myModal" >
+                  <img width="124px" height="124px" alt="Hike News" src="/css/images/mylogo.jpg">
+              </a>
+            
+            
+            <div class="navbar-collapse collapse">
+              <ul class="hnav navbar-nav">
+                
+                  <li> <a class="main-nav-link" href="/">首页</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/archives">归档</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/categories">分类</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/tags">标签</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/about">关于</a> </li>
+                
+                  <li><div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="请输入关键词..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(无标题)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div></li>
+            </div>
+          </div>
+                
+      </div>
+    </div>
+
+</header>
+
+
+
+      
+            
+      <div id="content" class="outer">
+        
+          <section id="main" style="float:none;"><article id="post-Redis主从复制" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" class="article-title" itemprop="name">
+      Redis主从复制
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2019/01/06/Redis主从复制/" class="article-date">
+	  <time datetime="2019-01-06T04:20:00.000Z" itemprop="datePublished">2019-01-06</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/数据存储/">数据存储</a>
+
+      
+	<a class="article-views">
+	<span id="busuanzi_container_page_pv">
+		阅读量<span id="busuanzi_value_page_pv"></span>
+	</span>
+	</a>
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>主从复制，就是把一台Redis服务的数据拷贝到另一台Redis服务器。前者称为主节点，后者称为从节点。数据只能从主节点流向从节点。一个主节点可以有多个从节点，一个从节点只能有一个主节点。<br>Redis的主从架构主要有两种模式：主从复制模式和链式主从复制模式。</p>
+<p>主从复制的作用主要有以下几点：</p>
+<ol>
+<li>数据冗余：实现数据热备份，提供多个数据冗余备份保证数据安全性。</li>
+<li>增强容错：主节点故障，从节点仍可以对外提供读服务。</li>
+<li>负载均衡：读写分离，分担服务器负载压力。</li>
+<li>高可用基础：是哨兵和集群实现的基础。<a id="more"></a>
+</li>
+</ol>
+<h2 id="主从复制实战"><a href="#主从复制实战" class="headerlink" title="主从复制实战"></a>主从复制实战</h2><h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><h4 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h4><p>系统：centos7<br>服务器：master(172.16.6.242)、slave1(172.16.6.243)、slave2(172.16.6.244)<br>Redis版本：5.0.3</p>
+<h4 id="同步时间"><a href="#同步时间" class="headerlink" title="同步时间"></a>同步时间</h4><p>服务器依次执行如下命令：<br>    sudo ntpdate cn.pool.ntp.org  // cn.pool.ntp.org为网络时间服务器，也可以同步自己的时间服务器</p>
+<p>若ntpdate未安装，执行如下命令安装：<br>    yum -y install ntp ntpdate</p>
+<h3 id="安装Redis"><a href="#安装Redis" class="headerlink" title="安装Redis"></a>安装Redis</h3><p>设置yum源，以安置最新稳定版本Redis：<br>    yum install -y <a href="http://rpms.famillecollet.com/enterprise/remi-release-7.rpm" target="_blank" rel="noopener">http://rpms.famillecollet.com/enterprise/remi-release-7.rpm</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># master安装  </span><br><span class="line">[root@master ~]# yum --enablerepo=remi install redis</span><br><span class="line"></span><br><span class="line"># slave1安装  </span><br><span class="line">[root@slave1 ~]# yum --enablerepo=remi install redis</span><br><span class="line"></span><br><span class="line"># slave2安装  </span><br><span class="line">[root@slave2 ~]# yum --enablerepo=remi install redis</span><br></pre></td></tr></table></figure>
+<h3 id="配置启动"><a href="#配置启动" class="headerlink" title="配置启动"></a>配置启动</h3><p>配置master节点并启动服务：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# vim /etc/redis.conf</span><br><span class="line">bind 0.0.0.0        # 监控本地所有IP；</span><br><span class="line">requirepass ialvin      # 设置密码 ialvin；</span><br><span class="line">[root@master ~]# systemctl start redis</span><br><span class="line">[root@master ~]# ss -tnl</span><br><span class="line">State      Recv-Q Send-Q Local Address:Port               Peer Address:Port</span><br><span class="line">LISTEN     0      128          *:6379                     *:*</span><br><span class="line">LISTEN     0      128          *:111                      *:*</span><br><span class="line">LISTEN     0      128          *:22                       *:*</span><br></pre></td></tr></table></figure></p>
+<p>配置slave1节点并启动服务，配置文件方式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">[root@slave1 ~]# vim /etc/redis.conf</span><br><span class="line">bind 0.0.0.0            # 监控本地所有IP；</span><br><span class="line">requirepass ialvin      # 设置密码为ialvin；</span><br><span class="line"></span><br><span class="line">replicaof 172.16.6.242 6379       # 设置主节点IP 端口；</span><br><span class="line">masterauth ialvin           # 主节点认证密码；</span><br><span class="line"></span><br><span class="line">[root@slave1 ~]# systemctl start redis       # 启动服务；</span><br><span class="line">[root@slave1 ~]# ss -tnl     # 端口已经开启；</span><br><span class="line">State      Recv-Q Send-Q Local Address:Port           Peer Address:Port</span><br><span class="line">LISTEN     0      128    172.16.6.243:7946                *:*</span><br><span class="line">LISTEN     0      128          *:27018                    *:*</span><br><span class="line">LISTEN     0      128          *:6379                     *:*</span><br><span class="line"></span><br><span class="line">[root@slave1 ~]# redis-cli</span><br><span class="line">127.0.0.1:6379&gt; auth ialvin</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; info replication</span><br><span class="line"># Replication</span><br><span class="line">role:slave</span><br><span class="line">master_host:172.16.6.242</span><br><span class="line">master_port:6379</span><br><span class="line">master_link_status:up</span><br><span class="line">master_last_io_seconds_ago:6</span><br><span class="line">master_sync_in_progress:0</span><br><span class="line">slave_repl_offset:140642</span><br><span class="line">slave_priority:100</span><br><span class="line">slave_read_only:1</span><br><span class="line">connected_slaves:0</span><br><span class="line">master_replid:970c2af1479671a4acb859113f0527c94c1a1fea</span><br><span class="line">master_replid2:0000000000000000000000000000000000000000</span><br><span class="line">master_repl_offset:140642</span><br><span class="line">second_repl_offset:-1</span><br><span class="line">repl_backlog_active:1</span><br><span class="line">repl_backlog_size:1048576</span><br><span class="line">repl_backlog_first_byte_offset:295</span><br><span class="line">repl_backlog_histlen:140348</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 切换到master查看</span><br><span class="line">127.0.0.1:6379&gt; info replication</span><br><span class="line"># Replication</span><br><span class="line">role:master</span><br><span class="line">connected_slaves:1</span><br><span class="line">slave0:ip=172.16.6.243,port=6379,state=online,offset=140838,lag=1</span><br><span class="line">master_replid:970c2af1479671a4acb859113f0527c94c1a1fea</span><br><span class="line">master_replid2:0000000000000000000000000000000000000000</span><br><span class="line">master_repl_offset:140838</span><br><span class="line">second_repl_offset:-1</span><br><span class="line">repl_backlog_active:1</span><br><span class="line">repl_backlog_size:1048576</span><br><span class="line">repl_backlog_first_byte_offset:1</span><br><span class="line">repl_backlog_histlen:140838</span><br></pre></td></tr></table></figure></p>
+<p>配置slave2节点并启动服务，命令行方式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">[root@slave2 ~]# vim /etc/redis.conf </span><br><span class="line">bind 0.0.0.0            # 监控本地所有IP；</span><br><span class="line">requirepass ialvin      # 设置密码为ialvin；</span><br><span class="line"></span><br><span class="line">[root@slave2 ~]# systemctl start redis</span><br><span class="line">[root@slave2 ~]# ss -tnl</span><br><span class="line">State      Recv-Q Send-Q Local Address:Port               Peer Address:Port</span><br><span class="line">LISTEN     0      128          *:6379                     *:*</span><br><span class="line">LISTEN     0      128          *:111                      *:*</span><br><span class="line">LISTEN     0      128          *:22                       *:*</span><br><span class="line">LISTEN     0      128    127.0.0.1:631                      *:*</span><br><span class="line"></span><br><span class="line">[root@slave2 ~]# redis-cli -a ialvin</span><br><span class="line">127.0.0.1:6379&gt; info replication        # 目前slave2还不是master的从节点；</span><br><span class="line"># Replication</span><br><span class="line">role:master</span><br><span class="line">connected_slaves:0</span><br><span class="line">master_replid:bdcd0e33999ba623c1363dbce3489775fc972850</span><br><span class="line">master_replid2:0000000000000000000000000000000000000000</span><br><span class="line">master_repl_offset:0</span><br><span class="line">second_repl_offset:-1</span><br><span class="line">repl_backlog_active:0</span><br><span class="line">repl_backlog_size:1048576</span><br><span class="line">repl_backlog_first_byte_offset:0</span><br><span class="line">repl_backlog_histlen:0</span><br><span class="line"></span><br><span class="line">127.0.0.1:6379&gt; config get replicaof      # 查看当前redis节点配置信息；</span><br><span class="line">1) &quot;replicaof&quot;</span><br><span class="line">2) &quot;&quot;</span><br><span class="line">127.0.0.1:6379&gt; replicaof 172.16.6.242 6379   # 配置主节点IP 端口；</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; config get masterauth       # 认证信息；</span><br><span class="line">1) &quot;masterauth&quot;</span><br><span class="line">2) &quot;&quot;</span><br><span class="line">127.0.0.1:6379&gt; config set masterauth iavlin        # 配置认证；</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; info replication        # 主节点配置完成；</span><br><span class="line"># Replication</span><br><span class="line">role:slave</span><br><span class="line">master_host:172.16.6.242</span><br><span class="line">master_port:6379</span><br><span class="line">master_link_status:up</span><br><span class="line">master_last_io_seconds_ago:10</span><br><span class="line">master_sync_in_progress:0</span><br><span class="line">slave_repl_offset:141496</span><br><span class="line">slave_priority:100</span><br><span class="line">slave_read_only:1</span><br><span class="line">connected_slaves:0</span><br><span class="line">master_replid:970c2af1479671a4acb859113f0527c94c1a1fea</span><br><span class="line">master_replid2:0000000000000000000000000000000000000000</span><br><span class="line">master_repl_offset:141496</span><br><span class="line">second_repl_offset:-1</span><br><span class="line">repl_backlog_active:1</span><br><span class="line">repl_backlog_size:1048576</span><br><span class="line">repl_backlog_first_byte_offset:141483</span><br><span class="line">repl_backlog_histlen:14</span><br><span class="line"></span><br><span class="line">127.0.0.1:6379&gt; config rewrite      # 保存到配置文件中；</span><br><span class="line">OK</span><br><span class="line"></span><br><span class="line">[root@slave2 ~]# tail -3  /etc/redis.conf        # 已经保存到配置文件中；</span><br><span class="line"># Generated by CONFIG REWRITE</span><br><span class="line">replicaof 172.16.6.242 6379</span><br><span class="line">masterauth &quot;ialvin&quot;</span><br></pre></td></tr></table></figure></p>
+<h3 id="主从复制测试"><a href="#主从复制测试" class="headerlink" title="主从复制测试"></a>主从复制测试</h3><p>统一在默认库0做测试：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#主节点master创建key</span><br><span class="line">[root@master ~]# redis-cli -a ialvin</span><br><span class="line">127.0.0.1:6379&gt; set foo bar</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; get foo</span><br><span class="line">&quot;bar&quot;</span><br><span class="line"></span><br><span class="line"># slave1上查看</span><br><span class="line">[root@slave1 ~]# redis-cli -a ialvin</span><br><span class="line">127.0.0.1:6379&gt; get foo</span><br><span class="line">&quot;bar&quot;</span><br><span class="line"></span><br><span class="line"># slave2上查看</span><br><span class="line">[root@slave2 ~]# redis-cli -a ialvin</span><br><span class="line">127.0.0.1:6379&gt; get foo</span><br><span class="line">&quot;bar&quot;</span><br><span class="line"></span><br><span class="line"># 主库写入key，从库可以读到</span><br></pre></td></tr></table></figure></p>
+<h2 id="主从复制原理"><a href="#主从复制原理" class="headerlink" title="主从复制原理"></a>主从复制原理</h2><p>Redis复制过程大体可分为三个阶段：建立连接、数据同步、命令传播。  </p>
+<h3 id="建立连接阶段"><a href="#建立连接阶段" class="headerlink" title="建立连接阶段"></a>建立连接阶段</h3><h4 id="主服务器的地址和端口"><a href="#主服务器的地址和端口" class="headerlink" title="主服务器的地址和端口"></a>主服务器的地址和端口</h4><p>当输入replicaof命令或者在配置文件中配置replicaof信息时，从服务器会将主服务器的ip地址和端口号保存到服务器状态的属性里面。</p>
+<h4 id="建立套接字连接"><a href="#建立套接字连接" class="headerlink" title="建立套接字连接"></a>建立套接字连接</h4><p>在replicaof命令执行之后，从服务器会根据属性里维护的主节点的ip和端口，向主服务器发起socket连接。以下为连接建立后主从节点的操作。<br>从节点：为该socket建立一个专门处理复制工作的文件事件处理器，负责后续的复制工作，如接收RDB文件、接收命令传播等。<br>主节点：为该socket创建相应的客户端状态，保存客户端信息。</p>
+<h4 id="PING探活"><a href="#PING探活" class="headerlink" title="PING探活"></a>PING探活</h4><p>从节点成为主节点的客户端之后，发送ping命令进行首次请求，检查socket连接是否可用，以及主节点当前是否能够处理请求。<br>正常情况下主节点会返回PONG，异常情况下从节点会断开socket连接，稍后会重新建立连接。</p>
+<h4 id="身份验证"><a href="#身份验证" class="headerlink" title="身份验证"></a>身份验证</h4><p>主节点设置了requirepass开启连接验证，从节点需要设置masterauth属性，且与主节点requirepass值设置为相同值。在从节点收到主节点PONG回复时，从节点会发送auth命令，命令格式为“auth + 密码”进行密码验证，其中密码为masterauth参数配置的密码。</p>
+<h4 id="发送从节点端口信息"><a href="#发送从节点端口信息" class="headerlink" title="发送从节点端口信息"></a>发送从节点端口信息</h4><p>身份验证之后，从节点会向主节点发送其监听的端口号（使用默认端口为6379），主节点将该信息保存到该从节点对应的客户端的slave_listening_port字段中；用来在主节点中执行info Replication时显示。</p>
+<h3 id="数据同步阶段"><a href="#数据同步阶段" class="headerlink" title="数据同步阶段"></a>数据同步阶段</h3><p>主从连接建立以后，便开始进行该阶段。执行方式：从节点向主节点发送psync命令（Redis2.8以前是sync命令）开始同步。  </p>
+<p>该阶段是主从复制核心阶段，根据主从节点状态不同分为全量复制和部分复制。  </p>
+<ul>
+<li>全量复制：初始化同步或无法进行部分复制时采用的同步方式，主节点将全量数据发给从节点，属于重型操作。</li>
+<li>部分复制：网络短暂中断情况下同步方式，主节点只将中断期间的写命令发送给从节点，比全量复制高效。但长时间网络中断，主节点无法完整保存期间执行的写命令，只能进行全量同步。</li>
+</ul>
+<p>该阶段以前从节点是主节点的客户端，主节点不是从节点的客户端；该阶段及以后阶段主从互为客户端。原因是从该阶段开始主节点开始主动向从节点发起请求。</p>
+<h4 id="全量复制同步"><a href="#全量复制同步" class="headerlink" title="全量复制同步"></a>全量复制同步</h4><p>Redis2.8以前只有该同步方式，通过psync命令进行全量复制过程：  </p>
+<ol>
+<li>从节点向主节点发送全量复制请求；或从节点向主节点发送部分复制请求，但主节点判断只能进行全量复制。  </li>
+<li>主节点接收全量复制请求，开线程执行bgsave命令生成RDB文件，同时使用复制缓冲区记录此刻开始的所有写命令。  </li>
+<li>bgsave命令执行完以后，将RDB文件发送到从节点，从节点先清除旧数据然后加载RDB文件（阻塞，进行时不能响应客户端请求）。</li>
+<li>主节点将复制缓冲区所有命令发送给从节点，从节点执行命令，此时从节点数据和主节点数据保持一致。</li>
+<li>从节点若开启AOF，会触发bgrewriteaof执行，保证和主节点AOF文件一致。</li>
+</ol>
+<h4 id="部分复制同步"><a href="#部分复制同步" class="headerlink" title="部分复制同步"></a>部分复制同步</h4><p>Redis2.8以后新增复制方式，缓解全量复制带来的性能开销及其它问题。<br>相关概念：<br><strong>复制偏移量</strong><br>主节点和从节点同时维护一个复制偏移量（offset），代表主节点向从节点传递的字节数；主节点向从节点传递N个字节，则主节点offset增加N；从节点从主节点接收N个字节，则从节点offset增加N。<br>从节点携带offset请求主节点进行部分复制，主节点通过比较自己保存的offset和从节点offset值确定本次部分复制的数据范围。<br>例如，如果主节点的offset是1000，而从节点的offset是500，那么部分复制就需要将offset为501-1000的数据传递给从节点。而offset为501-1000的数据存储在复制缓冲区。</p>
+<p><strong>复制缓冲区</strong><br>复制积压缓冲区是由主节点维护的、固定长度的、先进先出(FIFO)队列，默认大小1MB，可通过修改repl-backlog-size自定义配置；主要作用是备份主节点最近发送给从节点的数据。只有一个复制积压缓冲区。<br>  在命令传播阶段，主节点除了向从节点发送命令，同时会发一份到复制缓冲区作为备份，同时会记录每个字节的offset。部分复制的数据区间从该区域获取，当主从节点offset差距过大超过缓冲区长度时，无法进行部分复制，<br>只能进行全量复制。</p>
+<p><strong>Redis运行ID</strong><br>Redis启动时生成的40位16进制随机串，每次启动不一样。无论主从，每个节点都会生成。可通过 <code>redis-cli info server | grep run_id</code>查看。<br>  主从节点初次复制时，主节点将自己的runid发送给从节点，从节点将这个runid保存起来；当断线重连时，从节点会将这个runid发送给主节点；主节点根据runid判断能否进行部分复制，若相同则发起部分复制请求（还要综合offset和复制缓冲区情况），<br>不相同则全量复制。</p>
+<p>部分复制执行过程：  </p>
+<ol>
+<li>未执行过slaveof或最近执行了slaveof no one，则从节点发送命令为psync ? -1，向主节点请求全量复制。  </li>
+<li>之前执行了slaveof，则发送命令为psync <runid> <offset>，其中runid为上次复制的主节点的runid，offset为上次复制截止时从节点保存的复制偏移量。  </offset></runid></li>
+<li>如果主节点版本低于Redis2.8，则返回-ERR回复，此时从节点重新发送sync命令执行全量复制。  </li>
+<li>如果主节点版本够新，且runid与从节点发送的runid相同，且从节点发送的offset之后的数据在复制积压缓冲区中都存在，则回复+CONTINUE，表示将进行部分复制，从节点等待主节点发送其缺少的数据即可。</li>
+<li>如果主节点版本够新，但是runid与从节点发送的runid不同，或从节点发送的offset之后的数据已不在复制积压缓冲区中(在队列中被挤出了)，则回复+FULLRESYNC <runid> <offset>，表示要进行全量复制，<br>其中runid表示主节点当前的runid，offset表示主节点当前的offset，从节点保存这两个值，以备使用。</offset></runid></li>
+</ol>
+<h5 id="redis4-0升级psync"><a href="#redis4-0升级psync" class="headerlink" title="redis4.0升级psync"></a>redis4.0升级psync</h5><p>Redis4.0之前的psync我们称为psync1，4.0及以后升级后的psnyc我们称为psync2。  </p>
+<p>psync1主要存在以下问题：  </p>
+<ol>
+<li>节点重启后，runid和复制缓冲区丢失，只能进行全量复制。  </li>
+<li>主从发生切换时，只能进行全量复制。  </li>
+</ol>
+<p>psync2主要解决了以上问题。psync2在psync1基础上新增两个复制id：  </p>
+<ul>
+<li>master_replid: 复制id1(后文简称：replid1)，一个长度为41个字节(40个随机串+’0’)的字符串，每个节点都有，和runid没有直接关联，但和runid生成规则相同。当节点变为从节点后，自己的replid1会被主节点的replid1覆盖。  </li>
+<li>master_replid2：复制id2(后文简称:replid2),默认初始化为全0，用于存储上次主节点的replid1。</li>
+</ul>
+<p><strong>重启实现部分复制</strong>  </p>
+<ol>
+<li>Redis关闭时，通过shutdown save，都会调用rdbSaveInfoAuxFields函数，把当前实例的repl-id和repl-offset保存到RDB文件中。  </li>
+<li>重启时Redis加载RDB文件，会专门处理文件中辅助字段(AUX fields）信息，把其中repl_id和repl_offset加载到实例中，分别赋给master_replid和master_repl_offset两个变量值。<br>若开启了AOF持久化，由于加载优先级较高，导致重启后从节点依旧使用全量复制。  </li>
+<li>从节点向主节点上报master_replid和master_repl_offset+1，若与主节点的master_replid1或replid2有一个相等，且master_repl_offset+1字节，还存在于主节点的复制积压缓冲区中，则进行部分复制。</li>
+</ol>
+<p><strong>主从切换实现部分复制</strong><br>Redis从节点默认开启复制缓冲区功能，以便主节点故障从节点切换为主节点后，其他落后该节点的从节点可以从缓冲区中获取缺少的命令。该过程的实现通过两组replid、offset替换原来的master runid和offset变量实现：<br>第一组：master_replid和master_repl_offset：如果Redis是主节点，则表示为自己的replid和复制偏移量； 如果Redis是从节点，则表示同步主节点的replid1和复制偏移量。<br>第二组：master_replid2和second_repl_offset：无论主从，都表示自己上次主节点repid1和复制偏移量。  </p>
+<p>判断是否使用部分复制条件：如果从库提供的master_replid与master的replid相同，或者与master的replid2相同，且master_repl_offset+1字节，还存在于目标节点的复制积压缓冲区中，则进行部分复制。</p>
+<h3 id="命令传播阶段"><a href="#命令传播阶段" class="headerlink" title="命令传播阶段"></a>命令传播阶段</h3><p>在命令传播阶段，除了发送写命令，主从节点还维持着心跳机制：PING和REPLCONF ACK。心跳机制对于主从复制的超时判断、数据安全等有作用。  </p>
+<p><strong>主==&gt;从：PING</strong><br>每隔一段时间（默认10秒，通过repl-ping-slave-period参数指定）主节点向从节点发送PING命令判断从节点是否在线。  </p>
+<p><strong>从==&gt;主：REPLCONF ACK</strong><br>从节点每秒1次向主节点发送REPLCONF ACK命令，命令格式为：REPLCONF ACK {offset}，其中offset指从节点保存的复制偏移量，作用有以下几点：  </p>
+<ol>
+<li>实时监测主从节点网络状态<br>该命令会被主节点用于复制超时的判断，在主节点中使用info Replication，可以看到其从节点的状态中的lag值，代表的是主节点上次收到该REPLCONF ACK命令的时间间隔，在正常情况下，该值应该是0或1  </li>
+<li>检测命令丢失<br>从节点发送了自身的offset，主节点会与自己的offset对比，如果从节点数据缺失（如网络丢包），主节点会推送缺失的数据（这里也会利用复制积压缓冲区）。<br>注意，offset和复制积压缓冲区，不仅可以用于部分复制，也可以用于处理命令丢失等情形；区别在于前者是在断线重连后进行的，而后者是在主从节点没有断线的情况下进行的。  </li>
+<li>辅助保证从节点的数量和延迟<br>Redis主节点中使用min-slaves-to-write和min-slaves-max-lag参数，来保证主节点在不安全的情况下不会执行写命令；所谓不安全，是指从节点数量太少，或延迟过高。例如min-slaves-to-write和min-slaves-max-lag分别是3和10，<br>含义是如果从节点数量小于3个，或所有从节点的延迟值都大于10s，则主节点拒绝执行写命令。而这里从节点延迟值的获取，就是通过主节点接收到REPLCONF ACK命令的时间来判断的，即前面所说的info Replication中的lag值。</li>
+</ol>
+<p>参考：  </p>
+<ol>
+<li><a href="https://www.cnblogs.com/kismetv/p/9236731.html" target="_blank" rel="noopener">深入学习Redis（3）：主从复制</a></li>
+<li><a href="https://juejin.im/post/5b67029c6fb9a04fa42fd592#heading-5" target="_blank" rel="noopener">redis系列–主从复制以及redis复制演进</a></li>
+<li><a href="https://juejin.im/post/5b625b9be51d4519956759d0#heading-14" target="_blank" rel="noopener">redis系列：主从复制</a></li>
+<li><a href="https://www.jianshu.com/p/6fe7c56e487c" target="_blank" rel="noopener">Redis4.0新特性(二)-PSYNC2</a></li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <div id="donation_div"></div>
+
+<script src="/js/vdonate.js"></script>
+<script>
+var a = new Donate({
+  title: '如果觉得我的文章对您有用，请随意打赏。您的支持将鼓励我继续创作!', // 可选参数，打赏标题
+  btnText: '打赏支持', // 可选参数，打赏按钮文字
+  el: document.getElementById('donation_div'),
+  wechatImage: 'https://raw.githubusercontent.com/alvin6233/alvin6233.github.io/master/css/images/WechatPay.png',
+  alipayImage: 'https://raw.githubusercontent.com/alvin6233/alvin6233.github.io/master/css/images/AliPay.png'
+});
+</script>
+      
+      
+      <div>
+        <ul class="post-copyright">
+          <li class="post-copyright-author">
+          <strong>本文作者:  </strong>alvin dong</a>
+          </li>
+          <li class="post-copyright-link">
+          <strong>本文链接:  </strong>
+          <a href="/2019/01/06/Redis主从复制/" target="_blank" title="Redis主从复制">https://dongz.me/2019/01/06/Redis主从复制/</a>
+          </li>
+          <li class="post-copyright-license">
+            <strong>版权声明:   </strong>
+            本博客所有文章除特别声明外，均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+            许可协议。转载请注明出处
+          </li>
+         
+        </ul>
+<div>
+
+      
+      
+        
+	<div id="comment">
+		<!-- 来必力City版安装代码 -->
+		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
+		<script type="text/javascript">
+		   (function(d, s) {
+		       var j, e = d.getElementsByTagName(s)[0];
+
+		       if (typeof LivereTower === 'function') { return; }
+
+		       j = d.createElement(s);
+		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+		       j.async = true;
+
+		       e.parentNode.insertBefore(j, e);
+		   })(document, 'script');
+		</script>
+		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+		</div>
+		<!-- City版安装代码已完成 -->
+	</div>
+
+
+
+      
+      
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2019/01/06/Redis哨兵/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          Redis哨兵
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/12/21/函数式编程/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">函数式编程</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- Table of Contents -->
+
+  <aside id="toc-sidebar">
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#主从复制实战"><span class="nav-number">1.</span> <span class="nav-text">主从复制实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#准备"><span class="nav-number">1.1.</span> <span class="nav-text">准备</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#环境"><span class="nav-number">1.1.1.</span> <span class="nav-text">环境</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#同步时间"><span class="nav-number">1.1.2.</span> <span class="nav-text">同步时间</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Redis"><span class="nav-number">1.2.</span> <span class="nav-text">安装Redis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置启动"><span class="nav-number">1.3.</span> <span class="nav-text">配置启动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主从复制测试"><span class="nav-number">1.4.</span> <span class="nav-text">主从复制测试</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主从复制原理"><span class="nav-number">2.</span> <span class="nav-text">主从复制原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#建立连接阶段"><span class="nav-number">2.1.</span> <span class="nav-text">建立连接阶段</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#主服务器的地址和端口"><span class="nav-number">2.1.1.</span> <span class="nav-text">主服务器的地址和端口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#建立套接字连接"><span class="nav-number">2.1.2.</span> <span class="nav-text">建立套接字连接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PING探活"><span class="nav-number">2.1.3.</span> <span class="nav-text">PING探活</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#身份验证"><span class="nav-number">2.1.4.</span> <span class="nav-text">身份验证</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#发送从节点端口信息"><span class="nav-number">2.1.5.</span> <span class="nav-text">发送从节点端口信息</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据同步阶段"><span class="nav-number">2.2.</span> <span class="nav-text">数据同步阶段</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#全量复制同步"><span class="nav-number">2.2.1.</span> <span class="nav-text">全量复制同步</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#部分复制同步"><span class="nav-number">2.2.2.</span> <span class="nav-text">部分复制同步</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#redis4-0升级psync"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">redis4.0升级psync</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#命令传播阶段"><span class="nav-number">2.3.</span> <span class="nav-text">命令传播阶段</span></a></li></ol></li></ol>
+    
+    </div>
+  </aside>
+
+</section>
+        
+      </div>
+      
+      <footer id="footer">
+  
+
+  <div class="container">
+      	<div class="row">
+	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
+	      <p id="copyRightEn">Copyright &copy; 2013 - 2019 alvin&#39;s blog All Rights Reserved.</p>
+	      
+	      
+    		<p class="busuanzi_uv">
+				访客数 : <span id="busuanzi_value_site_uv"></span> |  
+				访问量 : <span id="busuanzi_value_site_pv"></span>
+		    </p>
+  		   
+		</div>
+
+		
+  </div>
+</footer>
+
+
+<!-- min height -->
+
+<script>
+    var wrapdiv = document.getElementById("wrap");
+    var contentdiv = document.getElementById("content");
+    var allheader = document.getElementById("allheader");
+
+    wrapdiv.style.minHeight = document.body.offsetHeight + "px";
+    if (allheader != null) {
+      contentdiv.style.minHeight = document.body.offsetHeight - allheader.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    } else {
+      contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    }
+</script>
+    </div>
+    <!-- <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">home</a>
+  
+    <a href="/archives" class="mobile-nav-link">archives</a>
+  
+    <a href="/categories" class="mobile-nav-link">categories</a>
+  
+    <a href="/tags" class="mobile-nav-link">tags</a>
+  
+    <a href="/about" class="mobile-nav-link">about</a>
+  
+</nav> -->
+    
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/scripts.js"></script>
+
+
+
+
+  <script src="/js/dialog.js"></script>
+
+
+
+
+
+
+
+
+	<div style="display: none;">
+    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
+  </div>
+
+
+
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+	</script>
+
+
+
+
+
+
+  </div>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">设置</h2>
+      </div>
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+
+
+      <div class="modal-body">
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="javascript:setFontSize();" aria-expanded="true" aria-controls="collapseOne">
+              正文字号大小
+            </a>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body">
+            您已调整页面字体大小
+          </div>
+        </div>
+      
+
+
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="javascript:setBackground();" aria-expanded="true" aria-controls="collapseTwo">
+              夜间护眼模式
+            </a>
+        </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="panel-body">
+            夜间模式已经开启，再次单击按钮即可关闭 
+          </div>
+        </div>
+
+        <div>
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关 于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>
+         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+          <div class="panel-body">
+            alvin&#39;s blog
+          </div>
+          <div class="panel-body">
+            Copyright © 2019 alvin dong All Rights Reserved.
+          </div>
+        </div>
+      </div>
+
+
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+  
+    <a id="menu-switch"><i class="fa fa-bars fa-lg"></i></a>
+  
+</body>
+</html>
