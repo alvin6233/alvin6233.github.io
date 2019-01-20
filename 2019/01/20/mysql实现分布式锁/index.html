@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>mysql实现分布式锁 | alvin&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="keywords" content="分布式锁" />
+  
+  
+  
+  
+  <meta name="description" content="为了保证一个方法或者属性在高并发情况下的同一时间只能被同一个线程执行，在传统单机应用单机部署的情况下，可以使用java并发锁如ReentrantLock或Synchronized。但是随着业务发展的需要，原单体单机部署的系统被演化成分布式集群系统后，由于分布式系统多线程、多进程并且分布在不同机器上，这将使原单机部署情况下的并发控制锁策略失效。为了解决这个问题，就需要一种跨JVM的互斥机制来控制共享">
+<meta name="keywords" content="分布式锁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql实现分布式锁">
+<meta property="og:url" content="https://dongz.me/2019/01/20/mysql实现分布式锁/index.html">
+<meta property="og:site_name" content="alvin&#39;s blog">
+<meta property="og:description" content="为了保证一个方法或者属性在高并发情况下的同一时间只能被同一个线程执行，在传统单机应用单机部署的情况下，可以使用java并发锁如ReentrantLock或Synchronized。但是随着业务发展的需要，原单体单机部署的系统被演化成分布式集群系统后，由于分布式系统多线程、多进程并且分布在不同机器上，这将使原单机部署情况下的并发控制锁策略失效。为了解决这个问题，就需要一种跨JVM的互斥机制来控制共享">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-01-20T14:24:48.293Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mysql实现分布式锁">
+<meta name="twitter:description" content="为了保证一个方法或者属性在高并发情况下的同一时间只能被同一个线程执行，在传统单机应用单机部署的情况下，可以使用java并发锁如ReentrantLock或Synchronized。但是随着业务发展的需要，原单体单机部署的系统被演化成分布式集群系统后，由于分布式系统多线程、多进程并且分布在不同机器上，这将使原单机部署情况下的并发控制锁策略失效。为了解决这个问题，就需要一种跨JVM的互斥机制来控制共享">
+  
+    <link rel="alternate" href="/atom.xml" title="alvin&#39;s blog" type="application/atom+xml">
+  
+
+  
+
+  <link rel="icon" href="/css/images/mylogo.jpg">
+  <link rel="apple-touch-icon" href="/css/images/mylogo.jpg">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
+  <link rel="stylesheet" href="/css/style.css">
+
+  <script src="/js/jquery-3.1.1.min.js"></script>
+  <script src="/js/bootstrap.js"></script>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+
+  
+    <link rel="stylesheet" href="/css/dialog.css">
+  
+
+  
+
+  
+    <link rel="stylesheet" href="/css/header-post.css" >
+  
+
+  
+  
+  
+    <link rel="stylesheet" href="/css/vdonate.css" >
+  
+
+</head>
+
+
+
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
+
+
+  
+  <div id="container">
+    <div id="wrap">
+      
+        <header>
+
+    <div id="allheader" class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="navbar-inner">
+          
+          <div class="container"> 
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+
+            
+              <a class="brand" style="
+                 margin-top: 0px;"  
+                href="#" data-toggle="modal" data-target="#myModal" >
+                  <img width="124px" height="124px" alt="Hike News" src="/css/images/mylogo.jpg">
+              </a>
+            
+            
+            <div class="navbar-collapse collapse">
+              <ul class="hnav navbar-nav">
+                
+                  <li> <a class="main-nav-link" href="/">首页</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/archives">归档</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/categories">分类</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/tags">标签</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/about">关于</a> </li>
+                
+                  <li><div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="请输入关键词..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(无标题)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div></li>
+            </div>
+          </div>
+                
+      </div>
+    </div>
+
+</header>
+
+
+
+      
+            
+      <div id="content" class="outer">
+        
+          <section id="main" style="float:none;"><article id="post-mysql实现分布式锁" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" class="article-title" itemprop="name">
+      mysql实现分布式锁
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2019/01/20/mysql实现分布式锁/" class="article-date">
+	  <time datetime="2019-01-20T14:22:00.000Z" itemprop="datePublished">2019-01-20</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/分布式/">分布式</a>
+
+      
+	<a class="article-views">
+	<span id="busuanzi_container_page_pv">
+		阅读量<span id="busuanzi_value_page_pv"></span>
+	</span>
+	</a>
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>为了保证一个方法或者属性在高并发情况下的同一时间只能被同一个线程执行，在传统单机应用单机部署的情况下，可以使用java并发锁如ReentrantLock或Synchronized。<br>但是随着业务发展的需要，原单体单机部署的系统被演化成分布式集群系统后，由于分布式系统多线程、多进程并且分布在不同机器上，这将使原单机部署情况下的并发控制锁策略失效。<br>为了解决这个问题，就需要一种跨JVM的互斥机制来控制共享资源的访问，这就是分布式锁要解决的问题。本文主要讲讲通过数据库如何实现分布式锁。<br><a id="more"></a></p>
+<h2 id="分布式锁应具备条件"><a href="#分布式锁应具备条件" class="headerlink" title="分布式锁应具备条件"></a>分布式锁应具备条件</h2><ul>
+<li>在分布式系统环境下，一个方法在同一时间只能被一个机器的的一个线程执行；  </li>
+<li>高可用的获取锁与释放锁；  </li>
+<li>高性能的获取锁与释放锁；  </li>
+<li>具备可重入特性；  </li>
+<li>具备锁失效机制，防止死锁；  </li>
+<li>具备非阻塞锁特性，即没有获取到锁将直接返回获取锁失败。  </li>
+</ul>
+<h2 id="基于数据库的实现"><a href="#基于数据库的实现" class="headerlink" title="基于数据库的实现"></a>基于数据库的实现</h2><h3 id="思想"><a href="#思想" class="headerlink" title="思想"></a>思想</h3><p>在数据库中创建一个表，表中包含资源字段，并在资源字段上创建唯一索引，想要使用某个资源，就使用这个资源向表中插入数据，成功插入则获取锁，执行完成后删除对应的行数据释放锁。  </p>
+<h3 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h3><h4 id="建锁表"><a href="#建锁表" class="headerlink" title="建锁表"></a>建锁表</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">drop table if exists tb_lock;</span><br><span class="line">create table tb_lock(</span><br><span class="line">id int primary key auto_increment comment &apos;主键&apos;,</span><br><span class="line">source_id varchar(64) not null comment &apos;资源id&apos;,</span><br><span class="line">owner_id varchar(64) not null comment &apos;资源占有者id&apos;,</span><br><span class="line">state int default 0 comment &apos;线程重入次数&apos;,</span><br><span class="line">dead_time long comment &apos;失效时间&apos;,</span><br><span class="line">update_time long not null comment &apos;更新时间&apos;,</span><br><span class="line">description varchar(100) comment &apos;说明&apos;,</span><br><span class="line">unique key `uidx_source_id` (`source_id`) using btree</span><br><span class="line">)ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT=&apos;分布式锁表&apos;;</span><br></pre></td></tr></table></figure>
+<p>id：自增可传递空值。<br>source_id：资源可能是方法、对象等，若为方法可以设置为方法名；若为对象可以设置为对象id或对象其它唯一标示。<br>owner_id：可根据规则 <code>ip+threadId</code>即服务器ip和线程id生成唯一标示。<br>dead_time：根据 <code>System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(lockTimeOut)</code>计算得出。<br>update_time：记录更新时间为 <code>System.nanoTime()</code>。<br>state：设置为1，表示第一次进入锁。<br>description：锁描述。  </p>
+<h4 id="锁定资源"><a href="#锁定资源" class="headerlink" title="锁定资源"></a>锁定资源</h4><p>设计方法 <code>boolean tryLock(String sourceId, long lockTimeOut)</code>，实现对资源sourceId的锁定，lockTimeOut为锁保持的最长有效期，可为空，为空代表永久持有锁直到主动释放锁。<br>方法实现具体步骤：  </p>
+<ol>
+<li>根据资源id查询是否资源被占用</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from tb_lock where source_id = &lt;id&gt;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>若返回结果为空，说明资源未被占用，当前线程执行插入资源占用数据。</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># 插入数据库资源行记录sql</span><br><span class="line">insert into tb_lock</span><br><span class="line">(`id`,</span><br><span class="line">`source_id`,</span><br><span class="line">`owner_id`,</span><br><span class="line">`state`,</span><br><span class="line">`dead_time`,</span><br><span class="line">`update_time`,</span><br><span class="line">`description`)</span><br><span class="line">VALUES</span><br><span class="line">(&lt;&#123;id: &#125;&gt;,</span><br><span class="line">&lt;&#123;source_id: &#125;&gt;,</span><br><span class="line">&lt;&#123;owner_id: &#125;&gt;,</span><br><span class="line">&lt;&#123;state: 0&#125;&gt;,</span><br><span class="line">&lt;&#123;dead_time: &#125;&gt;,</span><br><span class="line">&lt;&#123;update_time: &#125;&gt;,</span><br><span class="line">&lt;&#123;description: &#125;&gt;);</span><br></pre></td></tr></table></figure>
+<ol>
+<li>若返回记录，说明资源已被占用。  </li>
+</ol>
+<p>查看记录<code>owner_id</code>，若相等说明属于锁重入，<code>state</code>加1操作：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update tb_lock set state = state + 1 where id = &lt;id&gt;</span><br></pre></td></tr></table></figure>
+<p>若不相等说明资源已被其他线程占用，返回false。  </p>
+<blockquote>
+<p>注意：以上操作要放在同一事务中处理，利用数据库行锁中的排他锁，保证原子性。  </p>
+</blockquote>
+<h4 id="释放资源"><a href="#释放资源" class="headerlink" title="释放资源"></a>释放资源</h4><p>设计方法<code>boolean unLock(String sourceId)</code>，释放资源<code>sourceId</code>。  </p>
+<p>方法实现具体步骤：  </p>
+<p>判断state值是否为0，若为执行：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">delete from tb_lock where id = &lt;id&gt;</span><br></pre></td></tr></table></figure>
+<p>若不为0，执行：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update tb_lock set state = state - 1 where id = &lt;id&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意：以上操作同样要放到事务中保证原子性。 </p>
+</blockquote>
+<h3 id="缺点及不足"><a href="#缺点及不足" class="headerlink" title="缺点及不足"></a>缺点及不足</h3><ol>
+<li><p>实例中锁属于非阻塞的，即获取锁失败就立刻返回。可以通过循环，指定循环次数或时间进行重试操作，直到成功。  </p>
+</li>
+<li><p>数据库存在单点问题，可以搭建主从结构优化。</p>
+</li>
+<li><p>连接池容易被打满、事务超时、行锁升级表锁等问题难以解决。</p>
+</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <div id="donation_div"></div>
+
+<script src="/js/vdonate.js"></script>
+<script>
+var a = new Donate({
+  title: '如果觉得我的文章对您有用，请随意打赏。您的支持将鼓励我继续创作!', // 可选参数，打赏标题
+  btnText: '打赏支持', // 可选参数，打赏按钮文字
+  el: document.getElementById('donation_div'),
+  wechatImage: 'https://raw.githubusercontent.com/alvin6233/alvin6233.github.io/master/css/images/WechatPay.png',
+  alipayImage: 'https://raw.githubusercontent.com/alvin6233/alvin6233.github.io/master/css/images/AliPay.png'
+});
+</script>
+      
+      
+      <div>
+        <ul class="post-copyright">
+          <li class="post-copyright-author">
+          <strong>本文作者:  </strong>alvin dong</a>
+          </li>
+          <li class="post-copyright-link">
+          <strong>本文链接:  </strong>
+          <a href="/2019/01/20/mysql实现分布式锁/" target="_blank" title="mysql实现分布式锁">https://dongz.me/2019/01/20/mysql实现分布式锁/</a>
+          </li>
+          <li class="post-copyright-license">
+            <strong>版权声明:   </strong>
+            本博客所有文章除特别声明外，均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+            许可协议。转载请注明出处
+          </li>
+         
+        </ul>
+<div>
+
+      
+      
+        
+	<div id="comment">
+		<!-- 来必力City版安装代码 -->
+		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
+		<script type="text/javascript">
+		   (function(d, s) {
+		       var j, e = d.getElementsByTagName(s)[0];
+
+		       if (typeof LivereTower === 'function') { return; }
+
+		       j = d.createElement(s);
+		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+		       j.async = true;
+
+		       e.parentNode.insertBefore(j, e);
+		   })(document, 'script');
+		</script>
+		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+		</div>
+		<!-- City版安装代码已完成 -->
+	</div>
+
+
+
+      
+      
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2019/01/20/zookeeper集群搭建/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          zookeeper集群搭建
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/01/20/Redis集群/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">Redis集群</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- Table of Contents -->
+
+  <aside id="toc-sidebar">
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式锁应具备条件"><span class="nav-number">1.</span> <span class="nav-text">分布式锁应具备条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于数据库的实现"><span class="nav-number">2.</span> <span class="nav-text">基于数据库的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#思想"><span class="nav-number">2.1.</span> <span class="nav-text">思想</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实战"><span class="nav-number">2.2.</span> <span class="nav-text">实战</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#建锁表"><span class="nav-number">2.2.1.</span> <span class="nav-text">建锁表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#锁定资源"><span class="nav-number">2.2.2.</span> <span class="nav-text">锁定资源</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#释放资源"><span class="nav-number">2.2.3.</span> <span class="nav-text">释放资源</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缺点及不足"><span class="nav-number">2.3.</span> <span class="nav-text">缺点及不足</span></a></li></ol></li></ol>
+    
+    </div>
+  </aside>
+
+</section>
+        
+      </div>
+      
+      <footer id="footer">
+  
+
+  <div class="container">
+      	<div class="row">
+	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
+	      <p id="copyRightEn">Copyright &copy; 2013 - 2019 alvin&#39;s blog All Rights Reserved.</p>
+	      
+	      
+    		<p class="busuanzi_uv">
+				访客数 : <span id="busuanzi_value_site_uv"></span> |  
+				访问量 : <span id="busuanzi_value_site_pv"></span>
+		    </p>
+  		   
+		</div>
+
+		
+  </div>
+</footer>
+
+
+<!-- min height -->
+
+<script>
+    var wrapdiv = document.getElementById("wrap");
+    var contentdiv = document.getElementById("content");
+    var allheader = document.getElementById("allheader");
+
+    wrapdiv.style.minHeight = document.body.offsetHeight + "px";
+    if (allheader != null) {
+      contentdiv.style.minHeight = document.body.offsetHeight - allheader.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    } else {
+      contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    }
+</script>
+    </div>
+    <!-- <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">home</a>
+  
+    <a href="/archives" class="mobile-nav-link">archives</a>
+  
+    <a href="/categories" class="mobile-nav-link">categories</a>
+  
+    <a href="/tags" class="mobile-nav-link">tags</a>
+  
+    <a href="/about" class="mobile-nav-link">about</a>
+  
+</nav> -->
+    
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/scripts.js"></script>
+
+
+
+
+  <script src="/js/dialog.js"></script>
+
+
+
+
+
+
+
+
+	<div style="display: none;">
+    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
+  </div>
+
+
+
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+	</script>
+
+
+
+
+
+
+  </div>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">设置</h2>
+      </div>
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+
+
+      <div class="modal-body">
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="javascript:setFontSize();" aria-expanded="true" aria-controls="collapseOne">
+              正文字号大小
+            </a>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body">
+            您已调整页面字体大小
+          </div>
+        </div>
+      
+
+
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="javascript:setBackground();" aria-expanded="true" aria-controls="collapseTwo">
+              夜间护眼模式
+            </a>
+        </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="panel-body">
+            夜间模式已经开启，再次单击按钮即可关闭 
+          </div>
+        </div>
+
+        <div>
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关 于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>
+         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+          <div class="panel-body">
+            alvin&#39;s blog
+          </div>
+          <div class="panel-body">
+            Copyright © 2019 alvin dong All Rights Reserved.
+          </div>
+        </div>
+      </div>
+
+
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+  
+    <a id="menu-switch"><i class="fa fa-bars fa-lg"></i></a>
+  
+</body>
+</html>

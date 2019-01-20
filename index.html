@@ -260,6 +260,172 @@
         
           <section id="main" style="float:none;">
   
+    <article id="post-zookeeper集群搭建"  class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" itemprop="name">
+      <a class="article-title" href="/2019/01/20/zookeeper集群搭建/">zookeeper集群搭建</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2019/01/20/zookeeper集群搭建/" class="article-date">
+	  <time datetime="2019-01-20T14:25:00.000Z" itemprop="datePublished">2019-01-20</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/数据存储/">数据存储</a>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- alvin edit
+          <p class="article-excerpt-content">
+          zookeeper是一个高效的分布式协调服务，可以提供配置信息管理、命名、分布式同步、集群管理、数据库切换等服务。它不适合用来存储大量信息，可以用来存储一些配置、发布与订阅等少量信息。hadoop、storm、消息中间件、rpc服务框架、分布式数据库同步系统，这些都是zookeeper的应用场景。
+zookeeper集群中节点个数一般为奇数个（&gt;=3），若集群中主节点挂掉，剩余节点个数在半数以上时，就可以推举新的主节点，继续对外提供服务。
+
+为啥子2n+1zookeeper集群正常提...
+        </p> -->
+        <p>zookeeper是一个高效的分布式协调服务，可以提供配置信息管理、命名、分布式同步、集群管理、数据库切换等服务。它不适合用来存储大量信息，可以用来存储一些配置、发布与订阅等少量信息。<br>hadoop、storm、消息中间件、rpc服务框架、分布式数据库同步系统，这些都是zookeeper的应用场景。</p>
+<p>zookeeper集群中节点个数一般为奇数个（&gt;=3），若集群中主节点挂掉，剩余节点个数在半数以上时，就可以推举新的主节点，继续对外提供服务。</p>        
+        <p class="article-more-link">
+        <a href="/2019/01/20/zookeeper集群搭建/#more">阅读全文</a>             </p>
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+      
+
+    </footer>
+  </div>
+  
+</article>
+
+<!-- Table of Contents -->
+
+
+  
+    <article id="post-mysql实现分布式锁"  class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" itemprop="name">
+      <a class="article-title" href="/2019/01/20/mysql实现分布式锁/">mysql实现分布式锁</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2019/01/20/mysql实现分布式锁/" class="article-date">
+	  <time datetime="2019-01-20T14:22:00.000Z" itemprop="datePublished">2019-01-20</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/分布式/">分布式</a>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- alvin edit
+          <p class="article-excerpt-content">
+          为了保证一个方法或者属性在高并发情况下的同一时间只能被同一个线程执行，在传统单机应用单机部署的情况下，可以使用java并发锁如ReentrantLock或Synchronized。但是随着业务发展的需要，原单体单机部署的系统被演化成分布式集群系统后，由于分布式系统多线程、多进程并且分布在不同机器上，这将使原单机部署情况下的并发控制锁策略失效。为了解决这个问题，就需要一种跨JVM的互斥机制来控制共享资源的访问，这就是分布式锁要解决的问题。本文主要讲讲通过数据库如何实现分布式锁。
+分布式锁应具...
+        </p> -->
+        <p>为了保证一个方法或者属性在高并发情况下的同一时间只能被同一个线程执行，在传统单机应用单机部署的情况下，可以使用java并发锁如ReentrantLock或Synchronized。<br>但是随着业务发展的需要，原单体单机部署的系统被演化成分布式集群系统后，由于分布式系统多线程、多进程并且分布在不同机器上，这将使原单机部署情况下的并发控制锁策略失效。<br>为了解决这个问题，就需要一种跨JVM的互斥机制来控制共享资源的访问，这就是分布式锁要解决的问题。本文主要讲讲通过数据库如何实现分布式锁。<br>        
+        <p class="article-more-link">
+        <a href="/2019/01/20/mysql实现分布式锁/#more">阅读全文</a>             </p>
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+      
+
+    </footer>
+  </div>
+  
+</article>
+
+<!-- Table of Contents -->
+
+
+  
+    <article id="post-Redis集群"  class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" itemprop="name">
+      <a class="article-title" href="/2019/01/20/Redis集群/">Redis集群</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2019/01/20/Redis集群/" class="article-date">
+	  <time datetime="2019-01-20T14:20:00.000Z" itemprop="datePublished">2019-01-20</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/数据存储/">数据存储</a>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- alvin edit
+          <p class="article-excerpt-content">
+          主从复制和哨兵模式，存在诸多问题，最主要的问题是存储能力受单机限制，写操作不能实现负载均衡。Redis3.0开始引入分布式存储方案，集群。集群由多个节点组成，节点分为主节点和从节点。主节点负载读写请求和集群信息的维护，从节点只进行主节点数据和信息的复制。集群的作用如下：
+
+数据分区： 数据分区(或称数据分片)是集群最核心的功能。集群将数据分散到多个节点，一方面突破了Redis单机内存大小的限制，存储容量大大增加；另一方面每个主节点都可以对外提供读服务和写服务，大大提高了集群的响应能力。
+高...
+        </p> -->
+        <p>主从复制和哨兵模式，存在诸多问题，最主要的问题是存储能力受单机限制，写操作不能实现负载均衡。<br>Redis3.0开始引入分布式存储方案，集群。集群由多个节点组成，节点分为主节点和从节点。主节点负载读写请求和集群信息的维护，从节点只进行主节点数据和信息的复制。集群的作用如下：</p>
+<ul>
+<li><strong>数据分区：</strong> 数据分区(或称数据分片)是集群最核心的功能。集群将数据分散到多个节点，一方面突破了Redis单机内存大小的限制，存储容量大大增加；<br>另一方面每个主节点都可以对外提供读服务和写服务，大大提高了集群的响应能力。</li>
+<li><strong>高可用：</strong> 集群支持主从复制和主节点的自动故障转移（与哨兵类似）；当任一节点发生故障时，集群仍然可以对外提供服务。  </li>
+</ul>
+<p>本文集群模式，包含3个主节点、3个从节点。<br>        
+        <p class="article-more-link">
+        <a href="/2019/01/20/Redis集群/#more">阅读全文</a>             </p>
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+      
+
+    </footer>
+  </div>
+  
+</article>
+
+<!-- Table of Contents -->
+
+
+  
     <article id="post-Redis哨兵"  class="article article-type-post" itemscope itemprop="blogPost" >
   <div id="articleInner" class="article-inner">
     
@@ -645,168 +811,6 @@
         <p>java中容器，也称集合可以容纳其它类型数据。在平时也接触类不少比如ArrayList、HashSet、LinkedList、HashMap、TreeMap等等，但真要细说还真一知半解，大体风暴类一下，有不当的地方欢迎评论中指出～～<br>        
         <p class="article-more-link">
         <a href="/2018/12/12/风暴之集合/#more">阅读全文</a>             </p>
-      
-    </div>
-    <footer class="article-footer">
-      
-      
-      
-      
-
-    </footer>
-  </div>
-  
-</article>
-
-<!-- Table of Contents -->
-
-
-  
-    <article id="post-风暴之mysql"  class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="thumb" itemprop="name">
-      <a class="article-title" href="/2018/12/11/风暴之mysql/">风暴之mysql</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2018/12/11/风暴之mysql/" class="article-date">
-	  <time datetime="2018-12-10T16:40:00.000Z" itemprop="datePublished">2018-12-11</time>
-	</a>
-
-      
-    <a class="article-category-link" href="/categories/数据存储/">数据存储</a>
-
-      
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-      <!-- alvin edit
-          <p class="article-excerpt-content">
-          本篇以mysql常见维度展开头脑风暴。维度包括数据的存储结构、数据库事务、mysql中常见的锁、mysql使用优化、mysql中常见日志。图中有不当的地方请留言指出～～  
-风暴之mysql
-看大图
-
-        </p> -->
-        <p>本篇以mysql常见维度展开头脑风暴。维度包括数据的存储结构、数据库事务、mysql中常见的锁、mysql使用优化、mysql中常见日志。图中有不当的地方请留言指出～～<br>        
-        <p class="article-more-link">
-        <a href="/2018/12/11/风暴之mysql/#more">阅读全文</a>             </p>
-      
-    </div>
-    <footer class="article-footer">
-      
-      
-      
-      
-
-    </footer>
-  </div>
-  
-</article>
-
-<!-- Table of Contents -->
-
-
-  
-    <article id="post-风暴之线上问题排查"  class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="thumb" itemprop="name">
-      <a class="article-title" href="/2018/11/29/风暴之线上问题排查/">风暴之线上问题排查</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2018/11/29/风暴之线上问题排查/" class="article-date">
-	  <time datetime="2018-11-28T16:23:00.000Z" itemprop="datePublished">2018-11-29</time>
-	</a>
-
-      
-    <a class="article-category-link" href="/categories/积累/">积累</a>
-
-      
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-      <!-- alvin edit
-          <p class="article-excerpt-content">
-          实际生产环境下，应用不可避免的会遇到各种各样的问题，要熟练掌握一些命令和工具，以快速排查定位线上问题。  
-风暴之线上问题排查
-看大图
-
-        </p> -->
-        <p>实际生产环境下，应用不可避免的会遇到各种各样的问题，要熟练掌握一些命令和工具，以快速排查定位线上问题。<br>        
-        <p class="article-more-link">
-        <a href="/2018/11/29/风暴之线上问题排查/#more">阅读全文</a>             </p>
-      
-    </div>
-    <footer class="article-footer">
-      
-      
-      
-      
-
-    </footer>
-  </div>
-  
-</article>
-
-<!-- Table of Contents -->
-
-
-  
-    <article id="post-风暴之并发和多线程"  class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="thumb" itemprop="name">
-      <a class="article-title" href="/2018/11/29/风暴之并发和多线程/">风暴之并发和多线程</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2018/11/29/风暴之并发和多线程/" class="article-date">
-	  <time datetime="2018-11-28T16:18:00.000Z" itemprop="datePublished">2018-11-29</time>
-	</a>
-
-      
-    <a class="article-category-link" href="/categories/java/">java</a>
-
-      
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-      <!-- alvin edit
-          <p class="article-excerpt-content">
-          并发和多线程是Java编程中避不开的话题，今天主要对并发和多线程相关知识进行下头脑风暴。
-风暴之并发和多线程
-看大图
-
-        </p> -->
-        <p>并发和多线程是Java编程中避不开的话题，今天主要对并发和多线程相关知识进行下头脑风暴。<br>        
-        <p class="article-more-link">
-        <a href="/2018/11/29/风暴之并发和多线程/#more">阅读全文</a>             </p>
       
     </div>
     <footer class="article-footer">
