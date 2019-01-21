@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>zookeeper实现分布式锁 | alvin&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="keywords" content="分布式锁" />
+  
+  
+  
+  
+  <meta name="description" content="zookeeper能够保障分布式场景下数据的一致性、有序性、原子性及可靠性，它的所有写入动作会在主节点持久化，并在集群过半数节点写入成功才会返回；它也能够支持节点的崩溃恢复以及客户端的最终一致性视图。对于分布式锁场景来说，数据一致性的保障、以及锁服务的容灾保障至关重要。 本章主要是curator框架结合zookeeper实现分布式锁。">
+<meta name="keywords" content="分布式锁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="zookeeper实现分布式锁">
+<meta property="og:url" content="https://dongz.me/2019/01/21/zookeeper实现分布式锁/index.html">
+<meta property="og:site_name" content="alvin&#39;s blog">
+<meta property="og:description" content="zookeeper能够保障分布式场景下数据的一致性、有序性、原子性及可靠性，它的所有写入动作会在主节点持久化，并在集群过半数节点写入成功才会返回；它也能够支持节点的崩溃恢复以及客户端的最终一致性视图。对于分布式锁场景来说，数据一致性的保障、以及锁服务的容灾保障至关重要。 本章主要是curator框架结合zookeeper实现分布式锁。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-01-21T15:34:06.967Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="zookeeper实现分布式锁">
+<meta name="twitter:description" content="zookeeper能够保障分布式场景下数据的一致性、有序性、原子性及可靠性，它的所有写入动作会在主节点持久化，并在集群过半数节点写入成功才会返回；它也能够支持节点的崩溃恢复以及客户端的最终一致性视图。对于分布式锁场景来说，数据一致性的保障、以及锁服务的容灾保障至关重要。 本章主要是curator框架结合zookeeper实现分布式锁。">
+  
+    <link rel="alternate" href="/atom.xml" title="alvin&#39;s blog" type="application/atom+xml">
+  
+
+  
+
+  <link rel="icon" href="/css/images/mylogo.jpg">
+  <link rel="apple-touch-icon" href="/css/images/mylogo.jpg">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
+  <link rel="stylesheet" href="/css/style.css">
+
+  <script src="/js/jquery-3.1.1.min.js"></script>
+  <script src="/js/bootstrap.js"></script>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+
+  
+    <link rel="stylesheet" href="/css/dialog.css">
+  
+
+  
+
+  
+    <link rel="stylesheet" href="/css/header-post.css" >
+  
+
+  
+  
+  
+    <link rel="stylesheet" href="/css/vdonate.css" >
+  
+
+</head>
+
+
+
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
+
+
+  
+  <div id="container">
+    <div id="wrap">
+      
+        <header>
+
+    <div id="allheader" class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="navbar-inner">
+          
+          <div class="container"> 
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+
+            
+              <a class="brand" style="
+                 margin-top: 0px;"  
+                href="#" data-toggle="modal" data-target="#myModal" >
+                  <img width="124px" height="124px" alt="Hike News" src="/css/images/mylogo.jpg">
+              </a>
+            
+            
+            <div class="navbar-collapse collapse">
+              <ul class="hnav navbar-nav">
+                
+                  <li> <a class="main-nav-link" href="/">首页</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/archives">归档</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/categories">分类</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/tags">标签</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/about">关于</a> </li>
+                
+                  <li><div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="请输入关键词..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(无标题)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div></li>
+            </div>
+          </div>
+                
+      </div>
+    </div>
+
+</header>
+
+
+
+      
+            
+      <div id="content" class="outer">
+        
+          <section id="main" style="float:none;"><article id="post-zookeeper实现分布式锁" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" class="article-title" itemprop="name">
+      zookeeper实现分布式锁
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2019/01/21/zookeeper实现分布式锁/" class="article-date">
+	  <time datetime="2019-01-21T15:32:00.000Z" itemprop="datePublished">2019-01-21</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/分布式/">分布式</a>
+
+      
+	<a class="article-views">
+	<span id="busuanzi_container_page_pv">
+		阅读量<span id="busuanzi_value_page_pv"></span>
+	</span>
+	</a>
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><code>zookeeper</code>能够保障分布式场景下数据的一致性、有序性、原子性及可靠性，它的所有写入动作会在主节点持久化，并在集群过半数节点写入成功才会返回；<br>它也能够支持节点的崩溃恢复以及客户端的最终一致性视图。对于分布式锁场景来说，数据一致性的保障、以及锁服务的容灾保障至关重要。</p>
+<p>本章主要是curator框架结合zookeeper实现分布式锁。<br><a id="more"></a></p>
+<h2 id="zookeeper分布式锁实现原理"><a href="#zookeeper分布式锁实现原理" class="headerlink" title="zookeeper分布式锁实现原理"></a>zookeeper分布式锁实现原理</h2><p>原理还是看下大佬们的总结吧：  </p>
+<blockquote>
+<p>主要：</p>
+</blockquote>
+<p><a href="https://juejin.im/post/5c01532ef265da61362232ed" target="_blank" rel="noopener">七张图彻底讲清楚ZooKeeper分布式锁的实现原理</a>  </p>
+<blockquote>
+<p>其它：  </p>
+</blockquote>
+<p><a href="https://draveness.me/zookeeper-chubby" target="_blank" rel="noopener">详解分布式协调服务 ZooKeeper</a><br><a href="https://blog.csdn.net/csdnnews/article/details/86248155" target="_blank" rel="noopener">漫画：什么是 ZooKeeper</a><br><a href="https://mp.weixin.qq.com/s/u8QDlrDj3Rl1YjY4TyKMCA" target="_blank" rel="noopener">漫画：如何用Zookeeper实现分布式锁</a>  </p>
+<h2 id="使用curator框架实战"><a href="#使用curator框架实战" class="headerlink" title="使用curator框架实战"></a>使用curator框架实战</h2><h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><p>SpringBoot Version：2.1.2.RELEASE</p>
+<p>JDK：1.8</p>
+<h3 id="摘要代码"><a href="#摘要代码" class="headerlink" title="摘要代码"></a>摘要代码</h3><blockquote>
+<p>pom.xml</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- zookeeper &amp; curator --&gt;</span><br><span class="line">      &lt;dependency&gt;</span><br><span class="line">          &lt;groupId&gt;org.apache.zookeeper&lt;/groupId&gt;</span><br><span class="line">          &lt;artifactId&gt;zookeeper&lt;/artifactId&gt;</span><br><span class="line">          &lt;version&gt;3.4.10&lt;/version&gt;</span><br><span class="line">      &lt;/dependency&gt;</span><br><span class="line">      &lt;dependency&gt;</span><br><span class="line">          &lt;groupId&gt;org.apache.curator&lt;/groupId&gt;</span><br><span class="line">          &lt;artifactId&gt;curator-framework&lt;/artifactId&gt;</span><br><span class="line">          &lt;version&gt;2.12.0&lt;/version&gt;</span><br><span class="line">      &lt;/dependency&gt;</span><br><span class="line">      &lt;dependency&gt;</span><br><span class="line">          &lt;groupId&gt;org.apache.curator&lt;/groupId&gt;</span><br><span class="line">          &lt;artifactId&gt;curator-recipes&lt;/artifactId&gt;</span><br><span class="line">          &lt;version&gt;2.12.0&lt;/version&gt;</span><br><span class="line">      &lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>application.properties</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">server.port=8081</span><br><span class="line">spring.application.name=curator-use</span><br><span class="line"></span><br><span class="line">#重试次数</span><br><span class="line">curator.retryCount=3</span><br><span class="line">#重试间隔时间ms!</span><br><span class="line">curator.elapsedTimeMs=5000</span><br><span class="line"># zookeeper 地址</span><br><span class="line">curator.connectString=172.16.6.242:2181,172.16.6.243:2181,172.16.6.244:2181</span><br><span class="line"># session超时时间ms!</span><br><span class="line">curator.sessionTimeoutMs=60000</span><br><span class="line"># 连接超时时间ms!</span><br><span class="line">curator.connectionTimeoutMs=5000</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>属性类CuratorAttribute.java</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">@Component</span><br><span class="line">@ConfigurationProperties(prefix = &quot;curator&quot;)</span><br><span class="line">@Data</span><br><span class="line">public class CuratorAttribute &#123;</span><br><span class="line">    private int retryCount;</span><br><span class="line"></span><br><span class="line">    private int elapsedTimeMs;</span><br><span class="line"></span><br><span class="line">    private String connectString;</span><br><span class="line"></span><br><span class="line">    private int sessionTimeoutMs;</span><br><span class="line"></span><br><span class="line">    private int connectionTimeoutMs;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>配置类ZkConfiguration.java</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">@Configuration</span><br><span class="line">public class ZkConfiguration &#123;</span><br><span class="line">    @Autowired</span><br><span class="line">    private CuratorAttribute curatorAttribute;</span><br><span class="line"></span><br><span class="line">    @Bean(initMethod = &quot;start&quot;)</span><br><span class="line">    public CuratorFramework curatorFramework() &#123;</span><br><span class="line">        return CuratorFrameworkFactory.newClient(</span><br><span class="line">                curatorAttribute.getConnectString(),</span><br><span class="line">                curatorAttribute.getSessionTimeoutMs(),</span><br><span class="line">                curatorAttribute.getConnectionTimeoutMs(),</span><br><span class="line">                new RetryNTimes(curatorAttribute.getRetryCount(),curatorAttribute.getElapsedTimeMs()));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>分布式锁关节实现类</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line">@Slf4j</span><br><span class="line">@Service</span><br><span class="line">public class LockByZookeeper implements InitializingBean &#123;</span><br><span class="line">    private final static String ROOT_PATH_LOCK = &quot;rootlock&quot;;</span><br><span class="line">    private CountDownLatch countDownLatch = new CountDownLatch(1);</span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    private CuratorFramework curatorFramework;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 获取分布式锁</span><br><span class="line">     */</span><br><span class="line">    public void acquire(String path) &#123;</span><br><span class="line">        String keyPath = &quot;/&quot; + ROOT_PATH_LOCK + &quot;/&quot; + path;</span><br><span class="line">        while (true) &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                curatorFramework</span><br><span class="line">                        .create()</span><br><span class="line">                        .creatingParentsIfNeeded()</span><br><span class="line">                        .withMode(CreateMode.EPHEMERAL)</span><br><span class="line">                        .withACL(ZooDefs.Ids.OPEN_ACL_UNSAFE)</span><br><span class="line">                        .forPath(keyPath);</span><br><span class="line">                log.info(&quot;success to acquire lock for path:&#123;&#125;&quot;, keyPath);</span><br><span class="line">                break;</span><br><span class="line">            &#125; catch (Exception e) &#123;</span><br><span class="line">                log.info(&quot;failed to acquire lock for path:&#123;&#125;&quot;, keyPath);</span><br><span class="line">                log.info(&quot;while try again .......&quot;);</span><br><span class="line">                try &#123;</span><br><span class="line">                    if (countDownLatch.getCount() &lt;= 0) &#123;</span><br><span class="line">                        countDownLatch = new CountDownLatch(1);</span><br><span class="line">                    &#125;</span><br><span class="line">                    countDownLatch.await();</span><br><span class="line">                &#125; catch (InterruptedException e1) &#123;</span><br><span class="line">                    e1.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 释放分布式锁</span><br><span class="line">     */</span><br><span class="line">    public boolean release(String path) &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            String keyPath = &quot;/&quot; + ROOT_PATH_LOCK + &quot;/&quot; + path;</span><br><span class="line">            if (curatorFramework.checkExists().forPath(keyPath) != null) &#123;</span><br><span class="line">                curatorFramework.delete().forPath(keyPath);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            log.error(&quot;failed to release lock&quot;);</span><br><span class="line">            return false;</span><br><span class="line">        &#125;</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 创建 watcher 事件</span><br><span class="line">     */</span><br><span class="line">    private void addWatcher(String path) throws Exception &#123;</span><br><span class="line">        String keyPath;</span><br><span class="line">        if (path.equals(ROOT_PATH_LOCK)) &#123;</span><br><span class="line">            keyPath = &quot;/&quot; + path;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            keyPath = &quot;/&quot; + ROOT_PATH_LOCK + &quot;/&quot; + path;</span><br><span class="line">        &#125;</span><br><span class="line">        final PathChildrenCache cache = new PathChildrenCache(curatorFramework, keyPath, false);</span><br><span class="line">        cache.start(PathChildrenCache.StartMode.POST_INITIALIZED_EVENT);</span><br><span class="line">        cache.getListenable().addListener((client, event) -&gt; &#123;</span><br><span class="line">            if (event.getType().equals(PathChildrenCacheEvent.Type.CHILD_REMOVED)) &#123;</span><br><span class="line">                String oldPath = event.getData().getPath();</span><br><span class="line">                log.info(&quot;上一个节点 &quot;+ oldPath + &quot; 已经被断开&quot;);</span><br><span class="line">                if (oldPath.contains(path)) &#123;</span><br><span class="line">                    //释放计数器，让当前的请求获取锁</span><br><span class="line">                    countDownLatch.countDown();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    //创建父节点，并创建永久节点</span><br><span class="line">    @Override</span><br><span class="line">    public void afterPropertiesSet() &#123;</span><br><span class="line">        curatorFramework = curatorFramework.usingNamespace(&quot;lock-namespace&quot;);</span><br><span class="line">        String path = &quot;/&quot; + ROOT_PATH_LOCK;</span><br><span class="line">        try &#123;</span><br><span class="line">            if (curatorFramework.checkExists().forPath(path) == null) &#123;</span><br><span class="line">                curatorFramework.create()</span><br><span class="line">                        .creatingParentsIfNeeded()</span><br><span class="line">                        .withMode(CreateMode.PERSISTENT)</span><br><span class="line">                        .withACL(ZooDefs.Ids.OPEN_ACL_UNSAFE)</span><br><span class="line">                        .forPath(path);</span><br><span class="line">            &#125;</span><br><span class="line">            addWatcher(ROOT_PATH_LOCK);</span><br><span class="line">            log.info(&quot;root path 的 watcher 事件创建成功&quot;);</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            log.error(&quot;connect zookeeper fail，please check the log &gt;&gt; &#123;&#125;&quot;, e.getMessage(), e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>控制层类LockController.java</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">@RestController</span><br><span class="line">public class LockController &#123;</span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    private LockByZookeeper lockByZookeeper;</span><br><span class="line"></span><br><span class="line">    private final static String PATH = &quot;resource_lock&quot;;</span><br><span class="line"></span><br><span class="line">    @GetMapping(&quot;/lock1&quot;)</span><br><span class="line">    public Response&lt;Boolean&gt; getLock1() &#123;</span><br><span class="line">        Boolean flag;</span><br><span class="line">        lockByZookeeper.acquire(PATH);</span><br><span class="line">        try &#123;</span><br><span class="line">            Thread.sleep(20000);</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">            flag = lockByZookeeper.release(PATH);</span><br><span class="line">        &#125;</span><br><span class="line">        flag = lockByZookeeper.release(PATH);</span><br><span class="line">        return Response.success(flag);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @GetMapping(&quot;/lock2&quot;)</span><br><span class="line">    public Response getLock2() &#123;</span><br><span class="line">        Boolean flag;</span><br><span class="line">        lockByZookeeper.acquire(PATH);</span><br><span class="line">        try &#123;</span><br><span class="line">            Thread.sleep(15000);</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">            flag = lockByZookeeper.release(PATH);</span><br><span class="line">        &#125;</span><br><span class="line">        flag = lockByZookeeper.release(PATH);</span><br><span class="line">        return Response.success(flag);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中<code>/lock1</code> 和 <code>/lock2</code>两个接口获取同一个锁<code>resource_lock</code>。</p>
+<blockquote>
+<p>测试 </p>
+</blockquote>
+<p>先调用<code>lock1</code>接口，紧接着（不要超过20s）调用<code>lock2</code>接口。这时就是出现锁竞争，<code>lock1</code>占有锁，<code>lock2</code>等待获取锁。<code>lock1</code>释放锁之后通知<code>lock2</code>，<code>lock2</code>重新获取锁。执行日志如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">2019-01-21 15:23:32.506  INFO 40866 --- [nio-8081-exec-1] com.alvin.curatoruse.LockByZookeeper     : success to acquire lock for path:/rootlock/resource_lock</span><br><span class="line">2019-01-21 15:23:36.078  INFO 40866 --- [nio-8081-exec-2] com.alvin.curatoruse.LockByZookeeper     : failed to acquire lock for path:/rootlock/resource_lock</span><br><span class="line">2019-01-21 15:23:36.078  INFO 40866 --- [nio-8081-exec-2] com.alvin.curatoruse.LockByZookeeper     : while try again .......</span><br><span class="line">2019-01-21 15:23:52.527  INFO 40866 --- [ChildrenCache-0] com.alvin.curatoruse.LockByZookeeper     : 上一个节点 /rootlock/resource_lock 已经被断开</span><br><span class="line">2019-01-21 15:23:52.534  INFO 40866 --- [nio-8081-exec-2] com.alvin.curatoruse.LockByZookeeper     : success to acquire lock for path:/rootlock/resource_lock</span><br><span class="line">2019-01-21 15:24:07.547  INFO 40866 --- [ChildrenCache-0] com.alvin.curatoruse.LockByZookeeper     : 上一个节点 /rootlock/resource_lock 已经被断开</span><br></pre></td></tr></table></figure>
+<p><code>nio-8081-exec-1</code>为<code>lock1</code>线程，<code>nio-8081-exec-2</code>为<code>lock2</code>线程。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <div id="donation_div"></div>
+
+<script src="/js/vdonate.js"></script>
+<script>
+var a = new Donate({
+  title: '如果觉得我的文章对您有用，请随意打赏。您的支持将鼓励我继续创作!', // 可选参数，打赏标题
+  btnText: '打赏支持', // 可选参数，打赏按钮文字
+  el: document.getElementById('donation_div'),
+  wechatImage: 'https://raw.githubusercontent.com/alvin6233/alvin6233.github.io/master/css/images/WechatPay.png',
+  alipayImage: 'https://raw.githubusercontent.com/alvin6233/alvin6233.github.io/master/css/images/AliPay.png'
+});
+</script>
+      
+      
+      <div>
+        <ul class="post-copyright">
+          <li class="post-copyright-author">
+          <strong>本文作者:  </strong>alvin dong</a>
+          </li>
+          <li class="post-copyright-link">
+          <strong>本文链接:  </strong>
+          <a href="/2019/01/21/zookeeper实现分布式锁/" target="_blank" title="zookeeper实现分布式锁">https://dongz.me/2019/01/21/zookeeper实现分布式锁/</a>
+          </li>
+          <li class="post-copyright-license">
+            <strong>版权声明:   </strong>
+            本博客所有文章除特别声明外，均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+            许可协议。转载请注明出处
+          </li>
+         
+        </ul>
+<div>
+
+      
+      
+        
+	<div id="comment">
+		<!-- 来必力City版安装代码 -->
+		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
+		<script type="text/javascript">
+		   (function(d, s) {
+		       var j, e = d.getElementsByTagName(s)[0];
+
+		       if (typeof LivereTower === 'function') { return; }
+
+		       j = d.createElement(s);
+		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+		       j.async = true;
+
+		       e.parentNode.insertBefore(j, e);
+		   })(document, 'script');
+		</script>
+		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+		</div>
+		<!-- City版安装代码已完成 -->
+	</div>
+
+
+
+      
+      
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2019/01/20/zookeeper集群搭建/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">zookeeper集群搭建</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- Table of Contents -->
+
+  <aside id="toc-sidebar">
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#zookeeper分布式锁实现原理"><span class="nav-number">1.</span> <span class="nav-text">zookeeper分布式锁实现原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用curator框架实战"><span class="nav-number">2.</span> <span class="nav-text">使用curator框架实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#说明"><span class="nav-number">2.1.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#摘要代码"><span class="nav-number">2.2.</span> <span class="nav-text">摘要代码</span></a></li></ol></li></ol>
+    
+    </div>
+  </aside>
+
+</section>
+        
+      </div>
+      
+      <footer id="footer">
+  
+
+  <div class="container">
+      	<div class="row">
+	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
+	      <p id="copyRightEn">Copyright &copy; 2013 - 2019 alvin&#39;s blog All Rights Reserved.</p>
+	      
+	      
+    		<p class="busuanzi_uv">
+				访客数 : <span id="busuanzi_value_site_uv"></span> |  
+				访问量 : <span id="busuanzi_value_site_pv"></span>
+		    </p>
+  		   
+		</div>
+
+		
+  </div>
+</footer>
+
+
+<!-- min height -->
+
+<script>
+    var wrapdiv = document.getElementById("wrap");
+    var contentdiv = document.getElementById("content");
+    var allheader = document.getElementById("allheader");
+
+    wrapdiv.style.minHeight = document.body.offsetHeight + "px";
+    if (allheader != null) {
+      contentdiv.style.minHeight = document.body.offsetHeight - allheader.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    } else {
+      contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    }
+</script>
+    </div>
+    <!-- <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">home</a>
+  
+    <a href="/archives" class="mobile-nav-link">archives</a>
+  
+    <a href="/categories" class="mobile-nav-link">categories</a>
+  
+    <a href="/tags" class="mobile-nav-link">tags</a>
+  
+    <a href="/about" class="mobile-nav-link">about</a>
+  
+</nav> -->
+    
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/scripts.js"></script>
+
+
+
+
+  <script src="/js/dialog.js"></script>
+
+
+
+
+
+
+
+
+	<div style="display: none;">
+    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
+  </div>
+
+
+
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+	</script>
+
+
+
+
+
+
+  </div>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">设置</h2>
+      </div>
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+
+
+      <div class="modal-body">
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="javascript:setFontSize();" aria-expanded="true" aria-controls="collapseOne">
+              正文字号大小
+            </a>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body">
+            您已调整页面字体大小
+          </div>
+        </div>
+      
+
+
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="javascript:setBackground();" aria-expanded="true" aria-controls="collapseTwo">
+              夜间护眼模式
+            </a>
+        </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="panel-body">
+            夜间模式已经开启，再次单击按钮即可关闭 
+          </div>
+        </div>
+
+        <div>
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关 于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>
+         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+          <div class="panel-body">
+            alvin&#39;s blog
+          </div>
+          <div class="panel-body">
+            Copyright © 2019 alvin dong All Rights Reserved.
+          </div>
+        </div>
+      </div>
+
+
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+  
+    <a id="menu-switch"><i class="fa fa-bars fa-lg"></i></a>
+  
+</body>
+</html>
