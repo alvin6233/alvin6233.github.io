@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="alvin&#39;s blog">
 <meta property="og:description" content="zookeeper能够保障分布式场景下数据的一致性、有序性、原子性及可靠性，它的所有写入动作会在主节点持久化，并在集群过半数节点写入成功才会返回；它也能够支持节点的崩溃恢复以及客户端的最终一致性视图。对于分布式锁场景来说，数据一致性的保障、以及锁服务的容灾保障至关重要。 本章主要是curator框架结合zookeeper实现分布式锁。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-01-21T15:34:06.967Z">
+<meta property="og:updated_time" content="2019-01-21T15:35:52.198Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="zookeeper实现分布式锁">
 <meta name="twitter:description" content="zookeeper能够保障分布式场景下数据的一致性、有序性、原子性及可靠性，它的所有写入动作会在主节点持久化，并在集群过半数节点写入成功才会返回；它也能够支持节点的崩溃恢复以及客户端的最终一致性视图。对于分布式锁场景来说，数据一致性的保障、以及锁服务的容灾保障至关重要。 本章主要是curator框架结合zookeeper实现分布式锁。">
@@ -199,11 +199,11 @@
 <p>本章主要是curator框架结合zookeeper实现分布式锁。<br><a id="more"></a></p>
 <h2 id="zookeeper分布式锁实现原理"><a href="#zookeeper分布式锁实现原理" class="headerlink" title="zookeeper分布式锁实现原理"></a>zookeeper分布式锁实现原理</h2><p>原理还是看下大佬们的总结吧：  </p>
 <blockquote>
-<p>主要：</p>
+<p>主要：  </p>
 </blockquote>
 <p><a href="https://juejin.im/post/5c01532ef265da61362232ed" target="_blank" rel="noopener">七张图彻底讲清楚ZooKeeper分布式锁的实现原理</a>  </p>
 <blockquote>
-<p>其它：  </p>
+<p>其它：   </p>
 </blockquote>
 <p><a href="https://draveness.me/zookeeper-chubby" target="_blank" rel="noopener">详解分布式协调服务 ZooKeeper</a><br><a href="https://blog.csdn.net/csdnnews/article/details/86248155" target="_blank" rel="noopener">漫画：什么是 ZooKeeper</a><br><a href="https://mp.weixin.qq.com/s/u8QDlrDj3Rl1YjY4TyKMCA" target="_blank" rel="noopener">漫画：如何用Zookeeper实现分布式锁</a>  </p>
 <h2 id="使用curator框架实战"><a href="#使用curator框架实战" class="headerlink" title="使用curator框架实战"></a>使用curator框架实战</h2><h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><p>SpringBoot Version：2.1.2.RELEASE</p>
