@@ -260,6 +260,118 @@
         
           <section id="main" style="float:none;">
   
+    <article id="post-Spring-Security-Oauth2初探"  class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" itemprop="name">
+      <a class="article-title" href="/2019/02/24/Spring-Security-Oauth2初探/">Spring Security Oauth2初探</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2019/02/24/Spring-Security-Oauth2初探/" class="article-date">
+	  <time datetime="2019-02-24T14:48:00.000Z" itemprop="datePublished">2019-02-24</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/系统认证授权/">系统认证授权</a>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- alvin edit
+          <p class="article-excerpt-content">
+          OAuth是一个关于授权（authorization）的开放网络标准，在全世界得到广泛应用，目前的版本是2.0版。详细移步阮一峰的理解OAuth 2.0。  
+OAuth2根据使用场景不同，分成了4种模式：  
+授权码模式（authorization code）简化模式（implicit）密码模式（resource owner password credentials）客户端模式（client credentials）  
+采用Spring Boot 2.0 整合 Spring Secur...
+        </p> -->
+        <p>OAuth是一个关于授权（authorization）的开放网络标准，在全世界得到广泛应用，目前的版本是2.0版。<br>详细移步阮一峰的<a href="http://www.ruanyifeng.com/blog/2014/05/oauth_2_0.html" target="_blank" rel="noopener">理解OAuth 2.0</a>。  </p>
+<p>OAuth2根据使用场景不同，分成了4种模式：  </p>
+<p>授权码模式（authorization code）<br>简化模式（implicit）<br>密码模式（resource owner password credentials）<br>客户端模式（client credentials）  </p>
+<p>采用Spring Boot 2.0 整合 Spring Security Oauth2搭建授权、资源服务器，可以分为简易的分为三个步骤：  </p>
+<p>配置资源服务器<br>配置认证服务器<br>配置spring security   </p>
+<p>前两点是oauth2的主体内容，但前面我已经描述过了，spring security oauth2是建立在spring security基础之上的，所以有一些体系是公用的。<br>        
+        <p class="article-more-link">
+        <a href="/2019/02/24/Spring-Security-Oauth2初探/#more">阅读全文</a>             </p>
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+      
+
+    </footer>
+  </div>
+  
+</article>
+
+<!-- Table of Contents -->
+
+
+  
+    <article id="post-开源单点登陆系统CAS"  class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" itemprop="name">
+      <a class="article-title" href="/2019/02/24/开源单点登陆系统CAS/">开源单点登陆系统CAS</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2019/02/24/开源单点登陆系统CAS/" class="article-date">
+	  <time datetime="2019-02-24T14:45:00.000Z" itemprop="datePublished">2019-02-24</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/系统认证授权/">系统认证授权</a>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- alvin edit
+          <p class="article-excerpt-content">
+          ok，还是来看下官方介绍。原版是英文的，我这里弱弱的翻译下大概，不要见笑。当然英语大侠请直接看官方原版。CAS是Centrol Authentication Service的简称。CAS是面向Web的企业多语言单点登录解决方案，是集身份验证和授权等功能的综合性平台。CAS是一种开放且记录良好的身份验证协议。这里托管的同名开源Java服务器组件是通过该协议实现的，支持大量其他身份验证协议和功能。  
+为了方便，本文采用maven overlay方式构建项目，cas提供了cas-overlay...
+        </p> -->
+        <p>ok，还是来看下官方介绍。原版是英文的，我这里弱弱的翻译下大概，不要见笑。当然英语大侠请直接看官方原版。<br>CAS是<code>Centrol Authentication Service</code>的简称。CAS是面向Web的企业多语言单点登录解决方案，是集身份验证和授权等功能的<br>综合性平台。CAS是一种开放且记录良好的身份验证协议。这里托管的同名开源Java服务器组件是通过该协议实现的，支持大量其他身份验证协议和功能。  </p>
+<p>为了方便，本文采用maven overlay方式构建项目，cas提供了<code>cas-overlay-template</code>模板帮助构建项目。<br>        
+        <p class="article-more-link">
+        <a href="/2019/02/24/开源单点登陆系统CAS/#more">阅读全文</a>             </p>
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+      
+
+    </footer>
+  </div>
+  
+</article>
+
+<!-- Table of Contents -->
+
+
+  
     <article id="post-【转】MySQL性能优化神器Explain使用教程"  class="article article-type-post" itemscope itemprop="blogPost" >
   <div id="articleInner" class="article-inner">
     
@@ -713,130 +825,11 @@ zookeeper集群中节点个数一般为奇数个（&gt;=3），若集群中主�
 
 
   
-    <article id="post-Redis主从复制"  class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="thumb" itemprop="name">
-      <a class="article-title" href="/2019/01/06/Redis主从复制/">Redis主从复制</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2019/01/06/Redis主从复制/" class="article-date">
-	  <time datetime="2019-01-06T04:20:00.000Z" itemprop="datePublished">2019-01-06</time>
-	</a>
-
-      
-    <a class="article-category-link" href="/categories/数据存储/">数据存储</a>
-
-      
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-      <!-- alvin edit
-          <p class="article-excerpt-content">
-          主从复制，就是把一台Redis服务的数据拷贝到另一台Redis服务器。前者称为主节点，后者称为从节点。数据只能从主节点流向从节点。一个主节点可以有多个从节点，一个从节点只能有一个主节点。Redis的主从架构主要有两种模式：主从复制模式和链式主从复制模式。
-主从复制的作用主要有以下几点：
-
-数据冗余：实现数据热备份，提供多个数据冗余备份保证数据安全性。
-增强容错：主节点故障，从节点仍可以对外提供读服务。
-负载均衡：读写分离，分担服务器负载压力。
-高可用基础：是哨兵和集群实现的基础。
-
-
-主从...
-        </p> -->
-        <p>主从复制，就是把一台Redis服务的数据拷贝到另一台Redis服务器。前者称为主节点，后者称为从节点。数据只能从主节点流向从节点。一个主节点可以有多个从节点，一个从节点只能有一个主节点。<br>Redis的主从架构主要有两种模式：主从复制模式和链式主从复制模式。</p>
-<p>主从复制的作用主要有以下几点：</p>
-<ol>
-<li><strong>数据冗余：</strong>实现数据热备份，提供多个数据冗余备份保证数据安全性。</li>
-<li><strong>增强容错：</strong>主节点故障，从节点仍可以对外提供读服务。</li>
-<li><strong>负载均衡：</strong>读写分离，分担服务器负载压力。</li>
-<li><strong>高可用基础：</strong>是哨兵和集群实现的基础。        
-        <p class="article-more-link">
-        <a href="/2019/01/06/Redis主从复制/#more">阅读全文</a>             </p>
-      
-    </div>
-    <footer class="article-footer">
-      
-      
-      
-      
-
-    </footer>
-  </div>
-  
-</article>
-
-<!-- Table of Contents -->
-
-
-  
-    <article id="post-函数式编程"  class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="thumb" itemprop="name">
-      <a class="article-title" href="/2018/12/21/函数式编程/">函数式编程</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2018/12/21/函数式编程/" class="article-date">
-	  <time datetime="2018-12-20T16:27:00.000Z" itemprop="datePublished">2018-12-21</time>
-	</a>
-
-      
-    <a class="article-category-link" href="/categories/名词解释/">名词解释</a>
-
-      
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-      <!-- alvin edit
-          <p class="article-excerpt-content">
-          最早是从一些博客上看到过函数式编程，但是没有太在意。js支持将函数作为传出/传入参数，可以存储在变量中。java8中Lambda表达式 、Stream流处理等功能等闪亮登场，除此之外还支持函数接口。越来越多语言中引入函数式编程的特性，种种苗头都预示着函数式编程越来越得到重视。这里主要对函数式编程思想做一些理解和认识。
-发展历史形式系统
-概念：先是确立一些互不冲突的基础原理，以及一些操作这些原理的规则，然后就可以把这些原理以及规则拼凑起来形成新的更加复杂的规则或是定理了。数学家把这种方法称为...
-        </p> -->
-        <p>最早是从一些博客上看到过函数式编程，但是没有太在意。js支持将函数作为传出/传入参数，可以存储在变量中。java8中Lambda表达式 、Stream流处理等功能等闪亮登场，除此之外还支持函数接口。越来越多语言中引入函数式编程的特性，种种苗头都预示着函数式编程越来越得到重视。这里主要对函数式编程思想做一些理解和认识。<br>        
-        <p class="article-more-link">
-        <a href="/2018/12/21/函数式编程/#more">阅读全文</a>             </p>
-      
-    </div>
-    <footer class="article-footer">
-      
-      
-      
-      
-
-    </footer>
-  </div>
-  
-</article>
-
-<!-- Table of Contents -->
-
-
-  
 
 
   <nav id="page-nav">
     
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
   </nav>
 
 </section>
