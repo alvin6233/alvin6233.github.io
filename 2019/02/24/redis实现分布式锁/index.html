@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>redis实现分布式锁 | alvin&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="keywords" content="分布式锁" />
+  
+  
+  
+  
+  <meta name="description" content="说的简单些，redis来实现分布式锁的原理就是将程序中一个唯一的key写入redis中，当有其他分布式应用要访问时候此key时，就去redis中读取，读取到了则说明此数据正在被处理，读取不到则说明可以进行处理；但是，想将分布式锁处理的妥当，还真不是一件轻松地事情。 本文由简单到负责讲解redis分布式锁，最后以通用框架redisson来实战演练。">
+<meta name="keywords" content="分布式锁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis实现分布式锁">
+<meta property="og:url" content="https://dongz.me/2019/02/24/redis实现分布式锁/index.html">
+<meta property="og:site_name" content="alvin&#39;s blog">
+<meta property="og:description" content="说的简单些，redis来实现分布式锁的原理就是将程序中一个唯一的key写入redis中，当有其他分布式应用要访问时候此key时，就去redis中读取，读取到了则说明此数据正在被处理，读取不到则说明可以进行处理；但是，想将分布式锁处理的妥当，还真不是一件轻松地事情。 本文由简单到负责讲解redis分布式锁，最后以通用框架redisson来实战演练。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-24T14:35:24.873Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="redis实现分布式锁">
+<meta name="twitter:description" content="说的简单些，redis来实现分布式锁的原理就是将程序中一个唯一的key写入redis中，当有其他分布式应用要访问时候此key时，就去redis中读取，读取到了则说明此数据正在被处理，读取不到则说明可以进行处理；但是，想将分布式锁处理的妥当，还真不是一件轻松地事情。 本文由简单到负责讲解redis分布式锁，最后以通用框架redisson来实战演练。">
+  
+    <link rel="alternate" href="/atom.xml" title="alvin&#39;s blog" type="application/atom+xml">
+  
+
+  
+
+  <link rel="icon" href="/css/images/mylogo.jpg">
+  <link rel="apple-touch-icon" href="/css/images/mylogo.jpg">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
+  <link rel="stylesheet" href="/css/style.css">
+
+  <script src="/js/jquery-3.1.1.min.js"></script>
+  <script src="/js/bootstrap.js"></script>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+
+  
+    <link rel="stylesheet" href="/css/dialog.css">
+  
+
+  
+
+  
+    <link rel="stylesheet" href="/css/header-post.css" >
+  
+
+  
+  
+  
+    <link rel="stylesheet" href="/css/vdonate.css" >
+  
+
+</head>
+
+
+
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
+
+
+  
+  <div id="container">
+    <div id="wrap">
+      
+        <header>
+
+    <div id="allheader" class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="navbar-inner">
+          
+          <div class="container"> 
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+
+            
+              <a class="brand" style="
+                 margin-top: 0px;"  
+                href="#" data-toggle="modal" data-target="#myModal" >
+                  <img width="124px" height="124px" alt="Hike News" src="/css/images/mylogo.jpg">
+              </a>
+            
+            
+            <div class="navbar-collapse collapse">
+              <ul class="hnav navbar-nav">
+                
+                  <li> <a class="main-nav-link" href="/">首页</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/archives">归档</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/categories">分类</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/tags">标签</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/about">关于</a> </li>
+                
+                  <li><div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="请输入关键词..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(无标题)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div></li>
+            </div>
+          </div>
+                
+      </div>
+    </div>
+
+</header>
+
+
+
+      
+            
+      <div id="content" class="outer">
+        
+          <section id="main" style="float:none;"><article id="post-redis实现分布式锁" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" class="article-title" itemprop="name">
+      redis实现分布式锁
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2019/02/24/redis实现分布式锁/" class="article-date">
+	  <time datetime="2019-02-24T14:34:00.000Z" itemprop="datePublished">2019-02-24</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/分布式/">分布式</a>
+
+      
+	<a class="article-views">
+	<span id="busuanzi_container_page_pv">
+		阅读量<span id="busuanzi_value_page_pv"></span>
+	</span>
+	</a>
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>说的简单些，redis来实现分布式锁的原理就是将程序中一个唯一的key写入redis中，当有其他分布式应用要访问时候此key时，就去redis中读取，读取到了则说明此数据正在被处理，读取不到则说明可以进行处理；<br>但是，想将分布式锁处理的妥当，还真不是一件轻松地事情。</p>
+<p>本文由简单到负责讲解redis分布式锁，最后以通用框架redisson来实战演练。<br><a id="more"></a></p>
+<h2 id="实现进化"><a href="#实现进化" class="headerlink" title="实现进化"></a>实现进化</h2><h3 id="setnx实现"><a href="#setnx实现" class="headerlink" title="setnx实现"></a>setnx实现</h3><blockquote>
+<p>加锁：<code>setnx(key, value)</code>  </p>
+</blockquote>
+<p>key是可能发生竞争的资源唯一标示，例如：<code>my_resource_id</code>资源id作为key。value我们暂时取值为1。当一个线程执行该命令返回1，说明不存在该key，设置成功，表示该线程成功获取了<br>锁；当执行命令返回0时，说明设置失败，已存在该key，表示已经有其它线程获得了该锁。</p>
+<blockquote>
+<p>解锁：<code>del(key)</code> </p>
+</blockquote>
+<p>有加锁就有释放锁，执行<code>del(my_resource_id)</code>删除key，就释放了锁。其它线程就可以继续执行<code>setnx</code>命令来获得锁。</p>
+<blockquote>
+<p>超时锁：expire(key, value)</p>
+</blockquote>
+<p>线程获得锁后，在执行任务的过程中发生宕机，锁没有得到释放。其它线程永远获取不了该锁。因此锁必须设置超时时间，即使宕机，在一定时间后也会自动释放锁。<br><code>setnx</code>不能同时设置超时时间，需要额外的命令<code>expire</code>来设置。</p>
+<p>伪代码：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">if(setnx(my_resource_id, 1) == 1) &#123;</span><br><span class="line">    expire(my_resource_id, 30);</span><br><span class="line">    try&#123;</span><br><span class="line">        // handling business;   </span><br><span class="line">    &#125; finally &#123;</span><br><span class="line">        del(my_resource_id);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>存在问题  </p>
+</blockquote>
+<p><code>setnx</code>和<code>expire</code>是独立的命令，放在一起不具有原子性。<br><code>del</code>命令导致误删（下节讲）。</p>
+<h3 id="set实现"><a href="#set实现" class="headerlink" title="set实现"></a>set实现</h3><p>redis2.6.12以上版本提供命令<code>set(key,value,timeout,NX)</code>，key同样可以为资源，在添加key的同时设置有效期，保证了原子性。</p>
+<p>使用该方式虽然保证了原子性，单<code>del</code>操作仍然可能导致误删。 </p>
+<blockquote>
+<p><code>del</code>误删 </p>
+</blockquote>
+<p>比如现在有A和B两个线程，且AB在不同的服务器上，线程A首先获得了锁，并设置了锁的有效期30s。由于A线程在处理业务逻辑的时候超过30s，key过期自动释放锁。这时B线程来获取锁，成功获取锁后处理B线程业务逻辑，<br>在这期间A线程处理完业务执行<code>del</code>命令，导致线程A释放了线程B获取的锁。</p>
+<blockquote>
+<p>lua脚本解决<code>del</code>误删 </p>
+</blockquote>
+<p>可以在<code>del</code>释放锁之前做一个判断，验证当前的锁是不是当前线程加的锁。具体操作可以把当前的线程id当做value，并在删除之前验证key对应的value是不是自己线程的id。</p>
+<p>解锁伪代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if(Thread.getCurrentThreadId.equals(redis.get(my_resource_id)))&#123;</span><br><span class="line">    del(my_resource_id)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面避免了误删锁的问题，但是会引入另外一个问题：判断和释放锁是两个独立操作，不是原子性。<br>可以通过lua脚本解决：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">String scriptLua = &quot;</span><br><span class="line">if redis.call(&apos;get&apos;, KEYS[1]) == ARGV[1] </span><br><span class="line">then</span><br><span class="line">   return redis.call(&apos;del&apos;, KEYS[1])</span><br><span class="line">else</span><br><span class="line">   return 0</span><br><span class="line">end</span><br><span class="line">&quot;;</span><br><span class="line">redis.eval(scriptLua, Collections.singletonList(my_resource_id), Collections.singletonList(Thread.getCurrentThreadId))</span><br></pre></td></tr></table></figure>
+<p>使用lua脚本之后保证了判断和释放锁操作的原子性。但A和B访问同一代码块，高并发下对性能仍产生影响。</p>
+<blockquote>
+<p>进一步优化：锁续命</p>
+</blockquote>
+<p>在线程A获得锁以后，开启一个守护线程。守护线程每10s检查一次，若线程A还持有锁且有效期小于12s则将锁的有效期延长10s。若A线程所在服务器宕机，则守护线程也会停止。锁不能继续续命，<br>到达有效期后锁被自动释放。</p>
+<h2 id="redission框架实战"><a href="#redission框架实战" class="headerlink" title="redission框架实战"></a>redission框架实战</h2><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>和上一章原理类似，redission底层也是使用lua脚本保证原子性、<code>watch dog</code>实现自动续命机制。redission为方便使用对相关底层操作做了封装。通过简单<code>lock()</code>和<code>unlock()</code>方法即可<br>实现加锁和解锁功能。redission支持锁的可重入，封装的lua脚本大体如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&quot;if(redis.call(&apos;exists&apos;, KEYS[1]) == 0) then </span><br><span class="line">redis.call(&apos;hset&apos;, KEYS[1], ARGV[2], 1);</span><br><span class="line">redis.call(&apos;pexpire&apos;, KEYS[1], ARGV[1]);</span><br><span class="line">return nil;</span><br><span class="line">end;</span><br><span class="line">if(redis.call(&apos;hexists&apos;, KEYS[1], ARGV[2]) == 1) then</span><br><span class="line">redis.call(&apos;hincrby&apos;, KEYS[1], ARGV[2], 1);</span><br><span class="line">redis.call(&apos;pexpire&apos;, KEYS[1], ARGV[1]);</span><br><span class="line">return nil;</span><br><span class="line">end;</span><br><span class="line">return redis.call(&apos;pttl&apos;, KEYS[1]);</span><br><span class="line">&quot;</span><br></pre></td></tr></table></figure>
+<p>KEYS[1]代表的是你加锁的那个key，比如说：<code>RLock lock = redisson.getLock(&quot;my_resource_id&quot;);</code>这里你自己设置了加锁的那个锁key就是<code>my_resource_id</code>。<br>ARGV[1]代表的就是锁key的默认生存时间，默认30秒。<br>ARGV[2]代表的是加锁的客户端的ID，类似于下面这样：e0308498-6dc0-4a4c-8479-4866922bbea2:1  </p>
+<p>第一段if判断语句，就是用<code>exists key</code>命令判断一下，如果你要加锁的那个锁key不存在的话，你就进行加锁。使用<code>hset key field value</code>设置key对应field（<code>KEYS[1]</code>即客户端的ID）的值为1。<br>并通过<code>pexpire key value</code>设置锁的过期时间为<code>ARGV[1]</code>，单位为毫秒。  </p>
+<p>第二个if判断语句，如果要加锁的key存在就会进入该判断语句。用<code>hexists key field</code>判断锁的拥有者是否是当前客户端，如果是说明客户端再次获取该锁。执行<code>hincrby key field 1</code>对field对应的值加1，<br>记录客户端对锁的获取次数。  </p>
+<p>两个判断语句都没有进的情况说明当前客户端获取的目标锁被其它客户端占有，返回锁的剩余时间。  </p>
+<p>了解更多点这里：<a href="https://github.com/redisson/redisson/wiki" target="_blank" rel="noopener">官方Wiki</a></p>
+<h3 id="上代码"><a href="#上代码" class="headerlink" title="上代码"></a>上代码</h3><blockquote>
+<p>pom.xml</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.redisson&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;redisson-spring-boot-starter&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;3.10.1&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>application.properties</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">spring.application.name=redissondemo</span><br><span class="line">server.port=8085</span><br><span class="line">spring.redis.redisson.config=classpath:redisson.yaml</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>redisson.yaml</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">clusterServersConfig:</span><br><span class="line">  idleConnectionTimeout: 10000 #连接空闲超时，单位：毫秒</span><br><span class="line">  connectTimeout: 10000 #连接超时，单位：毫秒</span><br><span class="line">  timeout: 3000 #命令等待超时，单位：毫秒</span><br><span class="line">  retryAttempts: 3  #命令失败重试次数</span><br><span class="line">  retryInterval: 1500  #命令重试发送时间间隔，单位：毫秒</span><br><span class="line">  failedSlaveReconnectionInterval: 3000 #redis slave尝试重新连接的时间间隔，单位：毫秒</span><br><span class="line">  failedSlaveCheckInterval: 60000</span><br><span class="line">  password: ialvin</span><br><span class="line">  subscriptionsPerConnection: 5 #单个连接最大订阅数量</span><br><span class="line">  clientName: null  #客户端名称</span><br><span class="line">  loadBalancer: !&lt;org.redisson.connection.balancer.RoundRobinLoadBalancer&gt; &#123;&#125;  #负载均衡算法类的选择</span><br><span class="line">  subscriptionConnectionMinimumIdleSize: 1 #从节点发布和订阅连接的最小空闲连接数</span><br><span class="line">  subscriptionConnectionPoolSize: 50 #从节点发布和订阅连接池大小</span><br><span class="line">  slaveConnectionMinimumIdleSize: 32 #从节点最小空闲连接数</span><br><span class="line">  slaveConnectionPoolSize: 64 #从节点连接池大小</span><br><span class="line">  masterConnectionMinimumIdleSize: 32 #主节点最小空闲连接数</span><br><span class="line">  masterConnectionPoolSize: 64 #主节点连接池大小</span><br><span class="line">  readMode: &quot;SLAVE&quot; #取操作的负载均衡模式</span><br><span class="line">  subscriptionMode: &quot;SLAVE&quot; # 订阅操作的负载均衡模式</span><br><span class="line">  nodeAddresses: #节点地址</span><br><span class="line">  - &quot;redis://172.16.6.242:6379&quot;</span><br><span class="line">  - &quot;redis://172.16.6.243:6379&quot;</span><br><span class="line">  - &quot;redis://172.16.6.244:6379&quot;</span><br><span class="line">  - &quot;redis://172.16.6.242:6380&quot;</span><br><span class="line">  - &quot;redis://172.16.6.243:6380&quot;</span><br><span class="line">  - &quot;redis://172.16.6.244:6380&quot;</span><br><span class="line">  scanInterval: 1000 #主节点变化扫描间隔时间</span><br><span class="line">  pingConnectionInterval: 0 #定义节点间ping命令发送间隔，0为禁用</span><br><span class="line">  keepAlive: false #启用TCP keepAlive连接</span><br><span class="line">  tcpNoDelay: false #启用TCP tcpNoDelay连接</span><br><span class="line">  sslEnableEndpointIdentification: false #使用ssl安全连接</span><br><span class="line">threads: 0 #线程池数量</span><br><span class="line">nettyThreads: 0 #Netty线程池数量</span><br><span class="line">codec: !&lt;org.redisson.codec.FstCodec&gt; &#123;&#125; #序列化和反序列化编码方式</span><br><span class="line">transportMode: &quot;NIO&quot; #传输模式</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>TestController.java</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">@RestController</span><br><span class="line">public class TestController &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    private RedissonClient redisson;</span><br><span class="line">    </span><br><span class="line">    @GetMapping(&quot;/lock1&quot;)</span><br><span class="line">    public Response&lt;Boolean&gt; getLock1() &#123;</span><br><span class="line">        RLock lock = redisson.getLock(&quot;mylock&quot;);</span><br><span class="line">        try &#123;</span><br><span class="line">            lock.lock(20000, TimeUnit.MILLISECONDS);</span><br><span class="line">            log.info(&quot;lock1获得锁mylock, flag:&quot; + lock.isLocked());</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            lock.unlock();</span><br><span class="line">            log.info(&quot;lock1释放锁mylock, flag:&quot; + lock.isLocked());</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        return Response.success(&quot;&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @GetMapping(&quot;/lock2&quot;)</span><br><span class="line">    public Response getLock2() &#123;</span><br><span class="line">        RLock lock = redisson.getLock(&quot;mylock&quot;);</span><br><span class="line">        try &#123;</span><br><span class="line">            lock.lock(15000, TimeUnit.MILLISECONDS);</span><br><span class="line">            log.info(&quot;lock2获得锁mylock, flag:&quot; + lock.isLocked());</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            lock.unlock();</span><br><span class="line">            log.info(&quot;lock2释放锁mylock, flag:&quot; + lock.isLocked());</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            lock.unlock();</span><br><span class="line">            log.info(&quot;lock2释放锁mylock, flag:&quot; + lock.isLocked());</span><br><span class="line">        &#125;</span><br><span class="line">        return Response.success(&quot;&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>测试</p>
+</blockquote>
+<p>先调用<code>lock1</code>接口，紧接着（不要超过20s）调用<code>lock2</code>接口，两个接口都获取<code>mylock</code>锁，<code>lock1</code>首先占有锁，<code>lock2</code>等待获取锁。虽然<code>lock1</code>没有显式释放锁，但设置了锁<br>的有效期为20s，超过20s后<code>lock1</code>自动释放锁，此时<code>lock2</code>获取锁并主动释放锁。执行日志如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">2019-01-24 19:11:38.470  INFO 36698 --- [nio-8085-exec-1] com.alvin.redissiondemo.TestController   : lock1开始获取锁mylock, flag:false</span><br><span class="line">2019-01-24 19:11:38.482  INFO 36698 --- [nio-8085-exec-1] com.alvin.redissiondemo.TestController   : lock1获得锁mylock, flag:true</span><br><span class="line">2019-01-24 19:11:41.456  INFO 36698 --- [nio-8085-exec-2] com.alvin.redissiondemo.TestController   : lock2开始获取锁mylock, flag:true</span><br><span class="line">2019-01-24 19:11:58.494  INFO 36698 --- [nio-8085-exec-2] com.alvin.redissiondemo.TestController   : lock2获得锁mylock, flag:true</span><br><span class="line">2019-01-24 19:11:58.504  INFO 36698 --- [nio-8085-exec-2] com.alvin.redissiondemo.TestController   : lock2释放锁mylock, flag:false</span><br></pre></td></tr></table></figure>
+<p>可以看出<code>lock1</code>获得锁的时间是<code>2019-01-24 19:11:38.482</code>，<code>lock2</code>获得锁的时间为<code>2019-01-24 19:11:58.494</code>之间差了20s就是<code>lock1</code>持有锁的时间和设置的锁有效期一致。<br><code>lock2</code>获得锁就立刻显示释放了锁。</p>
+<blockquote>
+<p>参考：  </p>
+</blockquote>
+<p>[1] <a href="https://juejin.im/post/5bf3f15851882526a643e207" target="_blank" rel="noopener">https://juejin.im/post/5bf3f15851882526a643e207</a><br>[2] <a href="https://mp.weixin.qq.com/s/8fdBKAyHZrfHmSajXT_dnA" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/8fdBKAyHZrfHmSajXT_dnA</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <div id="donation_div"></div>
+
+<script src="/js/vdonate.js"></script>
+<script>
+var a = new Donate({
+  title: '如果觉得我的文章对您有用，请随意打赏。您的支持将鼓励我继续创作!', // 可选参数，打赏标题
+  btnText: '打赏支持', // 可选参数，打赏按钮文字
+  el: document.getElementById('donation_div'),
+  wechatImage: 'https://raw.githubusercontent.com/alvin6233/alvin6233.github.io/master/css/images/WechatPay.png',
+  alipayImage: 'https://raw.githubusercontent.com/alvin6233/alvin6233.github.io/master/css/images/AliPay.png'
+});
+</script>
+      
+      
+      <div>
+        <ul class="post-copyright">
+          <li class="post-copyright-author">
+          <strong>本文作者:  </strong>alvin dong</a>
+          </li>
+          <li class="post-copyright-link">
+          <strong>本文链接:  </strong>
+          <a href="/2019/02/24/redis实现分布式锁/" target="_blank" title="redis实现分布式锁">https://dongz.me/2019/02/24/redis实现分布式锁/</a>
+          </li>
+          <li class="post-copyright-license">
+            <strong>版权声明:   </strong>
+            本博客所有文章除特别声明外，均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+            许可协议。转载请注明出处
+          </li>
+         
+        </ul>
+<div>
+
+      
+      
+        
+	<div id="comment">
+		<!-- 来必力City版安装代码 -->
+		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
+		<script type="text/javascript">
+		   (function(d, s) {
+		       var j, e = d.getElementsByTagName(s)[0];
+
+		       if (typeof LivereTower === 'function') { return; }
+
+		       j = d.createElement(s);
+		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+		       j.async = true;
+
+		       e.parentNode.insertBefore(j, e);
+		   })(document, 'script');
+		</script>
+		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+		</div>
+		<!-- City版安装代码已完成 -->
+	</div>
+
+
+
+      
+      
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2019/02/24/【转】MYSQL的SQL性能优化总结/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          【转】MYSQL的SQL性能优化总结
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/01/21/zookeeper实现分布式锁/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">zookeeper实现分布式锁</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- Table of Contents -->
+
+  <aside id="toc-sidebar">
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#实现进化"><span class="nav-number">1.</span> <span class="nav-text">实现进化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#setnx实现"><span class="nav-number">1.1.</span> <span class="nav-text">setnx实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#set实现"><span class="nav-number">1.2.</span> <span class="nav-text">set实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#redission框架实战"><span class="nav-number">2.</span> <span class="nav-text">redission框架实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#原理"><span class="nav-number">2.1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#上代码"><span class="nav-number">2.2.</span> <span class="nav-text">上代码</span></a></li></ol></li></ol>
+    
+    </div>
+  </aside>
+
+</section>
+        
+      </div>
+      
+      <footer id="footer">
+  
+
+  <div class="container">
+      	<div class="row">
+	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
+	      <p id="copyRightEn">Copyright &copy; 2013 - 2019 alvin&#39;s blog All Rights Reserved.</p>
+	      
+	      
+    		<p class="busuanzi_uv">
+				访客数 : <span id="busuanzi_value_site_uv"></span> |  
+				访问量 : <span id="busuanzi_value_site_pv"></span>
+		    </p>
+  		   
+		</div>
+
+		
+  </div>
+</footer>
+
+
+<!-- min height -->
+
+<script>
+    var wrapdiv = document.getElementById("wrap");
+    var contentdiv = document.getElementById("content");
+    var allheader = document.getElementById("allheader");
+
+    wrapdiv.style.minHeight = document.body.offsetHeight + "px";
+    if (allheader != null) {
+      contentdiv.style.minHeight = document.body.offsetHeight - allheader.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    } else {
+      contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    }
+</script>
+    </div>
+    <!-- <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">home</a>
+  
+    <a href="/archives" class="mobile-nav-link">archives</a>
+  
+    <a href="/categories" class="mobile-nav-link">categories</a>
+  
+    <a href="/tags" class="mobile-nav-link">tags</a>
+  
+    <a href="/about" class="mobile-nav-link">about</a>
+  
+</nav> -->
+    
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/scripts.js"></script>
+
+
+
+
+  <script src="/js/dialog.js"></script>
+
+
+
+
+
+
+
+
+	<div style="display: none;">
+    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
+  </div>
+
+
+
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+	</script>
+
+
+
+
+
+
+  </div>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">设置</h2>
+      </div>
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+
+
+      <div class="modal-body">
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="javascript:setFontSize();" aria-expanded="true" aria-controls="collapseOne">
+              正文字号大小
+            </a>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body">
+            您已调整页面字体大小
+          </div>
+        </div>
+      
+
+
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="javascript:setBackground();" aria-expanded="true" aria-controls="collapseTwo">
+              夜间护眼模式
+            </a>
+        </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="panel-body">
+            夜间模式已经开启，再次单击按钮即可关闭 
+          </div>
+        </div>
+
+        <div>
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关 于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>
+         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+          <div class="panel-body">
+            alvin&#39;s blog
+          </div>
+          <div class="panel-body">
+            Copyright © 2019 alvin dong All Rights Reserved.
+          </div>
+        </div>
+      </div>
+
+
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+  
+    <a id="menu-switch"><i class="fa fa-bars fa-lg"></i></a>
+  
+</body>
+</html>

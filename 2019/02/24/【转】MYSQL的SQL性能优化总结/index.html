@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>【转】mysql的sql性能优化总结 | alvin&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="keywords" content="mysql" />
+  
+  
+  
+  
+  <meta name="description" content="转载RyuGou的一篇关键MySQL性能优化的文章，原文请戳：MYSQL的SQL性能优化总结很多时候，我们的程序出现的“性能问题”，其实是我们自己写的那”坨”代码的问题，是自己Coding的问题，是Mysql的DML语句使用的问题。 以下是我总结的关于MySQL DML语句的使用中需要注意的点。">
+<meta name="keywords" content="mysql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【转】MYSQL的SQL性能优化总结">
+<meta property="og:url" content="https://dongz.me/2019/02/24/【转】MYSQL的SQL性能优化总结/index.html">
+<meta property="og:site_name" content="alvin&#39;s blog">
+<meta property="og:description" content="转载RyuGou的一篇关键MySQL性能优化的文章，原文请戳：MYSQL的SQL性能优化总结很多时候，我们的程序出现的“性能问题”，其实是我们自己写的那”坨”代码的问题，是自己Coding的问题，是Mysql的DML语句使用的问题。 以下是我总结的关于MySQL DML语句的使用中需要注意的点。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://i6448038.github.io/img/mysql_performace/mysql_performace.png">
+<meta property="og:updated_time" content="2019-02-24T14:39:08.113Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【转】MYSQL的SQL性能优化总结">
+<meta name="twitter:description" content="转载RyuGou的一篇关键MySQL性能优化的文章，原文请戳：MYSQL的SQL性能优化总结很多时候，我们的程序出现的“性能问题”，其实是我们自己写的那”坨”代码的问题，是自己Coding的问题，是Mysql的DML语句使用的问题。 以下是我总结的关于MySQL DML语句的使用中需要注意的点。">
+<meta name="twitter:image" content="https://i6448038.github.io/img/mysql_performace/mysql_performace.png">
+  
+    <link rel="alternate" href="/atom.xml" title="alvin&#39;s blog" type="application/atom+xml">
+  
+
+  
+
+  <link rel="icon" href="/css/images/mylogo.jpg">
+  <link rel="apple-touch-icon" href="/css/images/mylogo.jpg">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
+  <link rel="stylesheet" href="/css/style.css">
+
+  <script src="/js/jquery-3.1.1.min.js"></script>
+  <script src="/js/bootstrap.js"></script>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+
+  
+    <link rel="stylesheet" href="/css/dialog.css">
+  
+
+  
+
+  
+    <link rel="stylesheet" href="/css/header-post.css" >
+  
+
+  
+  
+  
+    <link rel="stylesheet" href="/css/vdonate.css" >
+  
+
+</head>
+
+
+
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
+
+
+  
+  <div id="container">
+    <div id="wrap">
+      
+        <header>
+
+    <div id="allheader" class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="navbar-inner">
+          
+          <div class="container"> 
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+
+            
+              <a class="brand" style="
+                 margin-top: 0px;"  
+                href="#" data-toggle="modal" data-target="#myModal" >
+                  <img width="124px" height="124px" alt="Hike News" src="/css/images/mylogo.jpg">
+              </a>
+            
+            
+            <div class="navbar-collapse collapse">
+              <ul class="hnav navbar-nav">
+                
+                  <li> <a class="main-nav-link" href="/">首页</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/archives">归档</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/categories">分类</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/tags">标签</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/about">关于</a> </li>
+                
+                  <li><div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="请输入关键词..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(无标题)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div></li>
+            </div>
+          </div>
+                
+      </div>
+    </div>
+
+</header>
+
+
+
+      
+            
+      <div id="content" class="outer">
+        
+          <section id="main" style="float:none;"><article id="post-【转】MYSQL的SQL性能优化总结" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" class="article-title" itemprop="name">
+      【转】MYSQL的SQL性能优化总结
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2019/02/24/【转】MYSQL的SQL性能优化总结/" class="article-date">
+	  <time datetime="2019-02-24T14:38:00.000Z" itemprop="datePublished">2019-02-24</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/数据存储/">数据存储</a>
+
+      
+	<a class="article-views">
+	<span id="busuanzi_container_page_pv">
+		阅读量<span id="busuanzi_value_page_pv"></span>
+	</span>
+	</a>
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>转载RyuGou的一篇关键MySQL性能优化的文章，原文请戳：<a href="https://i6448038.github.io/2019/02/16/mysql-performance-optimize/" target="_blank" rel="noopener">MYSQL的SQL性能优化总结</a><br>很多时候，我们的程序出现的“性能问题”，其实是我们自己写的那”坨”代码的问题，是自己Coding的问题，是Mysql的DML语句使用的问题。 以下是我总结的关于MySQL DML语句的使用中需要注意的点。</p>
+<a id="more"></a>
+<h2 id="对于select-要时刻保持谨慎的态度"><a href="#对于select-要时刻保持谨慎的态度" class="headerlink" title="对于select *要时刻保持谨慎的态度"></a>对于<code>select *</code>要时刻保持谨慎的态度</h2><p>绝大多数情况，是不需要<code>select *</code>的。一旦使用了这种语句，便会让优化器无法完成索引覆盖扫描这类优化，而且还会增加额外的I/O、内存和CPU的消耗。<br>当然，使用<code>select *</code>也并不是全是坏处，合理的使用<code>select *</code>可以简化开发，提高相同代码的复用性。</p>
+<h2 id="是否扫描的太多额外的记录"><a href="#是否扫描的太多额外的记录" class="headerlink" title="是否扫描的太多额外的记录"></a>是否扫描的太多额外的记录</h2><p>有时候会发现某些查询可能需要读取几千行数据，但是仅返回几条或者很少的结果，可以使用以下方式去优化：</p>
+<ul>
+<li>看看能否改表结构。例如使用汇总表.</li>
+<li>看看获取数据结果的方式是否最优，获取路劲是否已经是最短。  </li>
+<li>使用覆盖索引，把所有需要的列都放到索引中，以减少返回表中对应行中取数据的步骤。  </li>
+</ul>
+<blockquote>
+<p>切分某些SQL语句</p>
+</blockquote>
+<p>传统的互联网系统中，强调网络连接尽量少，数据层尽可能在一次连接中完成尽可能多的工作，防止建立多次链接，但是这种想法对于MySQL并不适用，MySQL从设计上让连接和断开都很轻量，在一般服务器上可以支持每秒超过10万的查询。</p>
+<p>所以对于有些场景下，可以将一个大的查询“分而治之”，切分成小查询，然后再组合起来。例如以下情况：  </p>
+<ul>
+<li>对于全量数据查询变成分页。假如一张表中有数千万条数据，一次<code>select all</code>，肯定是不行的。可以换成一次取一部分，把一次的压力分摊。  </li>
+<li>删除大量旧数据的时候，不要一个大的语句一次性清完，推荐<code>一次删一万条</code>。如果用一个大的语句一次性完成的话，可能需要一次锁住大量数据，占满大量日志事务，让Mysql停在那儿了，为避免这种情况发生，最好一次性删除一万条左右的数据，然后每次删完暂停一会儿再操作，将服务器上的一次性压力分散。</li>
+</ul>
+<h2 id="慎用join操作"><a href="#慎用join操作" class="headerlink" title="慎用join操作"></a>慎用<code>join</code>操作</h2><p>这算是一条禁忌吧，很多公司的互联网产品都杜绝<code>join</code>操作，换成先从一张表中先取出数据id，再从另外一张表中使用<code>where in</code>查询的两次单表查询操作。主要是以下几点原因：  </p>
+<ul>
+<li>让应用的缓存(<code>redis</code>、<code>memcache</code>等)更高效。例如在第一张表中查询出部分<code>id</code>了，如果命中了缓存，就可以省去一条<code>where in</code>语句了。</li>
+<li>更容易应对业务的发展，方便对数据库进行拆分，更容易做到高性能和高扩展。  </li>
+<li>对<code>where in</code>中的id进行升序排序后，查询效率比<code>join</code>的随机关联更高效。  </li>
+<li>减少多余的查询。在应用层中两次查询，意味着对某条记录应用只需要查询一次，而使用<code>join</code>可能需要重复的扫描访问一部分数据。<br>单张表查询可以减少锁的竞争。</li>
+</ul>
+<p>假如非用不可，可以采用以下方式来优化：</p>
+<ul>
+<li>确保<code>ON</code>或者<code>using</code>子句中的列上有索引  </li>
+<li>确保任何的<code>group by</code>和<code>order by</code>中的表达式只涉及到一个表中的列。  </li>
+</ul>
+<h2 id="在性能要求比较高的场景中，杜绝查询中使用临时表"><a href="#在性能要求比较高的场景中，杜绝查询中使用临时表" class="headerlink" title="在性能要求比较高的场景中，杜绝查询中使用临时表"></a>在性能要求比较高的场景中，杜绝查询中使用临时表</h2><p>MySQL的临时表示没有任何索引的，使用临时表一般都意味着性能比较低,因此在对性能要求比较高的场景中，最好不要使用带有临时表的操作：</p>
+<ul>
+<li>未带索引的字段上的<code>group by</code>操作。</li>
+<li><code>UNION</code>查询。  </li>
+<li>查询语句中的子查询。  </li>
+<li>部分<code>order by</code>操作，例如<code>distinct</code>函数和<code>order by</code>一起使用且<code>distinct</code>和<code>order by</code>同一个字段。再例如某些情况下<code>group by</code>和<code>order by</code>字段不同。  </li>
+</ul>
+<p>具体是否用到临时表，可以通过<code>explain</code>来查看，查看<code>Extra</code>列的结果，如果出现<code>Using temporary</code>则需要注意。  </p>
+<h2 id="count-函数优化"><a href="#count-函数优化" class="headerlink" title="count()函数优化"></a><code>count()</code>函数优化</h2><p><code>count()</code>函数有一点需要特别注意：它是不统计值为NULL的字段的！所以：不能指定查询结果的某一列，来统计结果行数。即<code>count(xx column)</code> 不太好。</p>
+<p>如果想要统计结果集，就使用<code>count(*)</code>，性能也会很好。</p>
+<h2 id="尽量不使用子查询"><a href="#尽量不使用子查询" class="headerlink" title="尽量不使用子查询"></a>尽量不使用子查询</h2><p>尽量别使用子查询，尽可能的使用关联来代替</p>
+<h2 id="优化分页limit"><a href="#优化分页limit" class="headerlink" title="优化分页limit"></a>优化分页<code>limit</code></h2><p>通常我们在分页的时候，通常使用的是limit 50, 10这种语句。数据少还不错，但是当数据偏移量非常大的时候，性能就会出现问题，例如select xx,xxx from test_table limit 100000020, 20。扫描了100000020条数据，才返回20条数据。这个时候我们可以用一下两种方式来优化：  </p>
+<p><strong>【利用<code>between and</code>和主键索引】</strong>  </p>
+<p>利用主键自增id，我们如果知道了分页的上边界，以上查询可以改写为：<br><code>select xxx, xxx from test_table where id between xxxxx and xxxx</code>。  </p>
+<p><strong>【利用自增主键索引、<code>order by</code>加<code>limit</code>，不使用<code>offset</code>】</strong>  </p>
+<p><code>limit</code>和<code>offset</code>的问题，其实就是<code>offset</code>的问题，它会导致MySQL扫描大量不需要的行然后再抛弃掉。如果使用某个标签记录上一次所取数据的位置，那么下次就可以直接从书签位置开始扫描，这样就可以避免使用<code>offset</code>。  </p>
+<p>例如以上查询可以改为:</p>
+<p>第一组数据：<code>select xxx, xxxx from test_table order by id desc limit 20;</code></p>
+<p>这样就拿到了本次数据和下次数据的分解id值，则下一页查询就知道可以： <code>select xxx, xxx from test_table where id &lt; &#39;上页id分界值&#39; order by id desc limit 20</code></p>
+<h2 id="熟悉并灵活使用explain"><a href="#熟悉并灵活使用explain" class="headerlink" title="熟悉并灵活使用explain"></a>熟悉并灵活使用<code>explain</code></h2><p>以下是mysql执行查询的整个过程，explain可以查看图中标红部分，</p>
+<p><img src="https://i6448038.github.io/img/mysql_performace/mysql_performace.png" alt=""></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <div id="donation_div"></div>
+
+<script src="/js/vdonate.js"></script>
+<script>
+var a = new Donate({
+  title: '如果觉得我的文章对您有用，请随意打赏。您的支持将鼓励我继续创作!', // 可选参数，打赏标题
+  btnText: '打赏支持', // 可选参数，打赏按钮文字
+  el: document.getElementById('donation_div'),
+  wechatImage: 'https://raw.githubusercontent.com/alvin6233/alvin6233.github.io/master/css/images/WechatPay.png',
+  alipayImage: 'https://raw.githubusercontent.com/alvin6233/alvin6233.github.io/master/css/images/AliPay.png'
+});
+</script>
+      
+      
+      <div>
+        <ul class="post-copyright">
+          <li class="post-copyright-author">
+          <strong>本文作者:  </strong>alvin dong</a>
+          </li>
+          <li class="post-copyright-link">
+          <strong>本文链接:  </strong>
+          <a href="/2019/02/24/【转】MYSQL的SQL性能优化总结/" target="_blank" title="【转】MYSQL的SQL性能优化总结">https://dongz.me/2019/02/24/【转】MYSQL的SQL性能优化总结/</a>
+          </li>
+          <li class="post-copyright-license">
+            <strong>版权声明:   </strong>
+            本博客所有文章除特别声明外，均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+            许可协议。转载请注明出处
+          </li>
+         
+        </ul>
+<div>
+
+      
+      
+        
+	<div id="comment">
+		<!-- 来必力City版安装代码 -->
+		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
+		<script type="text/javascript">
+		   (function(d, s) {
+		       var j, e = d.getElementsByTagName(s)[0];
+
+		       if (typeof LivereTower === 'function') { return; }
+
+		       j = d.createElement(s);
+		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+		       j.async = true;
+
+		       e.parentNode.insertBefore(j, e);
+		   })(document, 'script');
+		</script>
+		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+		</div>
+		<!-- City版安装代码已完成 -->
+	</div>
+
+
+
+      
+      
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2019/02/24/【转】MySQL性能优化神器Explain使用教程/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          【转】MySQL性能优化神器Explain使用教程
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/02/24/redis实现分布式锁/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">redis实现分布式锁</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- Table of Contents -->
+
+  <aside id="toc-sidebar">
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#对于select-要时刻保持谨慎的态度"><span class="nav-number">1.</span> <span class="nav-text">对于select *要时刻保持谨慎的态度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#是否扫描的太多额外的记录"><span class="nav-number">2.</span> <span class="nav-text">是否扫描的太多额外的记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#慎用join操作"><span class="nav-number">3.</span> <span class="nav-text">慎用join操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在性能要求比较高的场景中，杜绝查询中使用临时表"><span class="nav-number">4.</span> <span class="nav-text">在性能要求比较高的场景中，杜绝查询中使用临时表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#count-函数优化"><span class="nav-number">5.</span> <span class="nav-text">count()函数优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#尽量不使用子查询"><span class="nav-number">6.</span> <span class="nav-text">尽量不使用子查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优化分页limit"><span class="nav-number">7.</span> <span class="nav-text">优化分页limit</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#熟悉并灵活使用explain"><span class="nav-number">8.</span> <span class="nav-text">熟悉并灵活使用explain</span></a></li></ol>
+    
+    </div>
+  </aside>
+
+</section>
+        
+      </div>
+      
+      <footer id="footer">
+  
+
+  <div class="container">
+      	<div class="row">
+	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
+	      <p id="copyRightEn">Copyright &copy; 2013 - 2019 alvin&#39;s blog All Rights Reserved.</p>
+	      
+	      
+    		<p class="busuanzi_uv">
+				访客数 : <span id="busuanzi_value_site_uv"></span> |  
+				访问量 : <span id="busuanzi_value_site_pv"></span>
+		    </p>
+  		   
+		</div>
+
+		
+  </div>
+</footer>
+
+
+<!-- min height -->
+
+<script>
+    var wrapdiv = document.getElementById("wrap");
+    var contentdiv = document.getElementById("content");
+    var allheader = document.getElementById("allheader");
+
+    wrapdiv.style.minHeight = document.body.offsetHeight + "px";
+    if (allheader != null) {
+      contentdiv.style.minHeight = document.body.offsetHeight - allheader.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    } else {
+      contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    }
+</script>
+    </div>
+    <!-- <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">home</a>
+  
+    <a href="/archives" class="mobile-nav-link">archives</a>
+  
+    <a href="/categories" class="mobile-nav-link">categories</a>
+  
+    <a href="/tags" class="mobile-nav-link">tags</a>
+  
+    <a href="/about" class="mobile-nav-link">about</a>
+  
+</nav> -->
+    
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/scripts.js"></script>
+
+
+
+
+  <script src="/js/dialog.js"></script>
+
+
+
+
+
+
+
+
+	<div style="display: none;">
+    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
+  </div>
+
+
+
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+	</script>
+
+
+
+
+
+
+  </div>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">设置</h2>
+      </div>
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+
+
+      <div class="modal-body">
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="javascript:setFontSize();" aria-expanded="true" aria-controls="collapseOne">
+              正文字号大小
+            </a>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body">
+            您已调整页面字体大小
+          </div>
+        </div>
+      
+
+
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="javascript:setBackground();" aria-expanded="true" aria-controls="collapseTwo">
+              夜间护眼模式
+            </a>
+        </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="panel-body">
+            夜间模式已经开启，再次单击按钮即可关闭 
+          </div>
+        </div>
+
+        <div>
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关 于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>
+         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+          <div class="panel-body">
+            alvin&#39;s blog
+          </div>
+          <div class="panel-body">
+            Copyright © 2019 alvin dong All Rights Reserved.
+          </div>
+        </div>
+      </div>
+
+
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+  
+    <a id="menu-switch"><i class="fa fa-bars fa-lg"></i></a>
+  
+</body>
+</html>
