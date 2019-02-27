@@ -260,6 +260,64 @@
         
           <section id="main" style="float:none;">
   
+    <article id="post-设计模式之数据访问对象模式"  class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" itemprop="name">
+      <a class="article-title" href="/2018/10/21/设计模式之数据访问对象模式/">设计模式之数据访问对象模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2018/10/21/设计模式之数据访问对象模式/" class="article-date">
+	  <time datetime="2018-10-21T04:38:00.000Z" itemprop="datePublished">2018-10-21</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/设计模式/">设计模式</a>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- alvin edit
+          <p class="article-excerpt-content">
+          数据访问对象模式（Data Access Object Pattern）或 DAO 模式用于把低级的数据访问 API 或操作从高级的业务服务中分离出来。以下是数据访问对象模式的参与者。
+
+数据访问对象接口（Data Access Object Interface） - 该接口定义了在一个模型对象上要执行的标准操作。
+数据访问对象实体类（Data Access Object concrete class） - 该类实现了上述的接口。该类负责从数据源获取数据，数据源可以是数据库，也可以是 xm...
+        </p> -->
+        <p>数据访问对象模式（Data Access Object Pattern）或 DAO 模式用于把低级的数据访问 API 或操作从高级的业务服务中分离出来。以下是数据访问对象模式的参与者。</p>
+<ul>
+<li><strong>数据访问对象接口（Data Access Object Interface）</strong> - 该接口定义了在一个模型对象上要执行的标准操作。</li>
+<li><strong>数据访问对象实体类（Data Access Object concrete class）</strong> - 该类实现了上述的接口。该类负责从数据源获取数据，数据源可以是数据库，也可以是 xml，或者是其他的存储机制。</li>
+<li><strong>模型对象/数值对象（Model Object/Value Object）</strong> - 该对象是简单的 POJO，包含了 get/set 方法来存储通过使用 DAO 类检索到的数据。        
+        <p class="article-more-link">
+        <a href="/2018/10/21/设计模式之数据访问对象模式/#more">阅读全文</a>             </p>
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+      
+
+    </footer>
+  </div>
+  
+</article>
+
+<!-- Table of Contents -->
+
+
+  
     <article id="post-设计模式之组合实体模式"  class="article article-type-post" itemscope itemprop="blogPost" >
   <div id="articleInner" class="article-inner">
     
@@ -726,56 +784,6 @@ Controller（控制器） - 控制器作用于模型和视图上。它控制数�
         <p>当对象间存在一对多关系时，则使用观察者模式（Observer Pattern）。比如，当一个对象被修改时，则会自动通知它的依赖对象。观察者模式属于行为型模式。<br>        
         <p class="article-more-link">
         <a href="/2018/10/21/设计模式之观察者模式/#more">阅读全文</a>             </p>
-      
-    </div>
-    <footer class="article-footer">
-      
-      
-      
-      
-
-    </footer>
-  </div>
-  
-</article>
-
-<!-- Table of Contents -->
-
-
-  
-    <article id="post-设计模式之备忘录模式"  class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="thumb" itemprop="name">
-      <a class="article-title" href="/2018/10/21/设计模式之备忘录模式/">设计模式之备忘录模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2018/10/21/设计模式之备忘录模式/" class="article-date">
-	  <time datetime="2018-10-21T04:23:16.000Z" itemprop="datePublished">2018-10-21</time>
-	</a>
-
-      
-      
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-      <!-- alvin edit
-          <p class="article-excerpt-content">
-          备忘录模式（Memento Pattern）保存一个对象的某个状态，以便在适当的时候恢复对象。备忘录模式属于行为型模式。
-
-        </p> -->
-        <p>备忘录模式（Memento Pattern）保存一个对象的某个状态，以便在适当的时候恢复对象。备忘录模式属于行为型模式。<br>        
-        <p class="article-more-link">
-        <a href="/2018/10/21/设计模式之备忘录模式/#more">阅读全文</a>             </p>
       
     </div>
     <footer class="article-footer">

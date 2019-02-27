@@ -260,6 +260,68 @@
         
           <section id="main" style="float:none;">
   
+    <article id="post-Redis哨兵"  class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" itemprop="name">
+      <a class="article-title" href="/2019/01/06/Redis哨兵/">Redis哨兵</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2019/01/06/Redis哨兵/" class="article-date">
+	  <time datetime="2019-01-06T04:24:00.000Z" itemprop="datePublished">2019-01-06</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/数据存储/">数据存储</a>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- alvin edit
+          <p class="article-excerpt-content">
+          哨兵在复制的基础上，哨兵实现了自动化的故障恢复。缺陷：写操作无法负载均衡；存储能力受到单机的限制。Redis2.8引入哨兵，主要功能如下：
+
+监控（Monitoring： 哨兵会不断地检查主节点和从节点是否运作正常。
+自动故障转移（Automatic failover）： 当主节点不能正常工作时，哨兵会开始自动故障转移操作，它会将失效主节点的其中一个从节点升级为新的主节点，并让其他从节点改为复制新的主节点。
+配置提供者（Configuration provider）： 客户端在初始化时，通...
+        </p> -->
+        <p>哨兵在复制的基础上，哨兵实现了自动化的故障恢复。缺陷：写操作无法负载均衡；存储能力受到单机的限制。<br>Redis2.8引入哨兵，主要功能如下：</p>
+<ul>
+<li><strong>监控（Monitoring：</strong> 哨兵会不断地检查主节点和从节点是否运作正常。</li>
+<li><strong>自动故障转移（Automatic failover）：</strong> 当主节点不能正常工作时，哨兵会开始自动故障转移操作，它会将失效主节点的其中一个从节点升级为新的主节点，并让其他从节点改为复制新的主节点。</li>
+<li><strong>配置提供者（Configuration provider）：</strong> 客户端在初始化时，通过连接哨兵来获得当前Redis服务的主节点地址。</li>
+<li><strong>通知（Notification）：</strong> 哨兵可以将故障转移的结果发送给客户端。</li>
+</ul>
+<p>本文哨兵系统，包含1个主节点、2个从节点和3个哨兵节点。<br>        
+        <p class="article-more-link">
+        <a href="/2019/01/06/Redis哨兵/#more">阅读全文</a>             </p>
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+      
+
+    </footer>
+  </div>
+  
+</article>
+
+<!-- Table of Contents -->
+
+
+  
     <article id="post-Redis主从复制"  class="article article-type-post" itemscope itemprop="blogPost" >
   <div id="articleInner" class="article-inner">
     
@@ -745,57 +807,6 @@
         <p>并发和多线程是Java编程中避不开的话题，今天主要对并发和多线程相关知识进行下头脑风暴。<br>        
         <p class="article-more-link">
         <a href="/2018/11/29/风暴之并发和多线程/#more">阅读全文</a>             </p>
-      
-    </div>
-    <footer class="article-footer">
-      
-      
-      
-      
-
-    </footer>
-  </div>
-  
-</article>
-
-<!-- Table of Contents -->
-
-
-  
-    <article id="post-风暴之Redis"  class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="thumb" itemprop="name">
-      <a class="article-title" href="/2018/11/29/风暴之Redis/">风暴之Redis</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2018/11/29/风暴之Redis/" class="article-date">
-	  <time datetime="2018-11-28T16:01:00.000Z" itemprop="datePublished">2018-11-29</time>
-	</a>
-
-      
-    <a class="article-category-link" href="/categories/数据存储/">数据存储</a>
-
-      
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-      <!-- alvin edit
-          <p class="article-excerpt-content">
-          Redis 是一个开源（BSD许可）的，内存中的数据结构存储系统，它可以用作数据库、缓存和消息中间件。 它支持多种类型的数据结构，如 字符串（strings）， 散列（hashes）， 列表（lists）， 集合（sets）， 有序集合（sorted sets） 与范围查询， bitmaps， hyperloglogs 和 地理空间（geospatial） 索引半径查询。 Redis 内置了 复制（replication），LUA脚本（Lua scripting）， LRU驱动事件（LRU...
-        </p> -->
-        <p>Redis 是一个开源（BSD许可）的，内存中的数据结构存储系统，它可以用作数据库、缓存和消息中间件。 它支持多种类型的数据结构，如 字符串（strings）， 散列（hashes）， 列表（lists）， 集合（sets）， 有序集合（sorted sets） 与范围查询， bitmaps， hyperloglogs 和 地理空间（geospatial） 索引半径查询。 Redis 内置了 复制（replication），LUA脚本（Lua scripting）， LRU驱动事件（LRU eviction），事务（transactions） 和不同级别的 磁盘持久化（persistence）， 并通过 Redis哨兵（Sentinel）和自动 分区（Cluster）提供高可用性（high availability）。<br>        
-        <p class="article-more-link">
-        <a href="/2018/11/29/风暴之Redis/#more">阅读全文</a>             </p>
       
     </div>
     <footer class="article-footer">
