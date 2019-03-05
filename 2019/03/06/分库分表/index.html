@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>分库分表 | alvin&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="keywords" content="分库分表" />
+  
+  
+  
+  
+  <meta name="description" content="关系型数据库本身比较容易成为系统瓶颈，单机存储容量、连接数、处理能力都有限。当单表的数据量达到1000W或100G以后，由于查询维度较多，即使添加从库、优化索引，做很多操作时性能仍下降严重。此时就要考虑对其进行切分了，切分的目的就在于减少数据库的负担，缩短sql执行时间。">
+<meta name="keywords" content="分库分表">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分库分表">
+<meta property="og:url" content="https://dongz.me/2019/03/06/分库分表/index.html">
+<meta property="og:site_name" content="alvin&#39;s blog">
+<meta property="og:description" content="关系型数据库本身比较容易成为系统瓶颈，单机存储容量、连接数、处理能力都有限。当单表的数据量达到1000W或100G以后，由于查询维度较多，即使添加从库、优化索引，做很多操作时性能仍下降严重。此时就要考虑对其进行切分了，切分的目的就在于减少数据库的负担，缩短sql执行时间。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://images2018.cnblogs.com/blog/1278254/201805/1278254-20180514014303109-1826311184.png">
+<meta property="og:image" content="https://images2018.cnblogs.com/blog/1278254/201805/1278254-20180514014417237-1672001359.png">
+<meta property="og:image" content="https://images2018.cnblogs.com/blog/1278254/201805/1278254-20180514014833061-560502066.png">
+<meta property="og:image" content="https://images2018.cnblogs.com/blog/1278254/201805/1278254-20180514015656387-1154395691.png">
+<meta property="og:image" content="https://images2018.cnblogs.com/blog/1278254/201805/1278254-20180514015805333-1409715906.png">
+<meta property="og:updated_time" content="2019-03-05T16:03:44.587Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="分库分表">
+<meta name="twitter:description" content="关系型数据库本身比较容易成为系统瓶颈，单机存储容量、连接数、处理能力都有限。当单表的数据量达到1000W或100G以后，由于查询维度较多，即使添加从库、优化索引，做很多操作时性能仍下降严重。此时就要考虑对其进行切分了，切分的目的就在于减少数据库的负担，缩短sql执行时间。">
+<meta name="twitter:image" content="https://images2018.cnblogs.com/blog/1278254/201805/1278254-20180514014303109-1826311184.png">
+  
+    <link rel="alternate" href="/atom.xml" title="alvin&#39;s blog" type="application/atom+xml">
+  
+
+  
+
+  <link rel="icon" href="/css/images/mylogo.jpg">
+  <link rel="apple-touch-icon" href="/css/images/mylogo.jpg">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
+  <link rel="stylesheet" href="/css/style.css">
+
+  <script src="/js/jquery-3.1.1.min.js"></script>
+  <script src="/js/bootstrap.js"></script>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+
+  
+    <link rel="stylesheet" href="/css/dialog.css">
+  
+
+  
+
+  
+    <link rel="stylesheet" href="/css/header-post.css" >
+  
+
+  
+  
+  
+    <link rel="stylesheet" href="/css/vdonate.css" >
+  
+
+</head>
+
+
+
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
+
+
+  
+  <div id="container">
+    <div id="wrap">
+      
+        <header>
+
+    <div id="allheader" class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="navbar-inner">
+          
+          <div class="container"> 
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+
+            
+              <a class="brand" style="
+                 margin-top: 0px;"  
+                href="#" data-toggle="modal" data-target="#myModal" >
+                  <img width="124px" height="124px" alt="Hike News" src="/css/images/mylogo.jpg">
+              </a>
+            
+            
+            <div class="navbar-collapse collapse">
+              <ul class="hnav navbar-nav">
+                
+                  <li> <a class="main-nav-link" href="/">首页</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/archives">归档</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/categories">分类</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/tags">标签</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/about">关于</a> </li>
+                
+                  <li><div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="请输入关键词..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(无标题)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div></li>
+            </div>
+          </div>
+                
+      </div>
+    </div>
+
+</header>
+
+
+
+      
+            
+      <div id="content" class="outer">
+        
+          <section id="main" style="float:none;"><article id="post-分库分表" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" class="article-title" itemprop="name">
+      分库分表
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2019/03/06/分库分表/" class="article-date">
+	  <time datetime="2019-03-05T16:03:00.000Z" itemprop="datePublished">2019-03-06</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/数据存储/">数据存储</a>
+
+      
+	<a class="article-views">
+	<span id="busuanzi_container_page_pv">
+		阅读量<span id="busuanzi_value_page_pv"></span>
+	</span>
+	</a>
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>关系型数据库本身比较容易成为系统瓶颈，单机存储容量、连接数、处理能力都有限。当单表的数据量达到1000W或100G以后，由于查询维度较多，即使添加从库、优化索引，做很多操作时性能仍下降严重。此时就要考虑对其进行切分了，<br>切分的目的就在于减少数据库的负担，缩短sql执行时间。<br><a id="more"></a></p>
+<h2 id="分库分表思想"><a href="#分库分表思想" class="headerlink" title="分库分表思想"></a>分库分表思想</h2><h3 id="数据切分方式"><a href="#数据切分方式" class="headerlink" title="数据切分方式"></a>数据切分方式</h3><p>数据切分根据其切分类型，可以分为两种方式：垂直（纵向）切分和水平（横向）切分。<br>分库分表的顺序应该是先垂直分，后水平分。 因为垂直分更简单，更符合我们处理现实世界问题的方式。</p>
+<h4 id="垂直（纵向）切分"><a href="#垂直（纵向）切分" class="headerlink" title="垂直（纵向）切分"></a>垂直（纵向）切分</h4><blockquote>
+<p>垂直分库</p>
+</blockquote>
+<p>垂直分库就是根据业务耦合性，将关联度低的不同表存储在不同的数据库。做法与大系统拆分为多个小系统类似，按业务分类进行独立划分。与”微服务治理”的做法相似，每个微服务使用单独的一个数据库。</p>
+<p><img src="https://images2018.cnblogs.com/blog/1278254/201805/1278254-20180514014303109-1826311184.png" alt=""></p>
+<blockquote>
+<p>垂直分表</p>
+</blockquote>
+<p>垂直分表是基于数据库中的”列”进行，某个表字段较多，可以新建一张扩展表，将不经常用或字段长度较大的字段拆分出去到扩展表中。在字段很多的情况下（例如一个大表有100多个字段），通过”大表拆小表”，更便于开发与维护，也能避免跨页问题，MySQL底层是通过数据页存储的，一条记录占用空间过大会导致跨页，造成额外的性能开销。另外数据库以行为单位将数据加载到内存中，这样表中字段长度较短且访问频率较高，内存能加载更多的数据，命中率更高，减少了磁盘IO，从而提升了数据库性能。</p>
+<p><img src="https://images2018.cnblogs.com/blog/1278254/201805/1278254-20180514014417237-1672001359.png" alt=""></p>
+<p>拆分字段的操作建议在数据库设计阶段就做好。如果是在发展过程中拆分，则需要改写以前的查询语句，会额外带来一定的成本和风险，建议谨慎。</p>
+<blockquote>
+<p>垂直切分优缺点</p>
+</blockquote>
+<p>优点：  </p>
+<ul>
+<li>解决业务系统层面的耦合，业务清晰  </li>
+<li>与微服务的治理类似，也能对不同业务的数据进行分级管理、维护、监控、扩展等</li>
+<li>高并发场景下，垂直切分一定程度的提升IO、数据库连接数、单机硬件资源的瓶颈</li>
+</ul>
+<p>缺点：  </p>
+<ul>
+<li>部分表无法join，只能通过接口聚合方式解决，提升了开发的复杂度  </li>
+<li>依然存在单表数据量过大的问题（需要水平切分）  </li>
+<li>分布式事务处理复杂  </li>
+</ul>
+<h4 id="水平（横向）切分"><a href="#水平（横向）切分" class="headerlink" title="水平（横向）切分"></a>水平（横向）切分</h4><blockquote>
+<p>单表水平切分</p>
+</blockquote>
+<p>何时：应用难以再细粒度的垂直切分，或切分后数据量行数巨大，存在单库读写性能瓶颈。<br>分类：库内分表、分库分表<br>表述：根据表内数据内在的逻辑关系，将同一个表按不同的条件分散到多个数据库或多个表中，每个表中只包含一部分数据，从而使得单个表的数据量变小，达到分布式的效果。</p>
+<p><img src="https://images2018.cnblogs.com/blog/1278254/201805/1278254-20180514014833061-560502066.png" alt=""></p>
+<p>库内分表只解决了单一表数据量过大的问题，但没有将表分布到不同机器的库上，因此对于减轻数据库的压力来说，帮助不是很大，大家还是竞争同一个物理机的CPU、内存、网络IO，最好通过分库分表来解决。</p>
+<p>优点：</p>
+<ul>
+<li>不存在单库数据量过大、高并发的性能瓶颈，提升系统稳定性和负载能力  </li>
+<li>应用端改造较小，不需要拆分业务模块  </li>
+<li>“冷热数据分离”实现方案</li>
+</ul>
+<p>缺点：  </p>
+<ul>
+<li>跨分片事务难以保证  </li>
+<li>跨分片的复杂查询如join关联查询      </li>
+<li>数据多次扩展难度和维护量极大</li>
+</ul>
+<blockquote>
+<p>数据分片规则</p>
+</blockquote>
+<p>1.数值范围  </p>
+<p>如将userId为1~9999的记录分到第一个库，10000~20000的分到第二个库<br><img src="https://images2018.cnblogs.com/blog/1278254/201805/1278254-20180514015656387-1154395691.png" alt=""></p>
+<p>优点：  </p>
+<ul>
+<li>单表大小可控  </li>
+<li>天然便于水平扩展，后期如果想对整个分片集群扩容时，只需要添加节点即可，无需对其他分片的数据进行迁移</li>
+<li>使用分片字段进行范围查找时，连续分片可快速定位分片进行快速查询，有效避免跨分片查询的问题</li>
+</ul>
+<p>缺点：  </p>
+<ul>
+<li>热点数据成为性能瓶颈。连续分片可能存在数据热点</li>
+</ul>
+<p>2.数值取模   </p>
+<p>一般采用hash取模mod的切分方式。<br>例如：将 Customer 表根据 cusno 字段切分到4个库中，<code>hash(cusno)%4</code>余数为0的放到第一个库，余数为1的放到第二个库，以此类推。这样同一个用户的数据会分散到同一个库中，如果查询条件带有cusno字段，则可明确定位到相应库去查询。</p>
+<p><img src="https://images2018.cnblogs.com/blog/1278254/201805/1278254-20180514015805333-1409715906.png" alt=""></p>
+<p>优点：  </p>
+<ul>
+<li>数据分片相对比较均匀，不容易出现热点和并发访问的瓶颈  </li>
+<li>后期分片集群扩容时，需要迁移旧的数据（使用一致性hash算法能较好的避免这个问题）  </li>
+<li>容易面临跨分片查询的复杂问题。比如上例中，如果频繁用到的查询条件中不带cusno时，将会导致无法定位数据库，从而需要同时向4个库发起查询，再在内存中合并数据，取最小集返回给应用，分库反而成为拖累。</li>
+</ul>
+<p>3.地理区域</p>
+<p>比如按照华东，华南，华北这样来区分业务  </p>
+<p>4.时间</p>
+<p>按照时间切分，就是将6个月前，甚至一年前的数据切出去放到另外的一张表，因为随着时间流逝，这些表的数据 被查询的概率变小，所以没必要和“热数据”放在一起，这个也是“冷热数据分离”。</p>
+<h2 id="分库分表中间件对比"><a href="#分库分表中间件对比" class="headerlink" title="分库分表中间件对比"></a>分库分表中间件对比</h2><h3 id="非代理方式"><a href="#非代理方式" class="headerlink" title="非代理方式"></a>非代理方式</h3><p>特点：  </p>
+<ol>
+<li>一般通过重新实现JDBC相关API，重写DataSource、PrepareStatement等操作数据库的API，可以在不改变业务代码情况下透明实现分库分表的能力  </li>
+<li>无需额外部署，和应用绑定一起发布</li>
+<li>中间件和应用强耦合   </li>
+<li>不能跨语言，每种语言要开发独立的客户端SDK</li>
+</ol>
+<blockquote>
+<p>Sharding-JDBC</p>
+</blockquote>
+<p>当当网开源的基于jdbc中间件，现已更名为ShardingSphere。</p>
+<p>主页：<a href="http://shardingsphere.apache.org/index_zh.html" target="_blank" rel="noopener">http://shardingsphere.apache.org/index_zh.html</a>  </p>
+<p>github：<a href="https://github.com/apache/incubator-shardingsphere" target="_blank" rel="noopener">https://github.com/apache/incubator-shardingsphere</a>  </p>
+<p>社区活跃度：较活跃  </p>
+<p>维护人群：张亮，已入职京东   </p>
+<p>使用情况：<a href="https://shardingsphere.apache.org/community/cn/company/" target="_blank" rel="noopener">https://shardingsphere.apache.org/community/cn/company/</a>  </p>
+<p>支持语言：Sharding-JDBC仅Java，Sharding-Proxy任意语言，Sharding-Sidecar任意语言</p>
+<p>关键特性：  </p>
+<ul>
+<li>分库 &amp; 分表  </li>
+<li>读写分离  </li>
+<li>分布式主键  </li>
+<li>XA强一致事务（Doing）   </li>
+<li>柔性事务（Doing）  </li>
+<li>配置动态化  </li>
+<li>熔断 &amp; 禁用  </li>
+<li>调用链路追踪  </li>
+<li>弹性伸缩 (Planning)  </li>
+</ul>
+<blockquote>
+<p>TDDL</p>
+</blockquote>
+<p>阿里巴巴开源组件，已停更。</p>
+<p>主页：</p>
+<p>github：<a href="https://github.com/alibaba/tb_tddl" target="_blank" rel="noopener">https://github.com/alibaba/tb_tddl</a></p>
+<p>社区活跃度：</p>
+<blockquote>
+<p>TSharding</p>
+</blockquote>
+<p>蘑菇街开源的基于mybatis的类似maven插件式的中间件。</p>
+<blockquote>
+<p>Ctrip-DAL</p>
+</blockquote>
+<p>携程开源的中间件。</p>
+<blockquote>
+<p>MySQL Fabric</p>
+</blockquote>
+<p>MySQL官方开源</p>
+<h3 id="代理方式"><a href="#代理方式" class="headerlink" title="代理方式"></a>代理方式</h3><p>特点：  </p>
+<ol>
+<li>应用和数据库的连接之间搭起一个代理层，上层应用以SQL协议连接代理层，代理层负责转发请求到底层物理实例  </li>
+<li>天然支持大多数的编程语言  </li>
+<li>引入第三方应用，增加不确定因素</li>
+</ol>
+<blockquote>
+<p>Mycat</p>
+</blockquote>
+<p>MyCat又是在Cobar基础上发展的版本，两个显著点是：  </p>
+<ul>
+<li>后端由BIO改为NIO，并发量有大幅提高  </li>
+<li>增加了对 Order By、Group By、limit 等聚合功能的支持(虽然Cobar也可以支持 Order By、Group By、Limit 语法，但是结果没有进行聚合，只是简单返回给前端，聚合功能还是需要业务系统自己完成)</li>
+</ul>
+<p>起源：对阿里的Cobar改造。</p>
+<p>主页：<a href="http://www.mycat.io/" target="_blank" rel="noopener">http://www.mycat.io/</a>  </p>
+<p>github：<a href="https://github.com/MyCATApache/Mycat-Server" target="_blank" rel="noopener">https://github.com/MyCATApache/Mycat-Server</a></p>
+<p>社区活跃度：比较活跃  </p>
+<p>维护人群：众多软件公司的实力派架构师和资深开发人员维护</p>
+<p>使用情况：<a href="https://github.com/MyCATApache/Mycat-Server/issues/112" target="_blank" rel="noopener">https://github.com/MyCATApache/Mycat-Server/issues/112</a></p>
+<p>支持语言：遵循Mysql原生协议，支持Mysql、Oracle、DB2、SQL Server 、mongodb 、巨杉</p>
+<p>关键特性：  </p>
+<ul>
+<li>遵守Mysql原生协议，跨语言，跨平台，跨数据库的通用中间件代理。  </li>
+<li>基于心跳的自动故障切换，支持读写分离，支持MySQL主从，以及galera cluster集群。  </li>
+<li>支持Galera for MySQL集群，Percona Cluster或者MariaDB cluster。  </li>
+<li>基于Nio实现，有效管理线程，高并发问题。  </li>
+<li>支持数据的多片自动路由与聚合，支持sum,count,max等常用的聚合函数。  </li>
+<li>支持单库内部任意join，支持跨库2表join，甚至基于caltlet的多表join。  </li>
+<li>支持通过全局表，ER关系的分片策略，实现了高效的多表join查询。  </li>
+<li>支持多租户方案。  </li>
+<li>支持分布式事务（弱xa）。  </li>
+<li>支持全局序列号，解决分布式下的主键生成问题。  </li>
+<li>分片规则丰富，插件化开发，易于扩展。  </li>
+<li>强大的web，命令行监控。  </li>
+<li>支持前端作为mysq通用代理，后端JDBC方式支持Oracle、DB2、SQL Server 、 mongodb 、巨杉。  </li>
+<li>支持密码加密。  </li>
+<li>支持服务降级。  </li>
+<li>支持IP白名单。  </li>
+<li>支持SQL黑名单、sql注入攻击拦截。  </li>
+<li>支持分表（1.6）  </li>
+<li>集群基于ZooKeeper管理，在线升级，扩容，智能优化，大数据处理（2.0开发版）。  </li>
+</ul>
+<blockquote>
+<p>Amoeba</p>
+</blockquote>
+<p>已经停更了</p>
+<p>文档：<a href="http://amoeba.sourceforge.net/amoeba.pdf" target="_blank" rel="noopener">http://amoeba.sourceforge.net/amoeba.pdf</a>  </p>
+<p>主页：<a href="http://wiki.hexnova.com/display/amoeba/Home" target="_blank" rel="noopener">http://wiki.hexnova.com/display/amoeba/Home</a> （打不开了）  </p>
+<p>github：？</p>
+<blockquote>
+<p>Cobar</p>
+</blockquote>
+<p>阿里巴巴开源中间件，已停更。</p>
+<p>Cobar是在Amoeba基础上进化的版本，一个显著变化是把后端JDBC Driver改为原生的MySQL通信协议层。后端去掉JDBC Driver后,意味着不再支持JDBC规范，不能支持 Oracle、PostgreSQL等数据。但使用原生通信协议代替JDBC Driver，后端的功能增加了很多想象力，比如主备切换、读写分离、异步操作等。</p>
+<p>文档：<a href="https://github.com/alibaba/cobar/wiki" target="_blank" rel="noopener">https://github.com/alibaba/cobar/wiki</a>  </p>
+<p>主页：？</p>
+<p>github：<a href="https://github.com/alibaba/cobar" target="_blank" rel="noopener">https://github.com/alibaba/cobar</a></p>
+<blockquote>
+<p>Atlas</p>
+</blockquote>
+<p>360开源</p>
+<blockquote>
+<p>Heisenberg</p>
+</blockquote>
+<p>百度开源</p>
+<blockquote>
+<p>Vitess</p>
+</blockquote>
+<p>youtube开源</p>
+<blockquote>
+<p>Tidb</p>
+</blockquote>
+<p>较新，尚待研究。</p>
+<p>首页：<a href="https://pingcap.com/docs-cn/" target="_blank" rel="noopener">https://pingcap.com/docs-cn/</a>  </p>
+<h3 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h3><p><a href="https://blog.csdn.net/jornada_/article/details/82947677" target="_blank" rel="noopener">分布式数据库中间件、产品——sharding-jdbc、mycat、drds</a><br><a href="https://blog.csdn.net/u013898617/article/details/80402956" target="_blank" rel="noopener">分库分表总结，Mycat从入门到放弃</a><br><a href="http://www.cnblogs.com/iceggboom/p/10134853.html" target="_blank" rel="noopener">分表分库解决方案（mycat,tidb,shardingjdbc）</a></p>
+<h2 id="分库分表实战"><a href="#分库分表实战" class="headerlink" title="分库分表实战"></a>分库分表实战</h2><p>待续</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <div id="donation_div"></div>
+
+<script src="/js/vdonate.js"></script>
+<script>
+var a = new Donate({
+  title: '如果觉得我的文章对您有用，请随意打赏。您的支持将鼓励我继续创作!', // 可选参数，打赏标题
+  btnText: '打赏支持', // 可选参数，打赏按钮文字
+  el: document.getElementById('donation_div'),
+  wechatImage: 'https://raw.githubusercontent.com/alvin6233/alvin6233.github.io/master/css/images/WechatPay.png',
+  alipayImage: 'https://raw.githubusercontent.com/alvin6233/alvin6233.github.io/master/css/images/AliPay.png'
+});
+</script>
+      
+      
+      <div>
+        <ul class="post-copyright">
+          <li class="post-copyright-author">
+          <strong>本文作者:  </strong>alvin dong</a>
+          </li>
+          <li class="post-copyright-link">
+          <strong>本文链接:  </strong>
+          <a href="/2019/03/06/分库分表/" target="_blank" title="分库分表">https://dongz.me/2019/03/06/分库分表/</a>
+          </li>
+          <li class="post-copyright-license">
+            <strong>版权声明:   </strong>
+            本博客所有文章除特别声明外，均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+            许可协议。转载请注明出处
+          </li>
+         
+        </ul>
+<div>
+
+      
+      
+        
+	<div id="comment">
+		<!-- 来必力City版安装代码 -->
+		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
+		<script type="text/javascript">
+		   (function(d, s) {
+		       var j, e = d.getElementsByTagName(s)[0];
+
+		       if (typeof LivereTower === 'function') { return; }
+
+		       j = d.createElement(s);
+		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+		       j.async = true;
+
+		       e.parentNode.insertBefore(j, e);
+		   })(document, 'script');
+		</script>
+		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+		</div>
+		<!-- City版安装代码已完成 -->
+	</div>
+
+
+
+      
+      
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2019/03/05/mysql-主从复制实践（docker）/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">mysql 主从复制实践【docker】</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- Table of Contents -->
+
+  <aside id="toc-sidebar">
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#分库分表思想"><span class="nav-number">1.</span> <span class="nav-text">分库分表思想</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据切分方式"><span class="nav-number">1.1.</span> <span class="nav-text">数据切分方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#垂直（纵向）切分"><span class="nav-number">1.1.1.</span> <span class="nav-text">垂直（纵向）切分</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#水平（横向）切分"><span class="nav-number">1.1.2.</span> <span class="nav-text">水平（横向）切分</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分库分表中间件对比"><span class="nav-number">2.</span> <span class="nav-text">分库分表中间件对比</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#非代理方式"><span class="nav-number">2.1.</span> <span class="nav-text">非代理方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代理方式"><span class="nav-number">2.2.</span> <span class="nav-text">代理方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#比较"><span class="nav-number">2.3.</span> <span class="nav-text">比较</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分库分表实战"><span class="nav-number">3.</span> <span class="nav-text">分库分表实战</span></a></li></ol>
+    
+    </div>
+  </aside>
+
+</section>
+        
+      </div>
+      
+      <footer id="footer">
+  
+
+  <div class="container">
+      	<div class="row">
+	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
+	      <p id="copyRightEn">Copyright &copy; 2013 - 2019 alvin&#39;s blog All Rights Reserved.</p>
+	      
+	      
+    		<p class="busuanzi_uv">
+				访客数 : <span id="busuanzi_value_site_uv"></span> |  
+				访问量 : <span id="busuanzi_value_site_pv"></span>
+		    </p>
+  		   
+		</div>
+
+		
+  </div>
+</footer>
+
+
+<!-- min height -->
+
+<script>
+    var wrapdiv = document.getElementById("wrap");
+    var contentdiv = document.getElementById("content");
+    var allheader = document.getElementById("allheader");
+
+    wrapdiv.style.minHeight = document.body.offsetHeight + "px";
+    if (allheader != null) {
+      contentdiv.style.minHeight = document.body.offsetHeight - allheader.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    } else {
+      contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    }
+</script>
+    </div>
+    <!-- <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">home</a>
+  
+    <a href="/archives" class="mobile-nav-link">archives</a>
+  
+    <a href="/categories" class="mobile-nav-link">categories</a>
+  
+    <a href="/tags" class="mobile-nav-link">tags</a>
+  
+    <a href="/about" class="mobile-nav-link">about</a>
+  
+</nav> -->
+    
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/scripts.js"></script>
+
+
+
+
+  <script src="/js/dialog.js"></script>
+
+
+
+
+
+
+
+
+	<div style="display: none;">
+    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
+  </div>
+
+
+
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+	</script>
+
+
+
+
+
+
+  </div>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">设置</h2>
+      </div>
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+
+
+      <div class="modal-body">
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="javascript:setFontSize();" aria-expanded="true" aria-controls="collapseOne">
+              正文字号大小
+            </a>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body">
+            您已调整页面字体大小
+          </div>
+        </div>
+      
+
+
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="javascript:setBackground();" aria-expanded="true" aria-controls="collapseTwo">
+              夜间护眼模式
+            </a>
+        </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="panel-body">
+            夜间模式已经开启，再次单击按钮即可关闭 
+          </div>
+        </div>
+
+        <div>
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关 于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>
+         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+          <div class="panel-body">
+            alvin&#39;s blog
+          </div>
+          <div class="panel-body">
+            Copyright © 2019 alvin dong All Rights Reserved.
+          </div>
+        </div>
+      </div>
+
+
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+  
+    <a id="menu-switch"><i class="fa fa-bars fa-lg"></i></a>
+  
+</body>
+</html>
