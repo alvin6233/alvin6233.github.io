@@ -260,6 +260,65 @@
         
           <section id="main" style="float:none;">
   
+    <article id="post-Redis集群"  class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" itemprop="name">
+      <a class="article-title" href="/2019/01/20/Redis集群/">Redis集群</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2019/01/20/Redis集群/" class="article-date">
+	  <time datetime="2019-01-20T14:20:00.000Z" itemprop="datePublished">2019-01-20</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/数据存储/">数据存储</a>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- alvin edit
+          <p class="article-excerpt-content">
+          主从复制和哨兵模式，存在诸多问题，最主要的问题是存储能力受单机限制，写操作不能实现负载均衡。Redis3.0开始引入分布式存储方案，集群。集群由多个节点组成，节点分为主节点和从节点。主节点负载读写请求和集群信息的维护，从节点只进行主节点数据和信息的复制。集群的作用如下：
+
+数据分区： 数据分区(或称数据分片)是集群最核心的功能。集群将数据分散到多个节点，一方面突破了Redis单机内存大小的限制，存储容量大大增加；另一方面每个主节点都可以对外提供读服务和写服务，大大提高了集群的响应能力。
+高...
+        </p> -->
+        <p>主从复制和哨兵模式，存在诸多问题，最主要的问题是存储能力受单机限制，写操作不能实现负载均衡。<br>Redis3.0开始引入分布式存储方案，集群。集群由多个节点组成，节点分为主节点和从节点。主节点负载读写请求和集群信息的维护，从节点只进行主节点数据和信息的复制。集群的作用如下：</p>
+<ul>
+<li><strong>数据分区：</strong> 数据分区(或称数据分片)是集群最核心的功能。集群将数据分散到多个节点，一方面突破了Redis单机内存大小的限制，存储容量大大增加；<br>另一方面每个主节点都可以对外提供读服务和写服务，大大提高了集群的响应能力。</li>
+<li><strong>高可用：</strong> 集群支持主从复制和主节点的自动故障转移（与哨兵类似）；当任一节点发生故障时，集群仍然可以对外提供服务。  </li>
+</ul>
+<p>本文集群模式，包含3个主节点、3个从节点。<br>        
+        <p class="article-more-link">
+        <a href="/2019/01/20/Redis集群/#more">阅读全文</a>             </p>
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+      
+
+    </footer>
+  </div>
+  
+</article>
+
+<!-- Table of Contents -->
+
+
+  
     <article id="post-Redis哨兵"  class="article article-type-post" itemscope itemprop="blogPost" >
   <div id="articleInner" class="article-inner">
     
@@ -753,60 +812,6 @@
         <p>实际生产环境下，应用不可避免的会遇到各种各样的问题，要熟练掌握一些命令和工具，以快速排查定位线上问题。<br>        
         <p class="article-more-link">
         <a href="/2018/11/29/风暴之线上问题排查/#more">阅读全文</a>             </p>
-      
-    </div>
-    <footer class="article-footer">
-      
-      
-      
-      
-
-    </footer>
-  </div>
-  
-</article>
-
-<!-- Table of Contents -->
-
-
-  
-    <article id="post-风暴之并发和多线程"  class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="thumb" itemprop="name">
-      <a class="article-title" href="/2018/11/29/风暴之并发和多线程/">风暴之并发和多线程</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2018/11/29/风暴之并发和多线程/" class="article-date">
-	  <time datetime="2018-11-28T16:18:00.000Z" itemprop="datePublished">2018-11-29</time>
-	</a>
-
-      
-    <a class="article-category-link" href="/categories/java/">java</a>
-
-      
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-      <!-- alvin edit
-          <p class="article-excerpt-content">
-          并发和多线程是Java编程中避不开的话题，今天主要对并发和多线程相关知识进行下头脑风暴。
-风暴之并发和多线程
-看大图
-
-        </p> -->
-        <p>并发和多线程是Java编程中避不开的话题，今天主要对并发和多线程相关知识进行下头脑风暴。<br>        
-        <p class="article-more-link">
-        <a href="/2018/11/29/风暴之并发和多线程/#more">阅读全文</a>             </p>
       
     </div>
     <footer class="article-footer">
