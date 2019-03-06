@@ -24,7 +24,7 @@
 <meta property="og:image" content="https://images2018.cnblogs.com/blog/1278254/201805/1278254-20180514014833061-560502066.png">
 <meta property="og:image" content="https://images2018.cnblogs.com/blog/1278254/201805/1278254-20180514015656387-1154395691.png">
 <meta property="og:image" content="https://images2018.cnblogs.com/blog/1278254/201805/1278254-20180514015805333-1409715906.png">
-<meta property="og:updated_time" content="2019-03-05T16:03:44.587Z">
+<meta property="og:updated_time" content="2019-03-05T16:08:55.684Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="分库分表">
 <meta name="twitter:description" content="关系型数据库本身比较容易成为系统瓶颈，单机存储容量、连接数、处理能力都有限。当单表的数据量达到1000W或100G以后，由于查询维度较多，即使添加从库、优化索引，做很多操作时性能仍下降严重。此时就要考虑对其进行切分了，切分的目的就在于减少数据库的负担，缩短sql执行时间。">
@@ -251,7 +251,8 @@
 <p>数据分片规则</p>
 </blockquote>
 <p>1.数值范围  </p>
-<p>如将userId为1~9999的记录分到第一个库，10000~20000的分到第二个库<br><img src="https://images2018.cnblogs.com/blog/1278254/201805/1278254-20180514015656387-1154395691.png" alt=""></p>
+<p>如将userId为1~9999的记录分到第一个库，10000~20000的分到第二个库  </p>
+<p><img src="https://images2018.cnblogs.com/blog/1278254/201805/1278254-20180514015656387-1154395691.png" alt=""></p>
 <p>优点：  </p>
 <ul>
 <li>单表大小可控  </li>
@@ -471,6 +472,15 @@ var a = new Donate({
   
     
 <nav id="article-nav">
+  
+    <a href="/2019/03/07/HTTP协议/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          HTTP协议
+        
+      </div>
+    </a>
   
   
     <a href="/2019/03/05/mysql-主从复制实践（docker）/" id="article-nav-older" class="article-nav-link-wrap">

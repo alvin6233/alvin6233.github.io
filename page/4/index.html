@@ -260,6 +260,66 @@
         
           <section id="main" style="float:none;">
   
+    <article id="post-设计模式之服务定位器模式"  class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" itemprop="name">
+      <a class="article-title" href="/2018/10/21/设计模式之服务定位器模式/">设计模式之服务定位器模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2018/10/21/设计模式之服务定位器模式/" class="article-date">
+	  <time datetime="2018-10-21T04:44:00.000Z" itemprop="datePublished">2018-10-21</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/设计模式/">设计模式</a>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- alvin edit
+          <p class="article-excerpt-content">
+          服务定位器模式（Service Locator Pattern）用在我们想使用 JNDI 查询定位各种服务的时候。考虑到为某个服务查找 JNDI 的代价很高，服务定位器模式充分利用了缓存技术。在首次请求某个服务时，服务定位器在 JNDI 中查找服务，并缓存该服务对象。当再次请求相同的服务时，服务定位器会在它的缓存中查找，这样可以在很大程度上提高应用程序的性能。以下是这种设计模式的实体。
+
+服务（Service） - 实际处理请求的服务。对这种服务的引用可以在 JNDI 服务器中查找到。
+C...
+        </p> -->
+        <p>服务定位器模式（Service Locator Pattern）用在我们想使用 JNDI 查询定位各种服务的时候。考虑到为某个服务查找 JNDI 的代价很高，服务定位器模式充分利用了缓存技术。在首次请求某个服务时，服务定位器在 JNDI 中查找服务，并缓存该服务对象。当再次请求相同的服务时，服务定位器会在它的缓存中查找，这样可以在很大程度上提高应用程序的性能。以下是这种设计模式的实体。</p>
+<ul>
+<li><strong>服务（Service）</strong> - 实际处理请求的服务。对这种服务的引用可以在 JNDI 服务器中查找到。</li>
+<li><strong>Context / 初始的 Context</strong> - JNDI Context 带有对要查找的服务的引用。</li>
+<li><strong>服务定位器（Service Locator）</strong> - 服务定位器是通过 JNDI 查找和缓存服务来获取服务的单点接触。</li>
+<li><strong>缓存（Cache）</strong> - 缓存存储服务的引用，以便复用它们。</li>
+<li><strong>客户端（Client）</strong> - Client 是通过 ServiceLocator 调用服务的对象。        
+        <p class="article-more-link">
+        <a href="/2018/10/21/设计模式之服务定位器模式/#more">阅读全文</a>             </p>
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+      
+
+    </footer>
+  </div>
+  
+</article>
+
+<!-- Table of Contents -->
+
+
+  
     <article id="post-设计模式之拦截过滤器模式"  class="article article-type-post" itemscope itemprop="blogPost" >
   <div id="articleInner" class="article-inner">
     
@@ -749,58 +809,6 @@ Controller（控制器） - 控制器作用于模型和视图上。它控制数�
 <p>在策略模式中，我们创建表示各种策略的对象和一个行为随着策略对象改变而改变的 context 对象。策略对象改变 context 对象的执行算法。<br>        
         <p class="article-more-link">
         <a href="/2018/10/21/设计模式之策略模式/#more">阅读全文</a>             </p>
-      
-    </div>
-    <footer class="article-footer">
-      
-      
-      
-      
-
-    </footer>
-  </div>
-  
-</article>
-
-<!-- Table of Contents -->
-
-
-  
-    <article id="post-设计模式之空对象模式"  class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="thumb" itemprop="name">
-      <a class="article-title" href="/2018/10/21/设计模式之空对象模式/">设计模式之空对象模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2018/10/21/设计模式之空对象模式/" class="article-date">
-	  <time datetime="2018-10-21T04:25:52.000Z" itemprop="datePublished">2018-10-21</time>
-	</a>
-
-      
-      
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-      <!-- alvin edit
-          <p class="article-excerpt-content">
-          在空对象模式（Null Object Pattern）中，一个空对象取代 NULL 对象实例的检查。Null 对象不是检查空值，而是反应一个不做任何动作的关系。这样的 Null 对象也可以在数据不可用的时候提供默认的行为。
-在空对象模式中，我们创建一个指定各种要执行的操作的抽象类和扩展该类的实体类，还创建一个未对该类做任何实现的空对象类，该空对象类将无缝地使用在需要检查空值的地方。
-
-        </p> -->
-        <p>在空对象模式（Null Object Pattern）中，一个空对象取代 NULL 对象实例的检查。Null 对象不是检查空值，而是反应一个不做任何动作的关系。这样的 Null 对象也可以在数据不可用的时候提供默认的行为。</p>
-<p>在空对象模式中，我们创建一个指定各种要执行的操作的抽象类和扩展该类的实体类，还创建一个未对该类做任何实现的空对象类，该空对象类将无缝地使用在需要检查空值的地方。<br>        
-        <p class="article-more-link">
-        <a href="/2018/10/21/设计模式之空对象模式/#more">阅读全文</a>             </p>
       
     </div>
     <footer class="article-footer">
