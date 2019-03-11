@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>监控搭建 | alvin&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="keywords" content="catgraphitegrafanastatsd" />
+  
+  
+  
+  
+  <meta name="description" content="监控对于系统，尤其是分布式系统的重要性不言而喻。这里不多做概念的阐述，主要讲目前公司使用的监控架构简单的自动动手实现下。本文主要分两个重要模块，一个是部署美团点评开源的分布式监控系统cat，另一个作为业务打点补充statsd+graphite+grafana构建业务打点监控系统。目前的这种结构是有些冗余的，后续会慢慢探索优化。">
+<meta name="keywords" content="cat,graphite,grafana,statsd">
+<meta property="og:type" content="article">
+<meta property="og:title" content="监控搭建">
+<meta property="og:url" content="https://dongz.me/2019/03/12/监控搭建/index.html">
+<meta property="og:site_name" content="alvin&#39;s blog">
+<meta property="og:description" content="监控对于系统，尤其是分布式系统的重要性不言而喻。这里不多做概念的阐述，主要讲目前公司使用的监控架构简单的自动动手实现下。本文主要分两个重要模块，一个是部署美团点评开源的分布式监控系统cat，另一个作为业务打点补充statsd+graphite+grafana构建业务打点监控系统。目前的这种结构是有些冗余的，后续会慢慢探索优化。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-03-11T17:18:16.687Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="监控搭建">
+<meta name="twitter:description" content="监控对于系统，尤其是分布式系统的重要性不言而喻。这里不多做概念的阐述，主要讲目前公司使用的监控架构简单的自动动手实现下。本文主要分两个重要模块，一个是部署美团点评开源的分布式监控系统cat，另一个作为业务打点补充statsd+graphite+grafana构建业务打点监控系统。目前的这种结构是有些冗余的，后续会慢慢探索优化。">
+  
+    <link rel="alternate" href="/atom.xml" title="alvin&#39;s blog" type="application/atom+xml">
+  
+
+  
+
+  <link rel="icon" href="/css/images/mylogo.jpg">
+  <link rel="apple-touch-icon" href="/css/images/mylogo.jpg">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
+  <link rel="stylesheet" href="/css/style.css">
+
+  <script src="/js/jquery-3.1.1.min.js"></script>
+  <script src="/js/bootstrap.js"></script>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+
+  
+    <link rel="stylesheet" href="/css/dialog.css">
+  
+
+  
+
+  
+    <link rel="stylesheet" href="/css/header-post.css" >
+  
+
+  
+  
+  
+    <link rel="stylesheet" href="/css/vdonate.css" >
+  
+
+</head>
+
+
+
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
+
+
+  
+  <div id="container">
+    <div id="wrap">
+      
+        <header>
+
+    <div id="allheader" class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="navbar-inner">
+          
+          <div class="container"> 
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+
+            
+              <a class="brand" style="
+                 margin-top: 0px;"  
+                href="#" data-toggle="modal" data-target="#myModal" >
+                  <img width="124px" height="124px" alt="Hike News" src="/css/images/mylogo.jpg">
+              </a>
+            
+            
+            <div class="navbar-collapse collapse">
+              <ul class="hnav navbar-nav">
+                
+                  <li> <a class="main-nav-link" href="/">首页</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/archives">归档</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/categories">分类</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/tags">标签</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/about">关于</a> </li>
+                
+                  <li><div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="请输入关键词..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(无标题)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div></li>
+            </div>
+          </div>
+                
+      </div>
+    </div>
+
+</header>
+
+
+
+      
+            
+      <div id="content" class="outer">
+        
+          <section id="main" style="float:none;"><article id="post-监控搭建" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" class="article-title" itemprop="name">
+      监控搭建
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2019/03/12/监控搭建/" class="article-date">
+	  <time datetime="2019-03-11T17:17:00.000Z" itemprop="datePublished">2019-03-12</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/监控/">监控</a>
+
+      
+	<a class="article-views">
+	<span id="busuanzi_container_page_pv">
+		阅读量<span id="busuanzi_value_page_pv"></span>
+	</span>
+	</a>
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>监控对于系统，尤其是分布式系统的重要性不言而喻。这里不多做概念的阐述，主要讲目前公司使用的监控架构简单的自动动手实现下。本文主要分两个重要模块，<br>一个是部署美团点评开源的分布式监控系统cat，另一个作为业务打点补充<code>statsd+graphite+grafana</code>构建业务打点监控系统。目前的这种结构是有些冗余的，<br>后续会慢慢探索优化。</p>
+<a id="more"></a>
+<h2 id="cat部署（集群模式）"><a href="#cat部署（集群模式）" class="headerlink" title="cat部署（集群模式）"></a>cat部署（集群模式）</h2><h3 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h3><p>cat版本：v3.0.0  </p>
+<p>系统：172.16.6.177（centos7）、172.16.6.178（centos7）</p>
+<p>服务器：tomcat8</p>
+<blockquote>
+<p>下载源代码，构建运行包</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 下载</span><br><span class="line">git clone https://github.com/dianping/cat.git</span><br><span class="line"></span><br><span class="line"># war打包</span><br><span class="line">mvn clean install -DskipTests</span><br><span class="line"></span><br><span class="line"># 重命名war包，cat要求部署路径http://ip:port/cat</span><br><span class="line">mv cat-alpha-3.0.0.war cat.war</span><br></pre></td></tr></table></figure>
+<p>若下载源码比较慢，可直接下载war包。</p>
+<blockquote>
+<p>tomcat配置（每个服务器）</p>
+</blockquote>
+<ul>
+<li><p>调整启动参数，修改 catalina.sh文件</p>
+<p>i. 需要每台CAT集群172.16.6.177、172.16.6.178都进行部署<br>ii. 建议使用cms gc策略<br>iii. 建议cat的使用堆大小至少10G以上，开发环境启动2G堆启动即可（自己玩就随便喽）</p>
+</li>
+<li><p>修改中文乱码 tomcat conf 目录下 server.xml</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;Connector port=&quot;8080&quot; protocol=&quot;HTTP/1.1&quot;</span><br><span class="line">           URIEncoding=&quot;utf-8&quot;    connectionTimeout=&quot;20000&quot;</span><br><span class="line">               redirectPort=&quot;8443&quot; /&gt;  &lt;!-- 增加  URIEncoding=&quot;utf-8&quot;  --&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>相关目录及配置文件</p>
+</blockquote>
+<ul>
+<li>创建目录（每个系统）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /data/applogs/cat</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>配置/data/appdatas/cat/client.xml（每台）</p>
+<p>i. 此配置文件的作用是所有的客户端都需要一个地址指向CAT的服务端<br>ii. 此文件可以通过运维统一进行部署和维护，比如使用puppet等运维工具<br>iii. 不同环境这份文件不一样，比如区分prod环境以及test环境，在美团点评内部一共是2套环境的CAT，一份是生产环境，一份是测试环境<br>iv. 注意：当路由错误，且该文件夹下存在client_cache.xml，请删除client_cache.xml，再重启服务  </p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 创建客户端配置文件</span><br><span class="line"></span><br><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;config mode=&quot;client&quot;&gt;</span><br><span class="line">    &lt;servers&gt;</span><br><span class="line">        &lt;server ip=&quot;172.16.6.177&quot; port=&quot;2280&quot; http-port=&quot;8080&quot;/&gt;</span><br><span class="line">        &lt;server ip=&quot;172.16.6.178&quot; port=&quot;2280&quot; http-port=&quot;8080&quot;/&gt;</span><br><span class="line">    &lt;/servers&gt;</span><br><span class="line">&lt;/config&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>安装CAT的数据库</li>
+</ul>
+<p>数据库的脚本文件 script/CatApplication.sql</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -uroot -Dcat &lt; CatApplication.sql</span><br></pre></td></tr></table></figure>
+<p>MySQL的一个系统参数：max_allowed_packet，其默认值为1048576(1M)，修改为1000M，修改完需要重启mysql</p>
+<p>注意：<br>    i. 集群共用一个数据库<br>   ii. 数据库编码使用utf8mb4，否则可能造成中文乱码等问题</p>
+<ul>
+<li>配置/data/appdatas/cat/datasources.xml（每台）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line"></span><br><span class="line">&lt;data-sources&gt;</span><br><span class="line">	&lt;data-source id=&quot;cat&quot;&gt;</span><br><span class="line">		&lt;maximum-pool-size&gt;3&lt;/maximum-pool-size&gt;</span><br><span class="line">		&lt;connection-timeout&gt;1s&lt;/connection-timeout&gt;</span><br><span class="line">		&lt;idle-timeout&gt;10m&lt;/idle-timeout&gt;</span><br><span class="line">		&lt;statement-cache-size&gt;1000&lt;/statement-cache-size&gt;</span><br><span class="line">		&lt;properties&gt;</span><br><span class="line">			&lt;driver&gt;com.mysql.jdbc.Driver&lt;/driver&gt;</span><br><span class="line">			&lt;url&gt;&lt;![CDATA[jdbc:mysql://172.16.6.177:3306/catdb]]&gt;&lt;/url&gt;  &lt;!-- 请替换为真实数据库URL及Port  --&gt;</span><br><span class="line">			&lt;user&gt;root&lt;/user&gt;  &lt;!-- 请替换为真实数据库用户名  --&gt;</span><br><span class="line">			&lt;password&gt;mysql&lt;/password&gt;  &lt;!-- 请替换为真实数据库密码  --&gt;</span><br><span class="line">			&lt;connectionProperties&gt;&lt;![CDATA[useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;socketTimeout=120000]]&gt;&lt;/connectionProperties&gt;</span><br><span class="line">		&lt;/properties&gt;</span><br><span class="line">	&lt;/data-source&gt;</span><br><span class="line">&lt;/data-sources&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>war部署</p>
+</blockquote>
+<ul>
+<li><p>将cat.war部署到tomcat下的webapps，启动tomcat</p>
+</li>
+<li><p>打开控制台的URL，<a href="http://172.16.6.177:8080/cat/s/config?op=routerConfigUpdate" target="_blank" rel="noopener">http://172.16.6.177:8080/cat/s/config?op=routerConfigUpdate</a></p>
+</li>
+<li><p>默认用户名：admin 默认密码：admin</p>
+</li>
+<li><p>集群路由配置</p>
+</li>
+</ul>
+<p>默认：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;router-config backup-server=&quot;127.0.0.1&quot; backup-server-port=&quot;2280&quot;&gt;</span><br><span class="line">   &lt;default-server id=&quot;127.0.0.1&quot; weight=&quot;1.0&quot; port=&quot;2280&quot; enable=&quot;true&quot;/&gt;</span><br><span class="line">   &lt;network-policy id=&quot;default&quot; title=&quot;默认&quot; block=&quot;false&quot; server-group=&quot;default_group&quot;&gt;</span><br><span class="line">   &lt;/network-policy&gt;</span><br><span class="line">   &lt;server-group id=&quot;default_group&quot; title=&quot;default-group&quot;&gt;</span><br><span class="line">      &lt;group-server id=&quot;127.0.0.1&quot;/&gt;</span><br><span class="line">   &lt;/server-group&gt;</span><br><span class="line">   &lt;domain id=&quot;cat&quot;&gt;</span><br><span class="line">      &lt;group id=&quot;default&quot;&gt;</span><br><span class="line">         &lt;server id=&quot;127.0.0.1&quot; port=&quot;2280&quot; weight=&quot;1.0&quot;/&gt;</span><br><span class="line">      &lt;/group&gt;</span><br><span class="line">   &lt;/domain&gt;</span><br><span class="line">&lt;/router-config&gt;</span><br></pre></td></tr></table></figure>
+<p>177服务器修改为（自动保存到数据库和178共用）：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">177：</span><br><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;router-config backup-server=&quot;172.16.6.178&quot; backup-server-port=&quot;2280&quot;&gt;</span><br><span class="line">   &lt;default-server id=&quot;172.16.6.177&quot; weight=&quot;1.0&quot; port=&quot;2280&quot; enable=&quot;true&quot;/&gt;</span><br><span class="line">   &lt;default-server id=&quot;172.16.6.178&quot; weight=&quot;1.0&quot; port=&quot;2280&quot; enable=&quot;true&quot;/&gt;</span><br><span class="line">   &lt;network-policy id=&quot;default&quot; title=&quot;default&quot; block=&quot;false&quot; server-group=&quot;default_group&quot;&gt;</span><br><span class="line">   &lt;/network-policy&gt;</span><br><span class="line">   &lt;server-group id=&quot;default_group&quot; title=&quot;default-group&quot;&gt;</span><br><span class="line">      &lt;group-server id=&quot;172.16.6.177&quot;/&gt;</span><br><span class="line">      &lt;group-server id=&quot;172.16.6.178&quot;/&gt;</span><br><span class="line">   &lt;/server-group&gt;</span><br><span class="line">   &lt;domain id=&quot;cat&quot;&gt;</span><br><span class="line">      &lt;group id=&quot;default&quot;&gt;</span><br><span class="line">         &lt;server id=&quot;172.16.6.177&quot; port=&quot;2280&quot; weight=&quot;1.0&quot;/&gt;</span><br><span class="line">         &lt;server id=&quot;172.16.6.178&quot; port=&quot;2280&quot; weight=&quot;1.0&quot;/&gt;</span><br><span class="line">      &lt;/group&gt;</span><br><span class="line">   &lt;/domain&gt;</span><br><span class="line">&lt;/router-config&gt;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>服务端配置</p>
+</blockquote>
+<p>配置链接：<a href="http://{ip:port}/cat/s/config?op=serverConfigUpdate" target="_blank" rel="noopener">http://{ip:port}/cat/s/config?op=serverConfigUpdate</a></p>
+<p>server.xml默认配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;server-config&gt;</span><br><span class="line">   &lt;server id=&quot;default&quot;&gt;</span><br><span class="line">      &lt;properties&gt;</span><br><span class="line">         &lt;property name=&quot;local-mode&quot; value=&quot;false&quot;/&gt;</span><br><span class="line">         &lt;property name=&quot;job-machine&quot; value=&quot;false&quot;/&gt;</span><br><span class="line">         &lt;property name=&quot;send-machine&quot; value=&quot;false&quot;/&gt;</span><br><span class="line">         &lt;property name=&quot;alarm-machine&quot; value=&quot;false&quot;/&gt;</span><br><span class="line">         &lt;property name=&quot;hdfs-enabled&quot; value=&quot;false&quot;/&gt;</span><br><span class="line">         &lt;property name=&quot;remote-servers&quot; value=&quot;127.0.0.1:8080&quot;/&gt;</span><br><span class="line">      &lt;/properties&gt;</span><br><span class="line">      &lt;storage local-base-dir=&quot;/data/appdatas/cat/bucket/&quot; max-hdfs-storage-time=&quot;15&quot; local-report-storage-time=&quot;2&quot; local-logivew-storage-time=&quot;1&quot; har-mode=&quot;true&quot; upload-thread=&quot;5&quot;&gt;</span><br><span class="line">         &lt;hdfs id=&quot;dump&quot; max-size=&quot;128M&quot; server-uri=&quot;hdfs://127.0.0.1/&quot; base-dir=&quot;/user/cat/dump&quot;/&gt;</span><br><span class="line">         &lt;harfs id=&quot;dump&quot; max-size=&quot;128M&quot; server-uri=&quot;har://127.0.0.1/&quot; base-dir=&quot;/user/cat/dump&quot;/&gt;</span><br><span class="line">         &lt;properties&gt;</span><br><span class="line">            &lt;property name=&quot;hadoop.security.authentication&quot; value=&quot;false&quot;/&gt;</span><br><span class="line">            &lt;property name=&quot;dfs.namenode.kerberos.principal&quot; value=&quot;hadoop/dev80.hadoop@testserver.com&quot;/&gt;</span><br><span class="line">            &lt;property name=&quot;dfs.cat.kerberos.principal&quot; value=&quot;cat@testserver.com&quot;/&gt;</span><br><span class="line">            &lt;property name=&quot;dfs.cat.keytab.file&quot; value=&quot;/data/appdatas/cat/cat.keytab&quot;/&gt;</span><br><span class="line">            &lt;property name=&quot;java.security.krb5.realm&quot; value=&quot;value1&quot;/&gt;</span><br><span class="line">            &lt;property name=&quot;java.security.krb5.kdc&quot; value=&quot;value2&quot;/&gt;</span><br><span class="line">         &lt;/properties&gt;</span><br><span class="line">      &lt;/storage&gt;</span><br><span class="line">      &lt;consumer&gt;</span><br><span class="line">         &lt;long-config default-url-threshold=&quot;1000&quot; default-sql-threshold=&quot;100&quot; default-service-threshold=&quot;50&quot;&gt;</span><br><span class="line">            &lt;domain name=&quot;cat&quot; url-threshold=&quot;500&quot; sql-threshold=&quot;500&quot;/&gt;</span><br><span class="line">            &lt;domain name=&quot;OpenPlatformWeb&quot; url-threshold=&quot;100&quot; sql-threshold=&quot;500&quot;/&gt;</span><br><span class="line">         &lt;/long-config&gt;</span><br><span class="line">      &lt;/consumer&gt;</span><br><span class="line">   &lt;/server&gt;</span><br><span class="line">   &lt;server id=&quot;127.0.0.1&quot;&gt;</span><br><span class="line">      &lt;properties&gt;</span><br><span class="line">         &lt;property name=&quot;job-machine&quot; value=&quot;true&quot;/&gt;</span><br><span class="line">         &lt;property name=&quot;send-machine&quot; value=&quot;true&quot;/&gt;</span><br><span class="line">         &lt;property name=&quot;alarm-machine&quot; value=&quot;true&quot;/&gt;</span><br><span class="line">      &lt;/properties&gt;</span><br><span class="line">   &lt;/server&gt;</span><br><span class="line">&lt;/server-config&gt;</span><br></pre></td></tr></table></figure></p>
+<p>177服务器修改为（自动保存到数据库和178服务器共用）：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;server-config&gt;</span><br><span class="line">   &lt;server id=&quot;default&quot;&gt;</span><br><span class="line">      &lt;properties&gt;</span><br><span class="line">         &lt;property name=&quot;local-mode&quot; value=&quot;false&quot;/&gt;</span><br><span class="line">         &lt;property name=&quot;job-machine&quot; value=&quot;false&quot;/&gt;</span><br><span class="line">         &lt;property name=&quot;send-machine&quot; value=&quot;false&quot;/&gt;</span><br><span class="line">         &lt;property name=&quot;alarm-machine&quot; value=&quot;false&quot;/&gt;</span><br><span class="line">         &lt;property name=&quot;hdfs-enabled&quot; value=&quot;false&quot;/&gt;</span><br><span class="line">         &lt;property name=&quot;remote-servers&quot; value=&quot;172.16.6.177:8080,172.16.6.178:8080&quot;/&gt;</span><br><span class="line">      &lt;/properties&gt;</span><br><span class="line">      &lt;storage local-base-dir=&quot;/data/appdatas/cat/bucket/&quot; max-hdfs-storage-time=&quot;15&quot; local-report-storage-time=&quot;7&quot; local-logivew-storage-time=&quot;7&quot; har-mode=&quot;true&quot; upload-thread=&quot;5&quot;&gt;</span><br><span class="line">      &lt;/storage&gt;</span><br><span class="line">      &lt;consumer&gt;</span><br><span class="line">         &lt;long-config default-url-threshold=&quot;1000&quot; default-sql-threshold=&quot;100&quot; default-service-threshold=&quot;50&quot;&gt;</span><br><span class="line">            &lt;domain name=&quot;cat&quot; url-threshold=&quot;500&quot; sql-threshold=&quot;500&quot;/&gt;</span><br><span class="line">            &lt;domain name=&quot;OpenPlatformWeb&quot; url-threshold=&quot;100&quot; sql-threshold=&quot;500&quot;/&gt;</span><br><span class="line">         &lt;/long-config&gt;</span><br><span class="line">      &lt;/consumer&gt;</span><br><span class="line">   &lt;/server&gt;</span><br><span class="line">   &lt;server id=&quot;172.16.6.178&quot;&gt;</span><br><span class="line">      &lt;properties&gt;</span><br><span class="line">         &lt;property name=&quot;job-machine&quot; value=&quot;true&quot;/&gt;</span><br><span class="line">         &lt;property name=&quot;alarm-machine&quot; value=&quot;true&quot;/&gt;</span><br><span class="line">         &lt;property name=&quot;send-machine&quot; value=&quot;true&quot;/&gt;</span><br><span class="line">      &lt;/properties&gt;</span><br><span class="line">   &lt;/server&gt;</span><br><span class="line">&lt;/server-config&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="问题总结"><a href="#问题总结" class="headerlink" title="问题总结"></a>问题总结</h3><p>事实上并非这么顺利，中间遇到了很多蛋疼的问题，泪崩。</p>
+<blockquote>
+<p>177服务器，外部访问8080不通</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line"># telnet测试端口</span><br><span class="line">[root@pingsrv19dev apache-tomcat-8.0.41]# telnet 172.16.6.177 8080</span><br><span class="line">Trying 172.16.6.177...</span><br><span class="line">telnet: connect to address 172.16.6.177: Connection refused</span><br><span class="line"></span><br><span class="line"># 查看防火墙状态</span><br><span class="line">[root@pingsrv18dev apache-tomcat-8.0.41]# firewall-cmd --state  </span><br><span class="line">not running  #关闭</span><br><span class="line"></span><br><span class="line"># 以为是iptables控制</span><br><span class="line">[root@pingsrv18dev apache-tomcat-8.0.41]# iptables -A INPUT -p tcp --dport 8080 -j ACCEPT</span><br><span class="line">[root@pingsrv18dev apache-tomcat-8.0.41]# iptables -A OUTPUT -p tcp --sport 8080 -j ACCEPT</span><br><span class="line">#添加端口允许后，测试仍不通</span><br><span class="line"></span><br><span class="line"># iptables查看端口映射，看到Chain DOCKER 8080被容器端口做过映射</span><br><span class="line">[root@pingsrv18dev apache-tomcat-8.0.41]# iptables -L -n</span><br><span class="line">Chain INPUT (policy ACCEPT)</span><br><span class="line">target     prot opt source               destination</span><br><span class="line">ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:8080</span><br><span class="line">ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:8080</span><br><span class="line">ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:8080</span><br><span class="line"></span><br><span class="line">Chain FORWARD (policy DROP)</span><br><span class="line">target     prot opt source               destination</span><br><span class="line">DOCKER-ISOLATION  all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line">DOCKER     all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line">ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED</span><br><span class="line">ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line">DOCKER     all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line">ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED</span><br><span class="line">ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line">ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line">DROP       all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT)</span><br><span class="line">target     prot opt source               destination</span><br><span class="line">ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp spt:8080</span><br><span class="line"></span><br><span class="line">Chain DOCKER (2 references)</span><br><span class="line">target     prot opt source               destination</span><br><span class="line">ACCEPT     tcp  --  0.0.0.0/0            172.18.0.2           tcp dpt:8080</span><br><span class="line">ACCEPT     tcp  --  0.0.0.0/0            172.17.0.2           tcp dpt:3306</span><br><span class="line"></span><br><span class="line">Chain DOCKER-ISOLATION (1 references)</span><br><span class="line">target     prot opt source               destination</span><br><span class="line">DROP       all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line">DROP       all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line">RETURN     all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line"></span><br><span class="line"># 查看容器，发现没有容器映射8080，猜测8080以前和容器端口做过映射，非正常关闭容器导致端口未被释放</span><br><span class="line">[root@pingsrv18dev ~]# docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                               NAMES</span><br><span class="line">3171a99b17fc        master/mysql        &quot;docker-entrypoint...&quot;   6 days ago          Up 3 days           0.0.0.0:3306-&gt;3306/tcp, 33060/tcp   mysql-master</span><br><span class="line"></span><br><span class="line"># 重启docker</span><br><span class="line">systemctl restart  docker</span><br><span class="line"></span><br><span class="line"># 再次查看，端口被释放</span><br><span class="line">[root@pingsrv18dev apache-tomcat-8.0.41]# iptables -L -n</span><br><span class="line">Chain INPUT (policy ACCEPT)</span><br><span class="line">target     prot opt source               destination</span><br><span class="line">ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:8080</span><br><span class="line">ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:8080</span><br><span class="line">ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:8080</span><br><span class="line"></span><br><span class="line">Chain FORWARD (policy DROP)</span><br><span class="line">target     prot opt source               destination</span><br><span class="line">DOCKER-ISOLATION  all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line">DOCKER     all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line">ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED</span><br><span class="line">ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line">ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line">DOCKER     all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line">ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED</span><br><span class="line">ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line">DROP       all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT)</span><br><span class="line">target     prot opt source               destination</span><br><span class="line">ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp spt:8080</span><br><span class="line"></span><br><span class="line">Chain DOCKER (2 references)</span><br><span class="line">target     prot opt source               destination</span><br><span class="line">ACCEPT     tcp  --  0.0.0.0/0            172.17.0.2           tcp dpt:3306</span><br><span class="line"></span><br><span class="line">Chain DOCKER-ISOLATION (1 references)</span><br><span class="line">target     prot opt source               destination</span><br><span class="line">DROP       all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line">DROP       all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line">RETURN     all  --  0.0.0.0/0            0.0.0.0/0</span><br><span class="line">[root@pingsrv18dev apache-tomcat-8.0.41]#</span><br><span class="line"></span><br><span class="line"># 启动tomcat后，查看端口，通了！！！</span><br><span class="line">[root@pingsrv19dev apache-tomcat-8.0.41]# telnet 172.16.6.177 8080</span><br><span class="line">Trying 172.16.6.177...</span><br><span class="line">Connected to 172.16.6.177.</span><br><span class="line">Escape character is &apos;^]&apos;.</span><br></pre></td></tr></table></figure>
+<h2 id="statsd-graphite-grafana"><a href="#statsd-graphite-grafana" class="headerlink" title="statsd + graphite + grafana"></a>statsd + graphite + grafana</h2><p>由于涉及到组件较多，这里采用docker部署方式。真是方便！！！！</p>
+<p>系统：172.16.6.91（centos7）</p>
+<blockquote>
+<p>下载镜像，创建容器</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">docker run -d\</span><br><span class="line"> --name graphite\</span><br><span class="line"> -p 80:80\</span><br><span class="line"> -p 81:81\</span><br><span class="line"> -p 2003-2004:2003-2004\</span><br><span class="line"> -p 2023-2024:2023-2024\</span><br><span class="line"> -p 8125:8125/udp\</span><br><span class="line"> -p 8126:8126\</span><br><span class="line"> -v /etc/localtime:/etc/localtime:ro\</span><br><span class="line"> hopsoft/graphite-statsd</span><br></pre></td></tr></table></figure>
+<p>事情并非想象中的简单，报错了：docker: Error response from daemon: OCI runtime create failed: container_linux.go:344: starting container process caused “process_linux.go:293: copying bootstrap data to pipe caused \”write init-p: broken pipe\””: unknown.</p>
+<p>google了一下大体原因是centos的kernel版本太低。so只能升级kernel核心版本喽！！</p>
+<p>具体步骤不搬了，都在这里，我是按照这个执行的，最后成功啦：<a href="https://www.howtoforge.com/tutorial/how-to-upgrade-kernel-in-centos-7-server/" target="_blank" rel="noopener">https://www.howtoforge.com/tutorial/how-to-upgrade-kernel-in-centos-7-server/</a></p>
+<blockquote>
+<p>容器包含的组件</p>
+</blockquote>
+<p>Includes the following components：  </p>
+<ul>
+<li>Nginx - reverse proxies the graphite dashboard  </li>
+<li>Graphite - front-end dashboard  </li>
+<li>Carbon - back-end   </li>
+<li>Statsd - UDP based back-end proxy  </li>
+<li>Grafana - front-end dashboard (more refined than Graphite)  </li>
+</ul>
+<blockquote>
+<p>statsd 打点</p>
+</blockquote>
+<p>centos执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">while true; do echo -n &quot;example:$((RANDOM % 100))|c&quot; | nc -w 1 -u 127.0.0.1 8125; done</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>graphite 查看</p>
+</blockquote>
+<p>默认账号：<br>username: root<br>password: root<br>email: root.graphite@mailinator.com  </p>
+<p>查看：<a href="http://172.16.6.91:81/render?from=-10mins&amp;until=now&amp;target=stats.example" target="_blank" rel="noopener">http://172.16.6.91:81/render?from=-10mins&amp;until=now&amp;target=stats.example</a></p>
+<blockquote>
+<p>grafana </p>
+</blockquote>
+<p>默认账号：<br>username: admin<br>password: admin<br>email: admin@localhost  </p>
+<p>连接时序数据graphite：<br>Visit <a href="http://172.16.6.91/datasources/new" target="_blank" rel="noopener">http://172.16.6.91/datasources/new</a> Then configure the Graphite data source with the URL <a href="http://172.16.6.91:81" target="_blank" rel="noopener">http://172.16.6.91:81</a></p>
+<p>配置dashboard：<br>metrics路径：stats.example</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <div id="donation_div"></div>
+
+<script src="/js/vdonate.js"></script>
+<script>
+var a = new Donate({
+  title: '如果觉得我的文章对您有用，请随意打赏。您的支持将鼓励我继续创作!', // 可选参数，打赏标题
+  btnText: '打赏支持', // 可选参数，打赏按钮文字
+  el: document.getElementById('donation_div'),
+  wechatImage: 'https://raw.githubusercontent.com/alvin6233/alvin6233.github.io/master/css/images/WechatPay.png',
+  alipayImage: 'https://raw.githubusercontent.com/alvin6233/alvin6233.github.io/master/css/images/AliPay.png'
+});
+</script>
+      
+      
+      <div>
+        <ul class="post-copyright">
+          <li class="post-copyright-author">
+          <strong>本文作者:  </strong>alvin dong</a>
+          </li>
+          <li class="post-copyright-link">
+          <strong>本文链接:  </strong>
+          <a href="/2019/03/12/监控搭建/" target="_blank" title="监控搭建">https://dongz.me/2019/03/12/监控搭建/</a>
+          </li>
+          <li class="post-copyright-license">
+            <strong>版权声明:   </strong>
+            本博客所有文章除特别声明外，均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+            许可协议。转载请注明出处
+          </li>
+         
+        </ul>
+<div>
+
+      
+      
+        
+	<div id="comment">
+		<!-- 来必力City版安装代码 -->
+		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
+		<script type="text/javascript">
+		   (function(d, s) {
+		       var j, e = d.getElementsByTagName(s)[0];
+
+		       if (typeof LivereTower === 'function') { return; }
+
+		       j = d.createElement(s);
+		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+		       j.async = true;
+
+		       e.parentNode.insertBefore(j, e);
+		   })(document, 'script');
+		</script>
+		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+		</div>
+		<!-- City版安装代码已完成 -->
+	</div>
+
+
+
+      
+      
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2019/03/07/HTTP协议/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">HTTP协议</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- Table of Contents -->
+
+  <aside id="toc-sidebar">
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#cat部署（集群模式）"><span class="nav-number">1.</span> <span class="nav-text">cat部署（集群模式）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实战"><span class="nav-number">1.1.</span> <span class="nav-text">实战</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题总结"><span class="nav-number">1.2.</span> <span class="nav-text">问题总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#statsd-graphite-grafana"><span class="nav-number">2.</span> <span class="nav-text">statsd + graphite + grafana</span></a></li></ol>
+    
+    </div>
+  </aside>
+
+</section>
+        
+      </div>
+      
+      <footer id="footer">
+  
+
+  <div class="container">
+      	<div class="row">
+	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
+	      <p id="copyRightEn">Copyright &copy; 2013 - 2019 alvin&#39;s blog All Rights Reserved.</p>
+	      
+	      
+    		<p class="busuanzi_uv">
+				访客数 : <span id="busuanzi_value_site_uv"></span> |  
+				访问量 : <span id="busuanzi_value_site_pv"></span>
+		    </p>
+  		   
+		</div>
+
+		
+  </div>
+</footer>
+
+
+<!-- min height -->
+
+<script>
+    var wrapdiv = document.getElementById("wrap");
+    var contentdiv = document.getElementById("content");
+    var allheader = document.getElementById("allheader");
+
+    wrapdiv.style.minHeight = document.body.offsetHeight + "px";
+    if (allheader != null) {
+      contentdiv.style.minHeight = document.body.offsetHeight - allheader.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    } else {
+      contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    }
+</script>
+    </div>
+    <!-- <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">home</a>
+  
+    <a href="/archives" class="mobile-nav-link">archives</a>
+  
+    <a href="/categories" class="mobile-nav-link">categories</a>
+  
+    <a href="/tags" class="mobile-nav-link">tags</a>
+  
+    <a href="/about" class="mobile-nav-link">about</a>
+  
+</nav> -->
+    
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/scripts.js"></script>
+
+
+
+
+  <script src="/js/dialog.js"></script>
+
+
+
+
+
+
+
+
+	<div style="display: none;">
+    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
+  </div>
+
+
+
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+	</script>
+
+
+
+
+
+
+  </div>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">设置</h2>
+      </div>
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+
+
+      <div class="modal-body">
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="javascript:setFontSize();" aria-expanded="true" aria-controls="collapseOne">
+              正文字号大小
+            </a>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body">
+            您已调整页面字体大小
+          </div>
+        </div>
+      
+
+
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="javascript:setBackground();" aria-expanded="true" aria-controls="collapseTwo">
+              夜间护眼模式
+            </a>
+        </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="panel-body">
+            夜间模式已经开启，再次单击按钮即可关闭 
+          </div>
+        </div>
+
+        <div>
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关 于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>
+         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+          <div class="panel-body">
+            alvin&#39;s blog
+          </div>
+          <div class="panel-body">
+            Copyright © 2019 alvin dong All Rights Reserved.
+          </div>
+        </div>
+      </div>
+
+
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+  
+    <a id="menu-switch"><i class="fa fa-bars fa-lg"></i></a>
+  
+</body>
+</html>

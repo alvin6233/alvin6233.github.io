@@ -260,6 +260,61 @@
         
           <section id="main" style="float:none;">
   
+    <article id="post-监控搭建"  class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" itemprop="name">
+      <a class="article-title" href="/2019/03/12/监控搭建/">监控搭建</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2019/03/12/监控搭建/" class="article-date">
+	  <time datetime="2019-03-11T17:17:00.000Z" itemprop="datePublished">2019-03-12</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/监控/">监控</a>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- alvin edit
+          <p class="article-excerpt-content">
+          监控对于系统，尤其是分布式系统的重要性不言而喻。这里不多做概念的阐述，主要讲目前公司使用的监控架构简单的自动动手实现下。本文主要分两个重要模块，一个是部署美团点评开源的分布式监控系统cat，另一个作为业务打点补充statsd+graphite+grafana构建业务打点监控系统。目前的这种结构是有些冗余的，后续会慢慢探索优化。
+
+cat部署（集群模式）实战cat版本：v3.0.0  
+系统：172.16.6.177（centos7）、172.16.6.178（centos7）
+服务器：to...
+        </p> -->
+        <p>监控对于系统，尤其是分布式系统的重要性不言而喻。这里不多做概念的阐述，主要讲目前公司使用的监控架构简单的自动动手实现下。本文主要分两个重要模块，<br>一个是部署美团点评开源的分布式监控系统cat，另一个作为业务打点补充<code>statsd+graphite+grafana</code>构建业务打点监控系统。目前的这种结构是有些冗余的，<br>后续会慢慢探索优化。</p>        
+        <p class="article-more-link">
+        <a href="/2019/03/12/监控搭建/#more">阅读全文</a>             </p>
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+      
+
+    </footer>
+  </div>
+  
+</article>
+
+<!-- Table of Contents -->
+
+
+  
     <article id="post-HTTP协议"  class="article article-type-post" itemscope itemprop="blogPost" >
   <div id="articleInner" class="article-inner">
     
@@ -762,66 +817,6 @@ key是可能发生竞争的资源唯一标示，例如：my_resource_id资...
 <p>本文由简单到负责讲解redis分布式锁，最后以通用框架redisson来实战演练。<br>        
         <p class="article-more-link">
         <a href="/2019/02/24/redis实现分布式锁/#more">阅读全文</a>             </p>
-      
-    </div>
-    <footer class="article-footer">
-      
-      
-      
-      
-
-    </footer>
-  </div>
-  
-</article>
-
-<!-- Table of Contents -->
-
-
-  
-    <article id="post-zookeeper实现分布式锁"  class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="thumb" itemprop="name">
-      <a class="article-title" href="/2019/01/21/zookeeper实现分布式锁/">zookeeper实现分布式锁</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2019/01/21/zookeeper实现分布式锁/" class="article-date">
-	  <time datetime="2019-01-21T15:32:00.000Z" itemprop="datePublished">2019-01-21</time>
-	</a>
-
-      
-    <a class="article-category-link" href="/categories/分布式/">分布式</a>
-
-      
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-      <!-- alvin edit
-          <p class="article-excerpt-content">
-          zookeeper能够保障分布式场景下数据的一致性、有序性、原子性及可靠性，它的所有写入动作会在主节点持久化，并在集群过半数节点写入成功才会返回；它也能够支持节点的崩溃恢复以及客户端的最终一致性视图。对于分布式锁场景来说，数据一致性的保障、以及锁服务的容灾保障至关重要。
-本章主要是curator框架结合zookeeper实现分布式锁。
-zookeeper分布式锁实现原理原理还是看下大佬们的总结吧：  
-
-主要：  
-
-七张图彻底讲清楚ZooKeeper分布式锁的实现原理  
-
-其它：   ...
-        </p> -->
-        <p><code>zookeeper</code>能够保障分布式场景下数据的一致性、有序性、原子性及可靠性，它的所有写入动作会在主节点持久化，并在集群过半数节点写入成功才会返回；<br>它也能够支持节点的崩溃恢复以及客户端的最终一致性视图。对于分布式锁场景来说，数据一致性的保障、以及锁服务的容灾保障至关重要。</p>
-<p>本章主要是curator框架结合zookeeper实现分布式锁。<br>        
-        <p class="article-more-link">
-        <a href="/2019/01/21/zookeeper实现分布式锁/#more">阅读全文</a>             </p>
       
     </div>
     <footer class="article-footer">
